@@ -1,0 +1,48 @@
+msgid "Workpoint"
+msgstr "Работа с точками"
+
+msgid "workpoint"
+msgstr "работа с точками"
+
+msgid "ability"
+msgstr "возможность"
+
+msgid "abilities"
+msgstr "возможности по скорости"
+
+msgid "city"
+msgstr "город"
+
+msgid "cities"
+msgstr "города"
+
+msgid "distinct"
+msgstr "район"
+
+msgid "distincts"
+msgstr "районы города"
+
+msgid "point"
+msgstr "координаты"
+
+msgid "points"
+msgstr "координаты точек"
+
+msgid "operator"
+msgstr "оператор"
+
+msgid "operators"
+msgstr "операторы"
+
+msgid "modem_type"
+msgstr "тип"
+
+msgid "modem_types"
+msgstr "типы модемов"
+
+msgid "speed_at_point"
+msgstr "значение"
+
+msgid "speed_at_points"
+msgstr "скорость в точках"
+

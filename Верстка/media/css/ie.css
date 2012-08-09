@@ -1,0 +1,24 @@
+@charset "utf-8";
+
+.col,
+.menu li,
+.select,
+.map_fullscreen,
+.map_slider_scale li,
+.bar1, .bar2, .bar_val, .bar_logo,
+.btn1,
+.overall h2, .average,
+.average_label,
+.op_stat_logo, .op_stat_name, .counter, .op_stat_lnk,
+.footer_menu li {
+	*display:inline;
+	*zoom:1;
+}
+..select_curr div {
+	*position:relative;
+	*zoom:1;
+}
+
+.wrapper {
+	outline: 3px solid #ddd;
+}

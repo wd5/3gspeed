@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block center %}
+    <h1>Что-то интересует?</h1>
+    <a href="/faq/sendquestion/" class="_to_faq fancybox">Задать вопрос</a>
+    {% if questionCategory %}
+    <h2>Вопросы по категории {{ questionCategory.title }}</h2>
+
+    <div class="faq">
+        {% for question in questionCategory.get_questions %}
+            <div class="question">
+                <div class="author">Спрашивает <span class="author_name">{{ question.name }},</span> <span class="author_date">{{ question.pub_date|date:"j E" }} в {{ question.pub_date|date:"H:i" }}</span>
+                </div>
+                <p>{{ question.question }}</p>
+                <div class="tail qst"></div>
+            </div>
+            {% if question.answer %}
+                <div class="answer">
+                    <div class="author">Отвечает <span class="author_name">{{ question.author }},</span> <span class="author_date">{{ question.ans_date|date:"j E" }} в {{ question.ans_date|date:"H:i" }}</span>
+                    </div>
+                    <p>{{ question.answer }}</p>
+                    <div class="tail ans"></div>
+                </div>
+            {% endif %}
+        {% empty %}
+            Вопросов пока нет
+        {% endfor %}
+    </div><!-- /faq -->
+    {% endif %}
+{% endblock %}

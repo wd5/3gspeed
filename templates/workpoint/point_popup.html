@@ -1,0 +1,94 @@
+{% load thumbnail %}
+<div class="map_popup"><!--style="position: absolute; left: 100px; bottom: 200px;"-->
+    <div class="tab op_all">
+        <div class="map_popup_info">
+            <table class="map_popup_info_table">
+                <thead>
+                    <tr>
+                        <th class="curr map_popup_op map_popup_op_3gspeed"><div><img src="/media/img/3gspeed.png" alt="op_all" /></div></th>
+                        {% for operator in operators %}
+                            <th class="map_popup_op">
+                                <div>
+                                    <img src="{{ operator.icon.url }}" width="35px" height="35px" alt="op_{{ operator.id }}" />
+                                </div> {{ operator.title }}
+                            </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="map_popup_info_label">Средняя скорость, <div>Мбит/с</div></td>
+                        {% for operator in operators %}
+                            <td class="map_popup_info_val">{{ operator.avg_speed }}</td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="map_popup_ics">
+            {% for ability  in abilities %}
+                <span class="map_popup_ic{{ ability.id }}" title="{{ ability.title }}"></span>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% for operator in operators %}
+        <div class="tab_hidden tab op_{{ operator.id }}" >
+            <div class="map_popup_info">
+                <table class="map_popup_info_table">
+                    <thead>
+                        <tr>
+                            <th class="map_popup_op map_popup_op_3gspeed"><div><img src="/media/img/3gspeed.png" alt="op_all" /></div></th>
+                            {% for item in operators %}
+                                <th class="{% if item.id == operator.id %}curr {% endif %}map_popup_op">
+                                    <div>
+                                        <img src="{{ item.icon.url }}" width="35px" height="35px" alt="op_{{ item.id }}" />
+                                    </div>
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                </table>
+
+                <table class="map_popup_info_detail">
+                    <thead>
+                        <tr>
+                            <th>Средняя скорость</th>
+                            <th>Тип модема</th>
+                            <th>Мбит/с</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="4">
+                                <div class="counter">
+                                    <div class="counter_val">{{ operator.avg_speed }}</div>
+                                    <div class="counter_glass"></div>
+                                </div>
+                                <div>Мбит/с</div>
+                            </td>
+                        {% for pt_speed in operator.point_spd_set %}
+                            {% if not forloop.first %}
+                            <tr {% cycle 'class="row2"' '' %}>
+                            {% endif %}
+                                <td>{{ pt_speed.modem_type.get_download_speed_type }}</td>
+                                <td>{{ pt_speed.get_MBs }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="map_popup_ics">
+                {% for op_ability in operator.abilities %}
+                    <span class="map_popup_ic{{ op_ability.id }}" title="{{ op_ability.title }}"></span>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+
+    <div class="map_popup_close"></div>
+    <div class="map_popup_b"></div>
+</div>

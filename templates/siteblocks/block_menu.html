@@ -1,0 +1,14 @@
+{% load mptt_tags %}
+
+<ul class="root">
+    {% recursetree menu %}
+        <li{% if node.is_active %} class="active" style="font-weight: bold;"{% endif %}>
+            <a href="{{ node.url }}">{{ node.title }}</a>
+            {% if not node.is_leaf_node %}
+                <ul class="children">
+                    {{ children }}
+                </ul>
+            {% endif %}
+        </li>
+    {% endrecursetree %}
+</ul>

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% load thumbnail siteblocks_extras %}
+
+{% if page.title %}
+    {% block title %}
+        {{ page.title }} &mdash;
+    {% endblock %}
+{% endif %}
+
+{% block center %}
+    <div class="text text_page">
+        <h1>{{ page.title }}</h1>
+        {% if page.image %}
+            <p>
+                {% thumbnail page.image "374x252" as  small %}
+                    <img src="{{ small.url }}" width="{{ small.x }}" height="{{ small.y }}" alt="" />
+                {% endthumbnail %}
+            </p>
+        {% endif %}
+        {{ page.content|safe }}
+
+    </div>
+    <div class="classes2">
+        <ul>
+            <li><a href="#members">Регистрация пилотов</a></li>
+            <li><a href="#guests">Регистрация зрителей</a></li>
+        </ul>
+    </div>
+    <div class="subpage" id="members" style="display: none;">
+        <div class="text text_page">
+            {{ members.content|safe }}
+        </div>
+        {% if block_reg %}
+            {{ block_reg|safe }}
+        {% endif %}
+    </div>
+    <div class="subpage" id="guests" style="display: none;">
+        <div class="text text_page">
+            {{ guests.content|safe }}
+        </div>
+        <form action="#guests" method="post" class="guest_form">
+        {% if send %}
+            <p>Приглашение отправлено на Ваш адрес электронной почты.</p>
+        {% else %}
+            <div class="input"><label for="id_name">ФИО</label>{{ form.name }}{{ form.name.errors }}</div>
+            <div class="input"><label for="id_phone">Телефон</label>{{ form.phone }}{{ form.phone.errors }}</div>
+            <div class="input"><label for="id_email">E-mail</label>{{ form.email }}{{ form.email.errors }}</div>
+            <div class="check"><label for="id_parking">{{ form.parking }} Требуется автопарковка</label></div>
+            <div class="input">{{ form.captcha }}{{ form.captcha.errors }}</div>
+            <div class="submit"><input style="font: 12px/15px 'Arial', sans-serif;" type="submit" value="Получить приглашение" /></div>
+        {% endif %}
+        </form>
+    </div>
+
+{% endblock %}

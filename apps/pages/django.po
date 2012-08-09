@@ -1,0 +1,11 @@
+msgid "Pages"
+msgstr "Структура сайта"
+
+msgid "pages"
+msgstr "структура сайта"
+
+msgid "page_items"
+msgstr "страницы"
+
+msgid "page_item"
+msgstr "страница"

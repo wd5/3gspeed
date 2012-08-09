@@ -1,0 +1,14 @@
+{% if news %}
+    <div class="news">
+        <div class="new new_main">{{ news.0.text|safe }}</div>
+        {% for new in news %}
+            {% if not forloop.first %}
+                <div class="new">
+                    <div class="new_date">{{ new.date_create|date:"j E" }}</div>
+                    <div class="new_text">{{ new.text|safe }}</div>
+                </div>
+            {% endif %}
+        {% endfor %}
+        <div class="news_b"></div>
+    </div><!--/news-->
+{% endif %}

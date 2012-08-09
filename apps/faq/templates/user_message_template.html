@@ -1,0 +1,12 @@
+<p>
+    <h2>{{ site_name }} - Ответ на ваш вопрос</h2>
+    <hr>
+    <p>Дата: {{ saved_object.pub_date }}</p>
+    <p>Имя: {{ saved_object.name }}</p>
+    <p>Email: {{ saved_object.email }}</p>
+    <p>Вопрос: {{ saved_object.question }}</p>
+    <hr>
+    <p>Дата ответа:{{ saved_object.ans_date }}</p>
+    <p>Автор:{{ saved_object.author }}</p>
+    <p>Ответ:<br>{{ saved_object.answer|safe }}</p>
+</p>

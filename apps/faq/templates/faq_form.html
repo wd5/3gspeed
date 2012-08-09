@@ -1,0 +1,14 @@
+<form action="" class="modal_form" method="post">
+    <div class="textarea"><span></span>
+        {{ form.question }}
+        {{ form.question.errors }}
+    </div>
+    <div class="input name"><span></span>
+        {{ form.name }}
+        {{ form.name.errors }}
+    </div>
+    <div class="input mail"><span></span>{{ form.email }}{{ form.email.errors }}</div>
+    <div class="submit">
+        <div><input type="button" value="Спросить" id="send_question" /></div>
+    </div>
+</form>

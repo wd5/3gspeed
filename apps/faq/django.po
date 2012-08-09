@@ -1,0 +1,17 @@
+msgid "Faq"
+msgstr "Вопрос/Ответ"
+
+msgid "faq"
+msgstr "вопрос/Ответ"
+
+msgid "questions"
+msgstr "вопросы"
+
+msgid "question"
+msgstr "вопрос"
+
+msgid "question_category"
+msgstr "категория"
+
+msgid "question_categories"
+msgstr "категории вопросов"

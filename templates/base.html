@@ -1,0 +1,92 @@
+{% load siteblocks_extras %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="/media/css/style.css" rel="stylesheet" type="text/css" />
+<!--[if lte IE 8]><link rel="stylesheet" type="text/css" media="screen" href="/media/css/ie.css" /><![endif]-->
+<script type="text/javascript" src="/media/js/jquery.js"></script>
+<script type="text/javascript" src="/media/js/jquery-ui-1.8.21.custom.min.js"></script>
+{% block extended_js %}
+{% endblock %}
+<script type="text/javascript" src="/media/js/script.js"></script>
+    <title>
+        {% block title %}
+            {% if meta.title %}
+                {% ifnotequal meta.title ''  %}
+                    {{ meta.title }} &mdash;
+                {% endifnotequal %}
+            {% endif %}
+        {% endblock %}
+        {{ site_name }}
+    </title>
+</head>
+
+<body>
+<div class="wrapper">
+
+<!--PAGE-->
+<div class="page">
+
+    <!--HEADER-->
+	<div class="header">
+	<div class="header_in">
+		<a id="logo_box" href="/" title="3GSpeed">
+			<img id="logo" src="/media/img/logo.png" alt="3GSpeed" />
+			<span id="logo_note">Измеряем мобильный интернет</span>
+		</a>
+
+		<div class="search">
+			<input class="search_input" type="text" placeholder="Поиск по адресу" />
+		</div>
+
+		<div class="menu">
+			<ul>
+				<li><a href="/about/">О проекте</a></li>
+				<li><a href="/statistic/">Статистика</a></li>
+			</ul>
+		</div><!--/menu-->
+
+		<div class=""></div>
+		<div class="measure{% if processing %} measure_active{% endif %} ">Идут замеры</div>
+	</div>
+	</div>
+    <!--/HEADER-->
+
+
+    <!--MAIN-->
+	<div class="main{% block class_main %}{% endblock %}">
+        {% block main %}{% endblock %}
+    </div>
+   <!--/MAIN-->
+
+
+    <!--FOOTER-->
+     <div class="footer">
+     <div class="footer_in">
+ 		<div id="copyright">© {% now "Y" %} 3GSpeed</div>
+
+ 		<div class="footer_soc">
+ 			Ищите нас в —
+ 			<a href="#"><img src="/media/img/t.png" alt="t" /></a>
+ 			<a href="#"><img src="/media/img/fb.png" alt="f" /></a>
+ 		</div>
+
+ 		<div class="footer_menu">
+ 			<ul>
+ 				<li><img src="/media/img/ic_about.png" alt="" /><a href="/about/">О проекте</a></li>
+ 				<li><img src="/media/img/ic_stat.png" alt="" /><a href="/statistic/">Статистика</a></li>
+ 			</ul>
+ 		</div><!--/footer_menu-->
+
+ 		<a id="madein" title="Разработка сайта — студия OctoberWeb" href="http://octoberweb.ru/"><img id="octoberweb" alt="Разработка сайта — студия OctoberWeb" src="/media/img/octoberweb.png" width="32" height="32"/>разработка сайта <span>OctoberWeb</span></a>
+     </div>
+     </div>
+     <!--/FOOTER-->
+
+</div>
+<!--/PAGE-->
+
+</div><!--/wrapper-->
+</body>
+</html>

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% load thumbnail siteblocks_extras %}
+
+
+{% block extended_js %}
+{% comment %}    <script src="http://api-maps.yandex.ru/2.0/?load=package.full&mode=debug&lang=ru-RU" type="text/javascript"></script>
+    <script type="text/javascript">
+    $(function(){
+
+        ymaps.ready(function () {
+                var map = new ymaps.Map("map",
+                    {
+                        center: [59.930879,30.329349],
+                        zoom: 14,
+                        type: "yandex#publicMap"
+                    }
+                );
+                map.controls.add("zoomControl");
+
+            // Создаем коллекцию, в которую будем добавлять метки
+            //pointsSet = new ymaps.GeoObjectCollection();
+
+            {% for point in points %}
+                var point_{{ point.id }} = new ymaps.Placemark(
+                    [{{ point.Latitude|formatted_float }},{{ point.Longitude|formatted_float }}]
+                );
+                map.geoObjects.add(point_{{ point.id }});
+            {% endfor %}
+
+
+        });
+    });
+    </script>{% endcomment %}
+{% endblock %}
+
+{% block main %}
+    {{ result }}
+    <div class="index_map_out">
+        <div class="index_map">
+            <div class="map" id="map">
+            </div><!--/map-->
+
+            <div class="map_ctrls">
+                {% if cities != False %}
+                    <div class="map_city_select select">
+                        <div class="select_curr">{{ city_curr.title }}<div></div></div>
+                        {% if cities %}
+                            <div class="select_drop">
+                                <ul>
+                                    <li><a href="#">Москва</a></li>
+                                    <li><a href="#">Нижний Новгород</a></li>
+                                    <li><a href="#">Чита</a></li>
+                                    <li><a href="#">Комсомольск-на-Амуре</a></li>
+                                    <li><a href="#">Нижний Новгород</a></li>
+                                    <li><a href="#">Чита</a></li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {% if operators %}
+                    <div class="map_op_select select">
+                    <div class="select_curr">Оператор<div></div></div>
+                    <div class="select_drop">
+                        <ul>
+                            <li><a href="#">Все</a></li>
+                            {% for operator in operators %}
+                                <li><a href="#">{{ operator.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+                {% if mtypes %}
+                    <div class="map_modem_select select">
+                        <div class="select_curr">Тип модема<div></div></div>
+                        <div class="select_drop">
+                            <ul>
+                                {% for type in mtypes %}
+                                    <li><a href="#">{{ type.download_speed|floatformat }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="map_fullscreen" title="Во весь экран"></div>
+            </div><!--/map_ctrls-->
+
+            <div class="map_filter">
+                <div class="map_filter_in">
+                    <div class="map_slider_ics">
+                        <span class="map_slider_ic1" title="Почта"></span>
+                        <span class="map_slider_ic2 map_slider_ic2_active" title="Мессенджеры"></span>
+                        <span class="map_slider_ic3 map_slider_ic3_active" title="Социальные сети"></span>
+                        <span class="map_slider_ic4 map_slider_ic4_active" title="Звонки"></span>
+                        <span class="map_slider_ic5" title="Видеозвонки"></span>
+                        <span class="map_slider_ic6" title="Видео"></span>
+                        <span class="map_slider_ic7" title="HD-видео"></span>
+                    </div><!--/map_slider_ics-->
+
+                    <div id="map_slider">
+                    </div>
+
+                    <div class="map_slider_scale">
+                        <ul>
+                            <li>0</li>
+                            <li>0.2</li>
+                            <li>0.4</li>
+                            <li>0.6</li>
+                            <li>0.8</li>
+                            <li>1.0</li>
+                            <li>1.2</li>
+                            <li>1.4</li>
+                            <li>1.6</li>
+                            <li>1.8</li>
+                            <li>2.0</li>
+                            <li>2.2</li>
+                            <li>2.4</li>
+                            <li>2.6</li>
+                            <li>2.8</li>
+                            <li>3.0</li>
+                            <li class="map_slider_scale_last">(Мбит/с)</li>
+                        </ul>
+                    </div><!--/map_slider_scale-->
+                </div><!--/map_filter_in-->
+
+                <div class="filter_toggle filter_toggle_hide"></div>
+                <!--<div class="filter_toggle filter_toggle_show"></div>-->
+            </div><!--/map_filter-->
+        </div><!--/index_map-->
+    </div><!--/index_map_out-->
+{% endblock %}
+

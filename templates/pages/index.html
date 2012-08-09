@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% load thumbnail %}
+
+{% if page.title %}
+    {% block title %}
+        {{ page.title }} &mdash;
+    {% endblock %}
+{% endif %}
+
+{% block center %}
+    <div class="text text_page">
+        {% if page.image %}
+            <p>
+                {% thumbnail page.image "374x252" as  small %}
+                    <img src="{{ small.url }}" width="{{ small.x }}" height="{{ small.y }}" alt="" />
+                {% endthumbnail %}
+            </p>
+        {% endif %}
+        {{ page.content|safe }}
+    </div>
+{% endblock %}
+

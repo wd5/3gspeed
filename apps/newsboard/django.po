@@ -1,0 +1,18 @@
+msgid "Newsboard"
+msgstr "Новости"
+
+msgid "newsboard"
+msgstr "новости"
+
+msgid "news_items"
+msgstr "новости"
+
+msgid "news_item"
+msgstr "новость"
+
+msgid "new_photo"
+msgstr "изображение"
+
+msgid "new_photos"
+msgstr "изображения для новости"
+

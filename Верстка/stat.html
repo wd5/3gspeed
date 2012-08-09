@@ -1,0 +1,329 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="media/css/style.css" rel="stylesheet" type="text/css" />
+<!--[if lte IE 8]><link rel="stylesheet" type="text/css" media="screen" href="media/css/ie.css" /><![endif]--> 
+<script type="text/javascript" src="media/js/jquery.js"></script>
+<script type="text/javascript" src="media/js/jquery-ui-1.8.21.custom.min.js"></script>
+<script type="text/javascript" src="media/js/script.js"></script>
+<title>3GSpeed</title>
+</head>
+
+<body>
+<div class="wrapper">
+
+<!--PAGE-->
+<div class="page">
+
+    <!--HEADER-->
+	<div class="header">
+	<div class="header_in">
+		<a id="logo_box" href="/" title="3GSpeed">
+			<img id="logo" src="media/img/logo.png" alt="3GSpeed" />
+			<span id="logo_note">Измеряем мобильный интернет</span>
+		</a>
+		
+		<div class="search">
+			<input class="search_input" type="text" placeholder="Поиск по адресу" />
+		</div>
+				
+		<div class="menu">
+			<ul>
+				<li><a href="#">О проекте</a></li>
+				<li><a href="#">Статистика</a></li>
+			</ul>
+		</div><!--/menu-->
+		
+		<div class=""></div>
+		
+		<div class="measure">Идут замеры</div>
+	</div>
+	</div>
+    <!--/HEADER-->
+
+
+    <!--MAIN-->
+	<div class="main">
+		<div class="mappy">
+			<a class="btn1" href="#">Перейти к карте</a>
+		</div><!--/mappy-->
+		
+		<div class="overall">
+			<div class="main_in">
+				<h2>Общая статистика</h2>
+				
+				<div class="select">
+					<div class="select_curr">Санкт-Петербург<div></div></div>
+					<div class="select_drop">
+						<ul>
+							<li><a href="#">Москва</a></li>
+							<li><a href="#">Нижний Новгород</a></li>
+							<li><a href="#">Чита</a></li>
+							<li><a href="#">Комсомольск-на-Амуре</a></li>
+							<li><a href="#">Нижний Новгород</a></li>
+							<li><a href="#">Чита</a></li>
+						</ul>
+					</div>
+				</div>
+				
+				<div class="select">
+					<div class="select_curr">Район<div></div></div>
+					<div class="select_drop">
+						<ul>
+							<li><a href="#">Южное Бутово</a></li>
+							<li><a href="#">Вологодский сувенир</a></li>
+							<li><a href="#">Невский фронт не сдается</a></li>
+						</ul>
+					</div>
+				</div>
+				
+				<div class="average">
+					<span class="average_label">Средняя скорость по городу</span>
+					<span class="average_val">2.3 <span class="average_mbs">Мбит/с</span></span>
+					<div class="average_arr"></div>
+				</div>
+			</div><!--/main_in-->
+		</div><!--/overall-->
+		
+		<div class="main_in">
+			<div class="op_stats">
+				<div class="op_stats_labels">
+					<span>Cредняя скорость</span>
+					<span>Максимальная скорость</span>
+				</div>
+				<div class="op_stat">
+					<div class="op_stat_logo"><img src="media/img/op_mts_zl.png" alt="" /></div>
+					<div class="op_stat_name">МТС</div>
+					<div class="counter">
+						<div class="counter_val">4.5</div>
+						<div class="counter_glass"></div>
+					</div>
+					<div class="counter counter_green">
+						<div class="counter_val">4.5</div>
+						<div class="counter_glass"></div>
+					</div>
+					<div class="op_stat_lnk"><a href="#">Перейти на карту</a></div>
+				</div>
+				<div class="op_stat">
+					<div class="op_stat_logo"><img src="media/img/op_bee_zl.png" alt="" /></div>
+					<div class="op_stat_name">Билайн</div>
+					<div class="counter">
+						<div class="counter_val">4.5</div>
+						<div class="counter_glass"></div>
+					</div>
+					<div class="counter">
+						<div class="counter_val">4.5</div>
+						<div class="counter_glass"></div>
+					</div>
+					<div class="op_stat_lnk"><a href="#">Перейти на карту</a></div>
+				</div>
+				<div class="op_stat">
+					<div class="op_stat_logo"><img src="media/img/op_meg_zl.png" alt="" /></div>
+					<div class="op_stat_name">Мегафон</div>
+					<div class="counter">
+						<div class="counter_val">4.5</div>
+						<div class="counter_glass"></div>
+					</div>
+					<div class="counter">
+						<div class="counter_val">4.5</div>
+						<div class="counter_glass"></div>
+					</div>
+					<div class="op_stat_lnk"><a href="#">Перейти на карту</a></div>
+				</div>
+				<div class="op_stats_units">
+					<span>Мбит/c</span>
+					<span>Мбит/c</span>
+				</div>
+			</div><!--/op_stats-->
+		</div><!--/main_in-->
+		
+		<div class="h_line"><h2>По типу модема</h2></div>
+		
+		<div class="main_in">
+			<div class="modem_stats">
+				<table>
+					<thead>
+						<tr>
+							<th class="modem_type">Тип <br />модема</th>
+							<th class="col_op"><img src="media/img/op_meg_zl.png" alt="" /> <span>Мегафон</span></th>
+							<th class="col_op"><img src="media/img/op_bee_zl.png" alt="" /> <span>Билайн</span></th>
+							<th class="col_op"><img src="media/img/op_mts_zl.png" alt="" /> <span>МТС</span></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="modem_type_val">7,2</td>
+							<td>
+								<div class="bar_line bar_line_inactive">
+									<div class="bar1 bar1_meg" style="width: 118px;"></div>
+									<div class="bar_val">1.9 <div>Мбит/с</div></div>
+								</div>
+							</td>
+							<td>
+								<div class="bar_line bar_line_inactive">
+									<div class="bar1 bar1_bee" style="width: 118px;"></div>
+									<div class="bar_val">1.9 <div>Мбит/с</div></div>
+								</div>
+							</td>
+							<td>
+								<div class="bar_line bar_line_active">
+									<div class="bar1 bar1_mts" style="width: 118px;"></div>
+									<div class="bar_val">1.9 <div>Мбит/с</div></div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="modem_type_val">14,4</td>
+							<td>
+								<div class="bar_line bar_line_active">
+									<div class="bar1 bar1_meg" style="width: 118px;"></div>
+									<div class="bar_val">1.9 <div>Мбит/с</div></div>
+								</div>
+							</td>
+							<td>
+								<div class="bar_line bar_line_inactive">
+									<div class="bar1 bar1_bee" style="width: 118px;"></div>
+									<div class="bar_val">1.9 <div>Мбит/с</div></div>
+								</div>
+							</td>
+							<td>
+								<div class="bar_line bar_line_inactive">
+									<div class="bar1 bar1_mts" style="width: 118px;"></div>
+									<div class="bar_val">1.9 <div>Мбит/с</div></div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="modem_type_val">21,6</td>
+							<td>
+								<div class="bar_line bar_line_inactive">
+									<div class="bar1 bar1_meg" style="width: 118px;"></div>
+									<div class="bar_val">1.9 <div>Мбит/с</div></div>
+								</div>
+							</td>
+							<td>
+								<div class="bar_line bar_line_inactive">
+									<div class="bar1 bar1_bee" style="width: 118px;"></div>
+									<div class="bar_val">1.9 <div>Мбит/с</div></div>
+								</div>
+							</td>
+							<td>
+								<div class="bar_line bar_line_active">
+									<div class="bar1 bar1_mts" style="width: 118px;"></div>
+									<div class="bar_val">1.9 <div>Мбит/с</div></div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="modem_type_val">28,8</td>
+							<td>
+								<div class="bar_line bar_line_inactive">
+									<div class="bar1 bar1_meg" style="width: 118px;"></div>
+									<div class="bar_val">1.9 <div>Мбит/с</div></div>
+								</div>
+							</td>
+							<td>
+								<div class="bar_line bar_line_active">
+									<div class="bar1 bar1_bee" style="width: 118px;"></div>
+									<div class="bar_val">1.9 <div>Мбит/с</div></div>
+								</div>
+							</td>
+							<td>
+								<div class="bar_line bar_line_inactive">
+									<div class="bar1 bar1_mts" style="width: 118px;"></div>
+									<div class="bar_val">1.9 <div>Мбит/с</div></div>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div><!--/modem_stats-->
+			
+			<div class="measurements_qty">
+				<table cellspacing="0">
+					<thead>
+						<tr>
+							<th rowspan="2" class="measurements_qty_interval_th">Интервалы скорости <br />(Мбит/с)</th>
+							<th colspan="3" class="measurements_qty_qty">Количество измерений</th>
+							<th rowspan="2" class="measurements_total_interval_th">Всего измерений</th>
+						</tr>
+						<tr>
+							<th class="measurements_op measurements_op_l"><img src="media/img/op_meg_zl.png" alt="" /></th>
+							<th class="measurements_op"><img src="media/img/op_bee_zl.png" alt="" /></th>
+							<th class="measurements_op measurements_op_r"><img src="media/img/op_mts_zl.png" alt="" /></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="measurements_qty_interval">0.0 - 0.5</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">66 000</td>
+						</tr>
+						<tr>
+							<td class="measurements_qty_interval">0.5 - 1.0</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">66 000</td>
+						</tr>
+						<tr>
+							<td class="measurements_qty_interval">1.0 - 1.5</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">66 000</td>
+						</tr>
+						<tr>
+							<td class="measurements_qty_interval">1.5 - 2.0</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">66 000</td>
+						</tr>
+						<tr>
+							<td class="measurements_qty_interval">2.0 - 2.5</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">22 000</td>
+							<td class="measurements_qty_val">66 000</td>
+						</tr>
+					</tbody>
+				</table>
+			</div><!--measurements_qty-->
+		</div><!--/main_in-->
+	</div>
+    <!--/MAIN-->
+	
+	
+    <!--FOOTER-->
+    <div class="footer">
+    <div class="footer_in">
+		<div id="copyright">© 2012 3GSpeed</div>
+
+		<div class="footer_soc">
+			Ищите нас в —
+			<a href="#"><img src="media/img/t.png" alt="t" /></a>
+			<a href="#"><img src="media/img/fb.png" alt="f" /></a>
+		</div>
+		
+		<div class="footer_menu">
+			<ul>
+				<li><img src="media/img/ic_about.png" alt="" /><a href="#">О проекте</a></li>
+				<li><img src="media/img/ic_stat.png" alt="" /><a href="#">Статистика</a></li>
+			</ul>
+		</div><!--/footer_menu-->
+		
+		<a id="madein" title="Разработка сайта — студия OctoberWeb" href="http://octoberweb.ru/"><img id="octoberweb" alt="Разработка сайта — студия OctoberWeb" src="media/img/octoberweb.png" width="32" height="32"/>разработка сайта <span>OctoberWeb</span></a>
+    </div>
+    </div>
+    <!--/FOOTER-->
+    
+</div>
+<!--/PAGE-->
+
+</div><!--/wrapper-->
+</body>
+</html>

@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% load thumbnail %}
+
+{% block title %}
+    Главная &mdash;
+{% endblock %}
+
+{% block extended_js %}
+    <script src="http://api-maps.yandex.ru/2.0/?load=package.full&mode=debug&lang=ru-RU" type="text/javascript"></script>
+    <script type="text/javascript">
+    $(function(){
+
+        ymaps.ready(function () {
+            {% if city_curr %} // если выбран текущий город, то ставин карту в его центр
+                var map = new ymaps.Map("map",
+                    {
+                        center: [{{ city_curr.coord }}],
+                        zoom: 14,
+                        type: "yandex#publicMap"
+                    }
+                );
+                map.controls.add("zoomControl");
+            {% else %} // в противном случае ставим центр в СПб
+                var map = new ymaps.Map("map",
+                    {
+                        center: [59.930879,30.329349],
+                        zoom: 14,
+                        type: "yandex#publicMap"
+                    }
+                );
+                map.controls.add("zoomControl");
+            {% endif %}
+
+            // Создаем коллекцию, в которую будем добавлять метки
+            //pointsSet = new ymaps.GeoObjectCollection();
+
+            {% for point in points %}
+                var point_{{ point.id }} = new ymaps.Placemark([{{ point.coord }}],
+                    {
+                        balloonContent: '{{ point.get_popup_window|safe }}'
+                    },
+                    {
+                        // Не скрывать иконку метки при открытии балуна
+                        hideIconOnBalloonOpen: false,
+                        // Изображение иконки метки
+                        iconImageHref: '/media/img/map_ic1.png',
+                        // Задаем макет балуна - пользовательская картинка с контентом
+                        balloonLayout: "default#imageWithContent",
+                        // Размеры содержимого балуна
+                        balloonContentSize: [360, 300],
+                        // Смещение картинки балуна
+                        balloonImageOffset: [-191, -305],
+                        // Балун не имеет тени
+                        balloonShadow: false
+                    }
+                );
+                map.geoObjects.add(point_{{ point.id }});
+                //pointsSet.add(point_{{ point.id }});
+            {% endfor %}
+
+            // Добавляем коллекцию геообъектов на карту.
+            //map.geoObjects.add(pointsSet);
+
+
+
+            $('.map_popup_close').live('click',function(){
+                map.balloon.close()
+            });
+
+
+
+/*            $(".contact .contact_address").live('click',function(){
+                var el = $(this)
+                var parent = el.parents('.contact')
+                var contact_set = $('.contacts_blk .contact')
+                var coords = parent.find(".contact_coord").val()
+                if (el.parents('.contact_curr').html()!=null)
+                    {}
+                else
+                    {
+                        contact_set.removeClass('contact_curr')
+                        parent.addClass('contact_curr')
+                        coords_array = coords.split(',')
+                        map.panTo([parseFloat(coords_array[0]),parseFloat(coords_array[1])], {flying: true});
+                    }
+                return false;
+            });*/
+
+        });
+    });
+    </script>
+{% endblock %}
+
+{% block main %}
+    {{ result }}
+    <div class="index_map_out">
+        <div class="index_map">
+            <div class="map" id="map">
+            </div><!--/map-->
+
+            <div class="map_ctrls">
+                {% if cities != False %}
+                    <div class="map_city_select select">
+                        <div class="select_curr">{{ city_curr.title }}<div></div></div>
+                        {% if cities %}
+                            <div class="select_drop">
+                                <ul>
+                                    <li><a href="#">Москва</a></li>
+                                    <li><a href="#">Нижний Новгород</a></li>
+                                    <li><a href="#">Чита</a></li>
+                                    <li><a href="#">Комсомольск-на-Амуре</a></li>
+                                    <li><a href="#">Нижний Новгород</a></li>
+                                    <li><a href="#">Чита</a></li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {% if operators %}
+                    <div class="map_op_select select">
+                    <div class="select_curr">Оператор<div></div></div>
+                    <div class="select_drop">
+                        <ul>
+                            <li><a href="#">Все</a></li>
+                            {% for operator in operators %}
+                                <li><a href="#">{{ operator.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+                {% if mtypes %}
+                    <div class="map_modem_select select">
+                        <div class="select_curr">Тип модема<div></div></div>
+                        <div class="select_drop">
+                            <ul>
+                                {% for type in mtypes %}
+                                    <li><a href="#">{{ type.download_speed|floatformat }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="map_fullscreen" title="Во весь экран"></div>
+            </div><!--/map_ctrls-->
+
+            <div class="map_filter">
+                <div class="map_filter_in">
+                    <div class="map_slider_ics">
+                        <span class="map_slider_ic1" title="Почта"></span>
+                        <span class="map_slider_ic2 map_slider_ic2_active" title="Мессенджеры"></span>
+                        <span class="map_slider_ic3 map_slider_ic3_active" title="Социальные сети"></span>
+                        <span class="map_slider_ic4 map_slider_ic4_active" title="Звонки"></span>
+                        <span class="map_slider_ic5" title="Видеозвонки"></span>
+                        <span class="map_slider_ic6" title="Видео"></span>
+                        <span class="map_slider_ic7" title="HD-видео"></span>
+                    </div><!--/map_slider_ics-->
+
+                    <div id="map_slider">
+                    </div>
+
+                    <div class="map_slider_scale">
+                        <ul>
+                            <li>0</li>
+                            <li>0.2</li>
+                            <li>0.4</li>
+                            <li>0.6</li>
+                            <li>0.8</li>
+                            <li>1.0</li>
+                            <li>1.2</li>
+                            <li>1.4</li>
+                            <li>1.6</li>
+                            <li>1.8</li>
+                            <li>2.0</li>
+                            <li>2.2</li>
+                            <li>2.4</li>
+                            <li>2.6</li>
+                            <li>2.8</li>
+                            <li>3.0</li>
+                            <li class="map_slider_scale_last">(Мбит/с)</li>
+                        </ul>
+                    </div><!--/map_slider_scale-->
+                </div><!--/map_filter_in-->
+
+                <div class="filter_toggle filter_toggle_hide"></div>
+                <!--<div class="filter_toggle filter_toggle_show"></div>-->
+            </div><!--/map_filter-->
+        </div><!--/index_map-->
+    </div><!--/index_map_out-->
+
+
+    <div class="main_in">
+        <div class="index_calcs">
+            <div class="index_calcs_in">
+                <div class="index_calc col">
+                    <h2>Средняя скорость&nbsp;3G</h2>
+                    <div class="bar_line bar_line_active">
+                        <div class="bar_logo"><img src="/media/img/op_mts_zm.png" alt="" /></div>
+                        <div class="bar1 bar1_mts" style="width: 140px;"></div>
+                        <div class="bar_val">1.9 <div>Мбит/с</div></div>
+                    </div>
+                    <div class="bar_line bar_line_inactive">
+                        <div class="bar_logo"><img src="/media/img/op_meg_zl.png" alt="" /></div>
+                        <div class="bar1 bar1_meg" style="width: 118px;"></div>
+                        <div class="bar_val">1.9 <div>Мбит/с</div></div>
+                    </div>
+                    <div class="bar_line bar_line_inactive">
+                        <div class="bar_logo"><img src="/media/img/op_bee_zl.png" alt="" /></div>
+                        <div class="bar1 bar1_bee" style="width: 90px;"></div>
+                        <div class="bar_val">1.9 <div>Мбит/с</div></div>
+                    </div>
+                </div>
+                <div class="index_calc col">
+                    <h2>Максимальная скорость&nbsp;3G</h2>
+                    <div class="bar_line bar_line_inactive">
+                        <div class="bar_logo"><img src="/media/img/op_mts_zm.png" alt="" /></div>
+                        <div class="bar2 bar2_mts" style="width: 123px;"></div>
+                        <div class="bar_val">1.9 <div>Мбит/с</div></div>
+                    </div>
+                    <div class="bar_line bar_line_active">
+                        <div class="bar_logo"><img src="/media/img/op_meg_zl.png" alt="" /></div>
+                        <div class="bar2 bar2_meg" style="width: 140px;"></div>
+                        <div class="bar_val">1.9 <div>Мбит/с</div></div>
+                    </div>
+                    <div class="bar_line bar_line_inactive">
+                        <div class="bar_logo"><img src="/media/img/op_bee_zl.png" alt="" /></div>
+                        <div class="bar2 bar2_bee" style="width: 104px;"></div>
+                        <div class="bar_val">1.9 <div>Мбит/с</div></div>
+                    </div>
+                </div>
+                <div class="index_calc col">
+                    <h2>Количество замеров</h2>
+                    <div class="measure_qty">1 345 346</div>
+                    <div class="measure_label">замеров скорости интернета в Санкт-Петербурге </div>
+                    <div class="measure_all"><a href="/statistic/">Вся статистика</a></div>
+                </div>
+            </div>
+        </div><!--/index_calcs-->
+
+        <div class="index_news col">
+            {% if news %}
+                <h2>Последние новости</h2>
+                {% for new in news %}
+                    <div class="index_new">
+                        <div class="index_new_date">{{ new.date_add|date:"j E" }}, {{ new.date_add|date:"l"|lower }}</div>
+                        <h3><a href="/news/{{ new.id }}/">{{ new.title }}</a></h3>
+                        <div class="index_new_short"><p>{{ new.short_text|safe }}</p></div>
+                    </div>
+                {% endfor %}
+                <div class="index_news_more"><a href="#">Больше новостей</a></div>
+            {% endif %}
+        </div><!--/index_news-->
+
+        <div class="short_about col">
+            <h2>Коротко о нашем проекте</h2>
+            <div class="text">
+                {{ about_text|safe }}
+                <p><a href="/about/">Узнать больше</a></p>
+            </div>
+        </div>
+    </div><!--/main_in-->
+{% endblock %}
+

@@ -1,0 +1,8 @@
+{% load i18n pymorphy_tags %}
+<h3>{% blocktrans with title|inflect:"дт" as filter_title %} By {{ filter_title }} {% endblocktrans %}</h3>
+<ul>
+{% for choice in choices %}
+    <li{% if choice.selected %} class="selected"{% endif %}>
+    <a href="{{ choice.query_string|iriencode }}">{{ choice.display }}</a></li>
+{% endfor %}
+</ul>

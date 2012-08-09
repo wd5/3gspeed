@@ -1,0 +1,14 @@
+{% if menu %}
+    <div class="menu">
+        <ul>
+            {% for menu in menu %}
+                <li {% ifequal menu.url current %}class="current"{% endifequal %}><div>
+                    {% if menu.image %}
+                        <img src="{{ menu.image.url }}" alt="" width="32" height="25" />
+                    {% endif %}
+                    <a href="{{ menu.url }}">{{ menu.name }}</a>
+                </div></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
