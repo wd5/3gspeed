@@ -12,12 +12,13 @@ from django.db.models.signals import post_save
 from apps.utils.managers import PublishedManager
 from mptt.models import MPTTModel, TreeForeignKey, TreeManager
 
-convert_parameter = 1024 * 102
+#convert_parameter = 1024 * 1024
+convert_parameter = 1000 * 1000
 
 def get_average_speed_MBs(op, point):
     point_spd_set_avg = SpeedAtPoint.objects.filter(operator__id=op.id, point__id=point.id).aggregate(
         Avg('internet_speed'))
-    MBs = point_spd_set_avg['internet_speed__avg'] / convert_parameter
+    MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
     return MBs
 
 
@@ -92,6 +93,8 @@ class Ability(models.Model):
 
 class City(models.Model):
     title = models.CharField(verbose_name=u'Название', max_length=100, )
+    title_second = models.CharField(verbose_name=u'Название предложном падеже', max_length=100,
+        help_text=u'Например, "Москва". Тогда "Где?" в - "Москве"')
     coord = models.CharField(max_length=100, verbose_name=u'Координаты центра')
     map = models.CharField(max_length=1, verbose_name=u'Карта', blank=True)
     is_published = models.BooleanField(verbose_name=u'Опубликовано', default=True)
@@ -136,7 +139,19 @@ class City(models.Model):
                 if operator and not mdm_type:
                     point_spd_set = SpeedAtPoint.objects.filter(operator=operator, point__distinct__city__id=self.id)
                     point_spd_set_avg = point_spd_set.aggregate(Avg('internet_speed'))
-                    MBs = point_spd_set_avg['internet_speed__avg'] / convert_parameter
+                    try:
+                        MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+                    except:
+                        MBs = 0
+                    speed_value = MBs
+                elif operator and mdm_type:
+                    point_spd_set = SpeedAtPoint.objects.filter(operator=operator, point__distinct__city__id=self.id,
+                        modem_type__download_speed=mdm_type)
+                    point_spd_set_avg = point_spd_set.aggregate(Avg('internet_speed'))
+                    try:
+                        MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+                    except:
+                        MBs = 0
                     speed_value = MBs
         elif type == 'max':
             if  operator == False and mdm_type == False:
@@ -151,11 +166,18 @@ class City(models.Model):
                 if operator and not mdm_type:
                     point_spd_set = SpeedAtPoint.objects.filter(operator=operator, point__distinct__city__id=self.id)
                     point_spd_set_avg = point_spd_set.aggregate(Max('internet_speed'))
-                    MBs = point_spd_set_avg['internet_speed__max'] / convert_parameter
+                    MBs = (point_spd_set_avg['internet_speed__max'] / convert_parameter) * 8
                     speed_value = MBs
         else:
             speed_value = False
         return speed_value
+
+    def get_mtypes(self):
+        modem_type_id_set = SpeedAtPoint.objects.filter(point__distinct__city__id=self.id).values('modem_type').distinct().order_by('modem_type')
+        modem_type_set = ModemType.objects.filter(id__in=modem_type_id_set)
+        downlspd_modem_type_set = modem_type_set.values('download_speed').distinct().order_by('download_speed')
+        return downlspd_modem_type_set
+
 
 
 class Distinct(models.Model):
@@ -193,12 +215,12 @@ class Point(models.Model):
 
     def get_max_speed(self):
         max_speed = self.get_speed_values().aggregate(Max('internet_speed'))['internet_speed__max']
-        MBs = max_speed / convert_parameter
+        MBs = (max_speed / convert_parameter) * 8
         return MBs
 
     def get_avg_speed(self):
         max_speed = self.get_speed_values().aggregate(Avg('internet_speed'))['internet_speed__avg']
-        MBs = max_speed / convert_parameter
+        MBs = (max_speed / convert_parameter) * 8
         return MBs
 
     def get_speed_values(self):
@@ -247,7 +269,7 @@ class Point(models.Model):
         except:
             operators_with_max_speed = False
         if operators_with_max_speed:
-            MBs = operators_with_max_speed / convert_parameter
+            MBs = (operators_with_max_speed / convert_parameter) * 8
             abilities_set = get_abilities_by_speed(MBs)
         else:
             abilities_set = []
@@ -289,7 +311,7 @@ class Point(models.Model):
                 cur_spd_set = False
             if cur_spd_set:
                 point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
-                MBs = point_spd_set_avg['internet_speed__avg'] / convert_parameter
+                MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
                 abililies_set = get_abilities_by_speed(MBs)
             else:
                 abililies_set = False
@@ -310,7 +332,7 @@ class Point(models.Model):
 
             if cur_spd_set:
                 point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
-                MBs = point_spd_set_avg['internet_speed__avg'] / convert_parameter
+                MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
                 abililies_set = get_abilities_by_speed(MBs)
             else:
                 if modem_type_set == False:
@@ -388,7 +410,7 @@ class SpeedAtPoint(models.Model):
         return u'скорость в точке №%s' % self.point.id
 
     def get_MBs(self):
-        MBs = self.internet_speed / convert_parameter
+        MBs = (self.internet_speed / convert_parameter) * 8
         MBs = round(MBs, 1)
         MBs = str(MBs).replace(',', '.')
         return MBs

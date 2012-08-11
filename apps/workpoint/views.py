@@ -41,6 +41,115 @@ class LoadMTypesAdmin(View):
 
 load_modem_types = LoadMTypesAdmin.as_view()
 
+class LoadCityDistincts(View):
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            if 'id_city' not in request.POST:
+                return HttpResponseBadRequest()
+
+            id_city = request.POST['id_city']
+
+            try:
+                id_city = int(id_city)
+            except ValueError:
+                return HttpResponseBadRequest()
+
+            try:
+                curr_city = City.objects.published().get(id=id_city)
+            except City.DoesNotExist:
+                return HttpResponseBadRequest()
+
+            distincts_by_pts = Point.objects.filter(distinct__city__id=curr_city.id).values('distinct').distinct().order_by('distinct')
+            id_distincts = []
+            for id in distincts_by_pts:
+                id_distincts.append(id['distinct'])
+            distincts_set = Distinct.objects.published().filter(id__in=id_distincts)
+            html_code = u''
+            for distinct in distincts_set:
+                html_code = u'%s<li><a href="#" name="%s">%s</a></li>' % ( html_code, distinct.id, distinct.title[:30])
+            return HttpResponse(html_code)
+        else:
+            return HttpResponseBadRequest()
+
+load_city_distincts = LoadCityDistincts.as_view()
+
+class LoadCityStatDivs(View):
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            if 'city_title' not in request.POST or 'type' not in request.POST:
+                return HttpResponseBadRequest()
+
+            city_title = request.POST['city_title']
+            type = request.POST['type']
+
+            try:
+                curr_city = City.objects.published().get(title=city_title)
+            except City.DoesNotExist:
+                return HttpResponseBadRequest()
+
+            if type not in ['avg','max','count']:
+                return HttpResponseBadRequest()
+
+            if type == 'count':
+                curr_city_pts_count =  curr_city.get_pts_count()
+                html = render_to_string(
+                    'workpoint/pt_count_block_template.html',
+                        {
+                        'title':curr_city.title_second,
+                        'count':curr_city_pts_count
+                    })
+                return HttpResponse(html)
+            elif type == 'avg':
+                operators = Operator.objects.published()
+                max_avg = 0
+                for operator in operators:
+                    avg_value = curr_city.get_city_speed('avg',operator)
+                    if max_avg < avg_value:
+                        max_avg = avg_value
+                        id_avg = operator.id
+                    setattr(operator, 'curr_city_avg_speed', round(avg_value,1))
+                for operator in operators:
+                    if operator.id == id_avg:
+                        setattr(operator, 'max_avg', True)
+                        avg_mult = 140 / operator.curr_city_avg_speed
+                for operator in operators:
+                    if operator.id != id_avg:
+                        setattr(operator, 'curr_city_avg_speed_pos', avg_mult*operator.curr_city_avg_speed)
+                html = render_to_string(
+                    'workpoint/avg_speed_block_template.html',
+                        {
+                        'operators':operators
+                    })
+                return HttpResponse(html)
+            elif type == 'max':
+                operators = Operator.objects.published()
+                max_max = 0
+                for operator in operators:
+                    max_value = curr_city.get_city_speed('max',operator)
+                    if max_max < max_value:
+                        max_max = max_value
+                        id_max = operator.id
+                    setattr(operator, 'curr_city_max_speed', round(max_value,1))
+                for operator in operators:
+                    if operator.id == id_max:
+                        setattr(operator, 'max_max', True)
+                        max_mult = 140 / operator.curr_city_max_speed
+                for operator in operators:
+                    if operator.id != id_max:
+                        setattr(operator, 'curr_city_max_speed_pos', max_mult*operator.curr_city_max_speed)
+                html = render_to_string(
+                    'workpoint/max_speed_block_template.html',
+                        {
+                        'operators':operators
+                    })
+                return HttpResponse(html)
+            else:
+                return HttpResponse('')
+        else:
+            return HttpResponseBadRequest()
+
+load_stat_city_div = LoadCityStatDivs.as_view()
+
 class LoadBalloonContent(View):
     def post(self, request, *args, **kwargs):
         if request.is_ajax():
@@ -141,6 +250,64 @@ class StatisticView(TemplateView):
                 id_distincts.append(id['distinct'])
             distincts_set = Distinct.objects.published().filter(id__in=id_distincts)
             context['distincts'] = distincts_set[:20]
+
+            operators = Operator.objects.published()
+            context['operators'] = operators
+            max_avg = 0
+            max_max = 0
+            max_types = 0
+            city_mtypes = city_curr.get_mtypes()
+            city_mtypes_max_val_set = []
+            for item in city_mtypes:
+                city_mtypes_max_val_set.append({'type':'%s' % item['download_speed'], 'value':0})
+            for operator in operators:
+                avg_value = city_curr.get_city_speed('avg',operator)
+                max_value = city_curr.get_city_speed('max',operator)
+                if max_avg < avg_value:
+                    max_avg = avg_value
+                    id_avg = operator.id
+                if max_max < max_value:
+                    max_max = max_value
+                    id_max = operator.id
+                setattr(operator, 'curr_city_avg_speed', round(avg_value,1))
+                setattr(operator, 'curr_city_max_speed', round(max_value,1))
+                tmodems_set = ModemType.objects.filter(operator__id=operator.id).values('download_speed').distinct().order_by('download_speed')
+                max_avg_mtype = 0
+                max_avg_mtype_set = []
+                for mtype in tmodems_set:
+                    mtype_avg_value = city_curr.get_city_speed('avg', operator, mtype['download_speed'])
+                    for item in city_mtypes_max_val_set:
+                        if item['type'] == '%s' % mtype['download_speed']:
+                            if item['value'] < mtype_avg_value:
+                                item['value'] = round(mtype_avg_value,1)
+
+                    if max_avg_mtype < mtype_avg_value:
+                        max_avg_mtype = mtype_avg_value
+                        id_avg_mtype = mtype['download_speed']
+                    max_avg_mtype_set.append({'id_mtype':mtype['download_speed'], 'mtype_avg_value':round(mtype_avg_value,1), 'max_avg_mtype':False, 'avg_pos':0})
+                for item in max_avg_mtype_set:
+                    if item['id_mtype'] == id_avg_mtype:
+                        item['max_avg_mtype'] = True
+                        avg_mtype_mult = 118 / item['mtype_avg_value']
+                for item in max_avg_mtype_set:
+                    if item['id_mtype'] != id_avg_mtype:
+                        item['avg_pos'] = avg_mtype_mult*item['mtype_avg_value']
+                setattr(operator, 'mtype_avg_set', max_avg_mtype_set)
+
+            for operator in operators:
+                if operator.id == id_avg:
+                    setattr(operator, 'max_avg', True)
+                    avg_mult = 140 / operator.curr_city_avg_speed
+                if operator.id == id_max:
+                    setattr(operator, 'max_max', True)
+                    max_mult = 140 / operator.curr_city_max_speed
+            for operator in operators:
+                if operator.id != id_avg:
+                    setattr(operator, 'curr_city_avg_speed_pos', avg_mult*operator.curr_city_avg_speed)
+                if operator.id != id_max:
+                    setattr(operator, 'curr_city_max_speed_pos', max_mult*operator.curr_city_max_speed)
+
+            context['city_mtypes_max_val_set'] = city_mtypes_max_val_set
 
         # найдем среднюю скорость по текущему городу
         curr_city_avg_speed = city_curr.get_city_speed('avg')

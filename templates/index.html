@@ -39,7 +39,8 @@
                 var point_{{ point.id }} = new ymaps.Placemark([{{ point.coord }}],
                     {
                         balloonContent: '',
-                        point_id: '{{ point.id }}'
+                        point_id: '{{ point.id }}',
+                        city_id: '{{ city_curr.id }}'
                     },
                     {
                         // Не скрывать иконку метки при открытии балуна
@@ -86,7 +87,8 @@
                     var point_{{ point.id }} = new ymaps.Placemark([{{ point.coord }}],
                         {
                             balloonContent: '',
-                            point_id: '{{ point.id }}'
+                            point_id: '{{ point.id }}',
+                            city_id: '{{ city.id }}'
                         },
                         {
                             // Не скрывать иконку метки при открытии балуна
@@ -185,7 +187,42 @@
                     var city_param_array = coords.split('|')
                     coords_array = city_param_array[0].split(',')
                     map.panTo([parseFloat(coords_array[0]),parseFloat(coords_array[1])], {flying: true});
-                    //map.geoObjects.add(pointsSet_2);
+                    //вытащим плашку со средней скоростью
+                    $.ajax({
+                        url: "/load_stat_city_div/",
+                        data: {
+                            city_title:curr_city,
+                            type:'avg'
+                        },
+                        type: "POST",
+                        success: function(data) {
+                            $('div.avg_speed').replaceWith(data)
+                        }
+                    });
+                    //вытащим плашку с максимальной скоростью
+                    $.ajax({
+                        url: "/load_stat_city_div/",
+                        data: {
+                            city_title:curr_city,
+                            type:'max'
+                        },
+                        type: "POST",
+                        success: function(data) {
+                            $('div.max_speed').replaceWith(data)
+                        }
+                    });
+                    //вытащим плашку с количеством точек по городу
+                    $.ajax({
+                        url: "/load_stat_city_div/",
+                        data: {
+                            city_title:curr_city,
+                            type:'count'
+                        },
+                        type: "POST",
+                        success: function(data) {
+                            $('div.pt_count').replaceWith(data)
+                        }
+                    });
                     }
 
                 if ((parent.is('.map_op_select')) || (parent.is('.map_modem_select')))
@@ -312,7 +349,7 @@
     <div class="main_in">
         <div class="index_calcs">
             <div class="index_calcs_in">
-                <div class="index_calc col">
+                <div class="index_calc col avg_speed">
                     <h2>Средняя скорость&nbsp;3G</h2>
                     {% for operator in operators  %}
                         <div class="bar_line {% if operator.max_avg %}bar_line_active{% else %}bar_line_inactive{% endif %}">
@@ -322,7 +359,7 @@
                         </div>
                     {% endfor %}
                 </div>
-                <div class="index_calc col">
+                <div class="index_calc col max_speed">
                     <h2>Максимальная скорость&nbsp;3G</h2>
                     {% for operator in operators  %}
                         <div class="bar_line {% if operator.max_max %}bar_line_active{% else %}bar_line_inactive{% endif %}">
@@ -332,10 +369,10 @@
                         </div>
                     {% endfor %}
                 </div>
-                <div class="index_calc col">
+                <div class="index_calc col pt_count">
                     <h2>Количество замеров</h2>
                     <div class="measure_qty">{{ curr_city_pts_count }}</div>
-                    <div class="measure_label">замеров скорости интернета в Санкт-Петербурге </div>
+                    <div class="measure_label">замеров скорости интернета в Санкт-Петербурге</div>
                     <div class="measure_all"><a href="/statistic/">Вся статистика</a></div>
                 </div>
             </div>
@@ -347,7 +384,7 @@
                 {% for new in news %}
                     <div class="index_new">
                         <div class="index_new_date">{{ new.date_add|date:"j E" }}, {{ new.date_add|date:"l"|lower }}</div>
-                      <h3><a href="#{# /news/{{ new.id }}/ #}">{{ new.title }}</a></h3>
+                      <h3><a href="/news/{{ new.id }}/">{{ new.title }}</a></h3>
                         <div class="index_new_short"><p>{{ new.short_text|safe }}</p></div>
                     </div>
                 {% endfor %}

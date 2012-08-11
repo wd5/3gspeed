@@ -18,14 +18,10 @@ $(document).ready(function() {
                     var elem = icons_set.eq(i)
                     var css_lft = elem.css('left').replace("px","")
                     css_lft = parseInt(css_lft)
-                    if (vals[1]<css_lft)
-                        {elem.removeClass("map_slider_active")}
-                    else
+                    if ((vals[1]>css_lft) && (vals[0]<css_lft))
                         {elem.addClass("map_slider_active")}
-                    if (vals[0]>css_lft)
-                        {elem.removeClass("map_slider_active")}
                     else
-                        {elem.addClass("map_slider_active")}
+                        {elem.removeClass("map_slider_active")}
                 }
         },
         stop: function(event, ui) {

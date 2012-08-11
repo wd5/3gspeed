@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load thumbnail %}
+{% load thumbnail siteblocks_extras %}
 
 {% block title %}
     Статистика &mdash;
@@ -26,7 +26,25 @@
         select_curr_div.attr('name',el.attr('name'));
         el.parent().remove()
         parent.toggleClass("select_dropped");
-        //alert(el.attr('name'))
+
+        if (parent.is('.stat_city'))
+            {
+            // подгружаем районы города
+            var id = el.attr('name')
+                $.ajax({
+                    url: "/load_city_distincts/",
+                    data: {
+                        id_city:id
+                    },
+                    type: "POST",
+                    success: function(data) {
+                        $('div.stat_distinct').html('<div class="select_curr" name="all">Район<div></div></div><div class="select_drop"><ul>'+ data +'</ul></div>')
+                    },
+                    error:function(jqXHR,textStatus,errorThrown) {
+                        $('div.stat_distinct').html('<div class="select_curr" name="all">Район<div></div></div><div class="select_drop"><ul></ul></div>')
+                    }
+                });
+            }
         return false;
     });
     </script>
@@ -77,213 +95,6 @@
         </div><!--/main_in-->
     </div><!--/overall-->
 
-    <div class="main_in">
-        <div class="op_stats">
-            <div class="op_stats_labels">
-                <span>Cредняя скорость</span>
-                <span>Максимальная скорость</span>
-            </div>
-            <div class="op_stat">
-                <div class="op_stat_logo"><img src="/media/img/op_mts_zl.png" alt="" /></div>
-                <div class="op_stat_name">МТС</div>
-                <div class="counter">
-                    <div class="counter_val">4.5</div>
-                    <div class="counter_glass"></div>
-                </div>
-                <div class="counter counter_green">
-                    <div class="counter_val">4.5</div>
-                    <div class="counter_glass"></div>
-                </div>
-                <div class="op_stat_lnk"><a href="#">Перейти на карту</a></div>
-            </div>
-            <div class="op_stat">
-                <div class="op_stat_logo"><img src="/media/img/op_bee_zl.png" alt="" /></div>
-                <div class="op_stat_name">Билайн</div>
-                <div class="counter">
-                    <div class="counter_val">4.5</div>
-                    <div class="counter_glass"></div>
-                </div>
-                <div class="counter">
-                    <div class="counter_val">4.5</div>
-                    <div class="counter_glass"></div>
-                </div>
-                <div class="op_stat_lnk"><a href="#">Перейти на карту</a></div>
-            </div>
-            <div class="op_stat">
-                <div class="op_stat_logo"><img src="/media/img/op_meg_zl.png" alt="" /></div>
-                <div class="op_stat_name">Мегафон</div>
-                <div class="counter">
-                    <div class="counter_val">4.5</div>
-                    <div class="counter_glass"></div>
-                </div>
-                <div class="counter">
-                    <div class="counter_val">4.5</div>
-                    <div class="counter_glass"></div>
-                </div>
-                <div class="op_stat_lnk"><a href="#">Перейти на карту</a></div>
-            </div>
-            <div class="op_stats_units">
-                <span>Мбит/c</span>
-                <span>Мбит/c</span>
-            </div>
-        </div><!--/op_stats-->
-    </div><!--/main_in-->
-
-    <div class="h_line"><h2>По типу модема</h2></div>
-
-    <div class="main_in">
-        <div class="modem_stats">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="modem_type">Тип <br />модема</th>
-                        <th class="col_op"><img src="/media/img/op_meg_zl.png" alt="" /> <span>Мегафон</span></th>
-                        <th class="col_op"><img src="/media/img/op_bee_zl.png" alt="" /> <span>Билайн</span></th>
-                        <th class="col_op"><img src="/media/img/op_mts_zl.png" alt="" /> <span>МТС</span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="modem_type_val">7,2</td>
-                        <td>
-                            <div class="bar_line bar_line_inactive">
-                                <div class="bar1 bar1_meg" style="width: 118px;"></div>
-                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="bar_line bar_line_inactive">
-                                <div class="bar1 bar1_bee" style="width: 118px;"></div>
-                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="bar_line bar_line_active">
-                                <div class="bar1 bar1_mts" style="width: 118px;"></div>
-                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="modem_type_val">14,4</td>
-                        <td>
-                            <div class="bar_line bar_line_active">
-                                <div class="bar1 bar1_meg" style="width: 118px;"></div>
-                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="bar_line bar_line_inactive">
-                                <div class="bar1 bar1_bee" style="width: 118px;"></div>
-                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="bar_line bar_line_inactive">
-                                <div class="bar1 bar1_mts" style="width: 118px;"></div>
-                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="modem_type_val">21,6</td>
-                        <td>
-                            <div class="bar_line bar_line_inactive">
-                                <div class="bar1 bar1_meg" style="width: 118px;"></div>
-                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="bar_line bar_line_inactive">
-                                <div class="bar1 bar1_bee" style="width: 118px;"></div>
-                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="bar_line bar_line_active">
-                                <div class="bar1 bar1_mts" style="width: 118px;"></div>
-                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="modem_type_val">28,8</td>
-                        <td>
-                            <div class="bar_line bar_line_inactive">
-                                <div class="bar1 bar1_meg" style="width: 118px;"></div>
-                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="bar_line bar_line_active">
-                                <div class="bar1 bar1_bee" style="width: 118px;"></div>
-                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="bar_line bar_line_inactive">
-                                <div class="bar1 bar1_mts" style="width: 118px;"></div>
-                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div><!--/modem_stats-->
-
-        <div class="measurements_qty">
-            <table cellspacing="0">
-                <thead>
-                    <tr>
-                        <th rowspan="2" class="measurements_qty_interval_th">Интервалы скорости <br />(Мбит/с)</th>
-                        <th colspan="3" class="measurements_qty_qty">Количество измерений</th>
-                        <th rowspan="2" class="measurements_total_interval_th">Всего измерений</th>
-                    </tr>
-                    <tr>
-                        <th class="measurements_op measurements_op_l"><img src="/media/img/op_meg_zl.png" alt="" /></th>
-                        <th class="measurements_op"><img src="/media/img/op_bee_zl.png" alt="" /></th>
-                        <th class="measurements_op measurements_op_r"><img src="/media/img/op_mts_zl.png" alt="" /></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="measurements_qty_interval">0.0 - 0.5</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">66 000</td>
-                    </tr>
-                    <tr>
-                        <td class="measurements_qty_interval">0.5 - 1.0</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">66 000</td>
-                    </tr>
-                    <tr>
-                        <td class="measurements_qty_interval">1.0 - 1.5</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">66 000</td>
-                    </tr>
-                    <tr>
-                        <td class="measurements_qty_interval">1.5 - 2.0</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">66 000</td>
-                    </tr>
-                    <tr>
-                        <td class="measurements_qty_interval">2.0 - 2.5</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">22 000</td>
-                        <td class="measurements_qty_val">66 000</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div><!--measurements_qty-->
-    </div><!--/main_in-->
+    {% include 'workpoint/stats_block.html' %}
 {% endblock %}
 

@@ -40,7 +40,8 @@
                                 {{ new.code_video|safe }}
                             </div>
                             {% if new.text %}
-                                {% comment %}<div class="timeline_media_more"><a href="/{# /news/{{ new.id }}/ #}">Читать новость</a></div>{% endcomment %}
+
+                                <div class="timeline_media_more"><a href="/news/{{ new.id }}/">Читать новость</a></div>
                             {% endif %}
                         {% else %}
                             {% if new.short_text %}
@@ -50,7 +51,7 @@
                             {% endif %}
 
                             {% if new.text %}
-                                {% comment %}<div class="timeline_new_more"><a href="/{# /news/{{ new.id }}/ #}">Читать полностью</a></div>{% endcomment %}
+                                <div class="timeline_new_more"><a href="/news/{{ new.id }}/">Читать полностью</a></div>
                             {% endif %}
                         {% endif %}
                     {% else %}
@@ -63,7 +64,7 @@
                                 {% endthumbnail %}
                             {% endfor %}
                         </div>
-                        {% comment %}<div class="timeline_media_more"><a href="/{# /news/{{ new.id }}/ #}">Еще 12 фотографий</a></div>{% endcomment %}
+                        <div class="timeline_media_more"><a href="/news/{{ new.id }}/">Еще 12 фотографий</a></div>
                     {% endif %}
 
                     <div class="timeline_arr"></div>

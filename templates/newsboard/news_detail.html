@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% load thumbnail %}
+
+{% block title %}
+    {{ news_current.title }} &mdash;
+{% endblock %}
+
+{% block class_main %} main_grey{% endblock %}
+
+{% block main %}
+    <div class="mappy">
+        <a class="btn1" href="/">Перейти к карте</a>
+    </div><!--/mappy-->
+
+    <div class="main_in">
+        <div class="about">
+            <div class="measurements_qty col">
+                <h2>{{ news_current.title }}</h2>
+                <div class="timeline_date">{{ news_current.date_add|date:"j E Y" }}г</div>
+                <div class="{% if not news_current.text %}text{% else %}timeline_date{% endif %}">
+                    {{ news_current.short_text|safe }}
+                </div>
+                <div class="text">
+                    {{ news_current.text|safe }}
+                </div>
+                {% if news_current.get_images %}
+                    <div class="timeline_photos">
+                        {% for image  in news_current.get_images %}
+                            {% thumbnail image.image "1000" upscale=0 as big %}
+                                {% thumbnail image.image "131x131" crop="center" as im %}
+                                    <a href="{{ big.url }}" rel="{{ news_current.id }}" class="fancybox"><img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="" /></a>
+                                {% endthumbnail %}
+                            {% endthumbnail %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if news_current.code_video %}
+                    <div class="timeline_video">
+                        {{ news_current.code_video|safe }}
+                    </div>
+                {% endif %}
+            </div>
+        </div><!--/about-->
+
+
+
+    </div><!--/main_in-->
+{% endblock %}
+

@@ -56,17 +56,6 @@ class IndexView(TemplateView):
                 if operator.id != id_max:
                     setattr(operator, 'curr_city_max_speed_pos', max_mult*operator.curr_city_max_speed)
 
-
-
-
-
-
-        #        popup_html = render_to_string(
-        #            'workpoint/point_popup.html',
-        #                {})
-        #        popup_html = popup_html.replace('\n', ' ')
-        #        context['balloonLayout'] = popup_html
-
         mtypes = ModemType.objects.values('download_speed').distinct().order_by('download_speed')
         context['mtypes'] = mtypes
         abilities = Ability.objects.all()

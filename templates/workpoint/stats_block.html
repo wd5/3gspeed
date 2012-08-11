@@ -1,0 +1,133 @@
+{% load thumbnail siteblocks_extras %}
+<div class="stats_block">
+    <div class="main_in">
+    <div class="op_stats">
+        <div class="op_stats_labels">
+            <span>Cредняя скорость</span>
+            <span>Максимальная скорость</span>
+        </div>
+        {% for operator in operators %}
+            <div class="op_stat">
+                <div class="op_stat_logo"><img src="{{ operator.icon.url }}" width="35" height="35" alt="" /></div>
+                <div class="op_stat_name">{{ operator.title }}</div>
+                <div class="counter{% if operator.max_avg %} counter_green{% endif %}">
+                    <div class="counter_val">{{ operator.curr_city_avg_speed|formatted_float }}</div>
+                    <div class="counter_glass"></div>
+                </div>
+                <div class="counter{% if operator.max_max %} counter_green{% endif %}">
+                    <div class="counter_val">{{ operator.curr_city_max_speed|formatted_float }}</div>
+                    <div class="counter_glass"></div>
+                </div>
+                <div class="op_stat_lnk"><a href="/">Перейти на карту</a></div>
+            </div>
+        {% endfor %}
+        <div class="op_stats_units">
+            <span>Мбит/c</span>
+            <span>Мбит/c</span>
+        </div>
+    </div><!--/op_stats-->
+    </div><!--/main_in-->
+
+    <div class="h_line"><h2>По типу модема</h2></div>
+
+    <div class="main_in">
+    <div class="modem_stats">
+        <table>
+            <thead>
+                <tr>
+                    <th class="modem_type">Тип <br />модема</th>
+                    {% for operator in operators %}
+                        <th class="col_op"><img src="{{ operator.icon.url }}" width="35" height="35" alt="" /> <span>{{ operator.title }}</span></th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for city_mtype in city_mtypes_max_val_set %}
+                    <tr>
+                        <td class="modem_type_val">{{ city_mtype.type|floatformat }}</td>
+                        {% for operator in operators %}
+                            {% for mtype_avg in operator.mtype_avg_set %}
+                                {% if mtype_avg.id_mtype|floatformat == city_mtype.type|floatformat %}
+                                    <td>{% comment %}{{ city_mtype.value }} and {{ mtype_avg.mtype_avg_value }} | {{ mtype_avg.max_avg_mtype }}{% endcomment %}
+                                        <div class="bar_line{% if city_mtype.value == mtype_avg.mtype_avg_value %} bar_line_active{% else %} bar_line_inactive{% endif %} ">
+                                            <div class="bar1 bar1_meg" style="width: {% if mtype_avg.max_avg_mtype == True %}118{% else %}{{ mtype_avg.avg_pos|floatformat:0 }}{% endif %}px;"></div>
+                                            <div class="bar_val">{{ mtype_avg.mtype_avg_value }} <div>Мбит/с</div></div>
+                                        </div>
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+{% comment %}
+                        <td>
+                            <div class="bar_line bar_line_inactive">
+                                <div class="bar1 bar1_bee" style="width: 118px;"></div>
+                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="bar_line bar_line_active">
+                                <div class="bar1 bar1_mts" style="width: 118px;"></div>
+                                <div class="bar_val">1.9 <div>Мбит/с</div></div>
+                            </div>
+                        </td>{% endcomment %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div><!--/modem_stats-->
+
+    <div class="measurements_qty">
+        <table cellspacing="0">
+            <thead>
+                <tr>
+                    <th rowspan="2" class="measurements_qty_interval_th">Интервалы скорости <br />(Мбит/с)</th>
+                    <th colspan="3" class="measurements_qty_qty">Количество измерений</th>
+                    <th rowspan="2" class="measurements_total_interval_th">Всего измерений</th>
+                </tr>
+                <tr>
+                    <th class="measurements_op measurements_op_l"><img src="/media/img/op_meg_zl.png" alt="" /></th>
+                    <th class="measurements_op"><img src="/media/img/op_bee_zl.png" alt="" /></th>
+                    <th class="measurements_op measurements_op_r"><img src="/media/img/op_mts_zl.png" alt="" /></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="measurements_qty_interval">0.0 - 0.5</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">66 000</td>
+                </tr>
+                <tr>
+                    <td class="measurements_qty_interval">0.5 - 1.0</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">66 000</td>
+                </tr>
+                <tr>
+                    <td class="measurements_qty_interval">1.0 - 1.5</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">66 000</td>
+                </tr>
+                <tr>
+                    <td class="measurements_qty_interval">1.5 - 2.0</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">66 000</td>
+                </tr>
+                <tr>
+                    <td class="measurements_qty_interval">2.0 - 2.5</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">22 000</td>
+                    <td class="measurements_qty_val">66 000</td>
+                </tr>
+            </tbody>
+        </table>
+    </div><!--measurements_qty-->
+    </div><!--/main_in-->
+</div>

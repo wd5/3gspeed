@@ -1,0 +1,11 @@
+{% load siteblocks_extras %}
+<div class="index_calc col max_speed">
+    <h2>Максимальная скорость&nbsp;3G</h2>
+    {% for operator in operators  %}
+        <div class="bar_line {% if operator.max_max %}bar_line_active{% else %}bar_line_inactive{% endif %}">
+            <div class="bar_logo"><img src="{{ operator.icon.url }}" width="31px" height="31px" alt="" /></div>
+            <div class="bar2 bar2_mts" style="width: {% if operator.max_max %}140{% else %}{{ operator.curr_city_max_speed_pos|floatformat:0 }}{% endif %}px;"></div>
+            <div class="bar_val">{{ operator.curr_city_max_speed|formatted_float }} <div>Мбит/с</div></div>
+        </div>
+    {% endfor %}
+</div>

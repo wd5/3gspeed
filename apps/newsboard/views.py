@@ -41,7 +41,6 @@ class NewsDetailView(DetailView):
     context_object_name = 'news_current'
     model = News
     queryset = model.objects.published()
-    template_name = 'newsboard/detail.html'
 
     def get_object(self, queryset=None):
         queryset = self.get_queryset()
