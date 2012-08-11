@@ -38,6 +38,12 @@ class News(models.Model):
     def get_images(self):
         return self.newsimage_set.all()
 
+    def get_three_images(self):
+        return self.newsimage_set.all()[:3]
+
+    def get_count_images(self):
+        count = self.newsimage_set.all().count()
+        return count
 
 class NewsImage(models.Model):
     new = models.ForeignKey(News, verbose_name=u'новость')

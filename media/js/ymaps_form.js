@@ -21,7 +21,7 @@ $(function(){
                 {
                     center: [geopoint[0],geopoint[1]],
                     zoom: scale,
-                    type: "yandex#publicMap"
+                    type: "yandex#map"
                 }
             );
 

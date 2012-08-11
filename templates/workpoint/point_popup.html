@@ -1,6 +1,6 @@
 {% load thumbnail %}
 <div class="map_popup"><!--style="position: absolute; left: 100px; bottom: 200px;"-->
-    <div class="tab op_all">
+    <div class="tab op_all {% if curr_operator_id %}tab_hidden{% endif %} ">
         <div class="map_popup_info">
             <table class="map_popup_info_table">
                 <thead>
@@ -28,13 +28,13 @@
 
         <div class="map_popup_ics">
             {% for ability  in abilities %}
-                <span class="map_popup_ic{{ ability.id }}" title="{{ ability.title }}"></span>
+                <span style="background-image: url('{{ ability.icon.url }}')"  title="{{ ability.title|title }}"></span>
             {% endfor %}
         </div>
     </div>
 
     {% for operator in operators %}
-        <div class="tab_hidden tab op_{{ operator.id }}" >
+        <div class="{% if curr_operator_id != operator.id %}tab_hidden{% endif %} tab op_{{ operator.id }}" >
             <div class="map_popup_info">
                 <table class="map_popup_info_table">
                     <thead>
@@ -82,7 +82,7 @@
 
             <div class="map_popup_ics">
                 {% for op_ability in operator.abilities %}
-                    <span class="map_popup_ic{{ op_ability.id }}" title="{{ op_ability.title }}"></span>
+                    <span style="background-image: url('{{ op_ability.icon.url }}')" title="{{ op_ability.title|title }}"></span>
                 {% endfor %}
             </div>
         </div>

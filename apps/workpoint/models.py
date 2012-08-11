@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db.models.aggregates import Avg, Max, Count
 from django.template.loader import render_to_string
+from decimal import Decimal
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 import datetime
@@ -11,21 +12,47 @@ from django.db.models.signals import post_save
 from apps.utils.managers import PublishedManager
 from mptt.models import MPTTModel, TreeForeignKey, TreeManager
 
+convert_parameter = 1024 * 102
+
 def get_average_speed_MBs(op, point):
     point_spd_set_avg = SpeedAtPoint.objects.filter(operator__id=op.id, point__id=point.id).aggregate(
         Avg('internet_speed'))
-    MBs = point_spd_set_avg['internet_speed__avg'] / ( 1024 * 100)
+    MBs = point_spd_set_avg['internet_speed__avg'] / convert_parameter
     return MBs
 
 
 def get_point_spd_set(op, point):
-    point_spd_set = SpeedAtPoint.objects.filter(operator__id=op.id, point__id=point.id)
+    point_spd_set = SpeedAtPoint.objects.filter(operator__id=op.id, point__id=point.id).order_by(
+        'modem_type__download_speed')
     return point_spd_set
 
 
 def get_abilities_by_speed(speed):
+    speed = Decimal("%s" % speed)
     abilities_set = Ability.objects.filter(download_speed__lte=speed)
     return abilities_set
+
+
+def str_price(price):
+    if not price:
+        return u'0'
+    value = u'%s' % price
+    if price._isinteger():
+        value = u'%s' % value[:len(value) - 3]
+        count = 3
+    else:
+        count = 6
+
+    if len(value) > count:
+        ends = value[len(value) - count:]
+        starts = value[:len(value) - count]
+
+        if len(starts) > 3:
+            starts = u'%s %s' % (starts[:1], starts[1:len(starts)])
+
+        return u'%s %s' % (starts, ends)
+    else:
+        return u'%s' % value
 
 
 def file_path_icons(instance, filename):
@@ -38,6 +65,7 @@ def file_path_ability_icons(instance, filename):
 
 class Ability(models.Model):
     icon = ImageField(verbose_name=u'иконка', upload_to=file_path_ability_icons)
+    marker = ImageField(verbose_name=u'маркер', upload_to=file_path_ability_icons)
     title = models.CharField(verbose_name=u'Название', max_length=100, )
     download_speed = models.DecimalField(verbose_name=u'достаточная скорость', help_text=u'Мбит/с', decimal_places=2,
         max_digits=10, )
@@ -46,9 +74,20 @@ class Ability(models.Model):
         ordering = ['download_speed']
         verbose_name = _(u'ability')
         verbose_name_plural = _(u'abilities')
+        get_latest_by = 'download_speed'
 
     def __unicode__(self):
         return self.title
+
+    def get_filter_position(self):
+        min_pos = 100
+        max_pos = 850
+        rez = (self.download_speed * 250) + min_pos
+        if rez > max_pos:
+            rez = max_pos
+        if rez < min_pos:
+            rez = min_pos
+        return rez
 
 
 class City(models.Model):
@@ -73,6 +112,50 @@ class City(models.Model):
     def get_points(self):
         points_set = Point.objects.filter(distinct__city__id=self.id)
         return points_set
+
+    def get_pts_count(self):
+        points_set = self.get_points()
+        all_pts_count = 0
+        for point in points_set:
+            point_speed_cnt = point.get_speed_values().count()
+            all_pts_count = all_pts_count + point_speed_cnt
+        return all_pts_count
+
+    def get_city_speed(self, type='avg', operator=False, mdm_type=False):
+        if type == 'avg':
+            if  operator == False and mdm_type == False:
+                points_set = self.get_points()
+                summ = 0
+                counter = 0
+                for point in points_set:
+                    pt_avg_speed = point.get_avg_speed()
+                    summ = summ + pt_avg_speed
+                    counter = counter + 1
+                speed_value = summ / counter
+            else:
+                if operator and not mdm_type:
+                    point_spd_set = SpeedAtPoint.objects.filter(operator=operator, point__distinct__city__id=self.id)
+                    point_spd_set_avg = point_spd_set.aggregate(Avg('internet_speed'))
+                    MBs = point_spd_set_avg['internet_speed__avg'] / convert_parameter
+                    speed_value = MBs
+        elif type == 'max':
+            if  operator == False and mdm_type == False:
+                points_set = self.get_points()
+                max = 0
+                for point in points_set:
+                    pt_max_speed = point.get_max_speed()
+                    if max < pt_max_speed:
+                        max = pt_max_speed
+                speed_value = max
+            else:
+                if operator and not mdm_type:
+                    point_spd_set = SpeedAtPoint.objects.filter(operator=operator, point__distinct__city__id=self.id)
+                    point_spd_set_avg = point_spd_set.aggregate(Max('internet_speed'))
+                    MBs = point_spd_set_avg['internet_speed__max'] / convert_parameter
+                    speed_value = MBs
+        else:
+            speed_value = False
+        return speed_value
 
 
 class Distinct(models.Model):
@@ -106,12 +189,17 @@ class Point(models.Model):
         verbose_name_plural = _(u'points')
 
     def __unicode__(self):
-        return self.coord
+        return u'%s - %s' % (self.distinct.title, self.coord)
 
-    #    def get_max_speed(self):
-    #        max_speed = self.get_speed_values().aggregate(Max('internet_speed'))['internet_speed__max']
-    #        MBs = max_speed/(( 1024 * 100)*( 1024 * 100))
-    #        return MBs
+    def get_max_speed(self):
+        max_speed = self.get_speed_values().aggregate(Max('internet_speed'))['internet_speed__max']
+        MBs = max_speed / convert_parameter
+        return MBs
+
+    def get_avg_speed(self):
+        max_speed = self.get_speed_values().aggregate(Avg('internet_speed'))['internet_speed__avg']
+        MBs = max_speed / convert_parameter
+        return MBs
 
     def get_speed_values(self):
         return self.speedatpoint_set.all()
@@ -133,13 +221,19 @@ class Point(models.Model):
             setattr(operator, 'point_spd_set', get_point_spd_set(operator, self))
         return operators_set
 
-    def get_popup_window(self):
+    def get_popup_window(self, curr_operator_title=False):
         operators = self.get_operators()
+        try:
+            curr_op = Operator.objects.get(title__contains=curr_operator_title)
+            curr_op = curr_op.id
+        except:
+            curr_op = False
         popup_html = render_to_string(
             'workpoint/point_popup.html',
                 {
                 'point': self,
                 'operators': operators,
+                'curr_operator_id': curr_op,
                 'abilities': self.get_abilities()
             })
         popup_html = popup_html.replace('\n', ' ')
@@ -153,11 +247,82 @@ class Point(models.Model):
         except:
             operators_with_max_speed = False
         if operators_with_max_speed:
-            MBs = operators_with_max_speed / ( 1024 * 100)
+            MBs = operators_with_max_speed / convert_parameter
             abilities_set = get_abilities_by_speed(MBs)
         else:
             abilities_set = []
         return abilities_set
+
+    def get_abilitiy_icon(self):
+        abilities = self.get_abilities()
+        if abilities:
+            last = abilities.latest()
+            url = last.marker.url
+        else:
+            url = '/media/img/map_ic0.png'
+        return url
+
+    def get_abilitiy_icon_additional(self, op_title=False, mdm_type=False):
+        try:
+            orerator = Operator.objects.get(title=op_title)
+        except:
+            orerator = False
+        if orerator:
+            try:
+                mdm_type = Decimal("%s" % mdm_type)
+                modem_type_set = ModemType.objects.filter(operator=orerator, download_speed=mdm_type)
+                modem_type_list = []
+                for modem_type in modem_type_set:
+                    modem_type_list.append(modem_type.id)
+            except:
+                modem_type_list = False
+            try:
+                if modem_type_list:
+                    cur_spd_set = SpeedAtPoint.objects.filter(point=self, operator=orerator,
+                        modem_type__id__in=modem_type_list)
+                else:
+                    if modem_type_list == False:
+                        cur_spd_set = SpeedAtPoint.objects.filter(point=self, operator=orerator)
+                    else:
+                        cur_spd_set = False
+            except:
+                cur_spd_set = False
+            if cur_spd_set:
+                point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
+                MBs = point_spd_set_avg['internet_speed__avg'] / convert_parameter
+                abililies_set = get_abilities_by_speed(MBs)
+            else:
+                abililies_set = False
+        else:
+            try:
+                mdm_type = Decimal("%s" % mdm_type)
+                modem_type_set = ModemType.objects.filter(download_speed=mdm_type)
+                modem_type_list = []
+                for modem_type in modem_type_set:
+                    modem_type_list.append(modem_type.id)
+            except:
+                modem_type_set = False
+
+            if modem_type_set:
+                cur_spd_set = SpeedAtPoint.objects.filter(point=self, modem_type__id__in=modem_type_list)
+            else:
+                cur_spd_set = False
+
+            if cur_spd_set:
+                point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
+                MBs = point_spd_set_avg['internet_speed__avg'] / convert_parameter
+                abililies_set = get_abilities_by_speed(MBs)
+            else:
+                if modem_type_set == False:
+                    abililies_set = self.get_abilities()
+                else:
+                    abililies_set = []
+        if abililies_set:
+            last = abililies_set.latest()
+            url = last.marker.url
+        else:
+            url = '/media/img/map_ic0.png'
+        return url
 
 
 class Operator(models.Model):
@@ -223,7 +388,7 @@ class SpeedAtPoint(models.Model):
         return u'скорость в точке №%s' % self.point.id
 
     def get_MBs(self):
-        MBs = self.internet_speed / ( 1024 * 100)
+        MBs = self.internet_speed / convert_parameter
         MBs = round(MBs, 1)
         MBs = str(MBs).replace(',', '.')
         return MBs
