@@ -124,7 +124,7 @@ class City(models.Model):
                 max = (max / 8) * convert_parameter # todo: Не забыть переделать
                 min = (min / 8) * convert_parameter
                 for point in points_set:
-                    point_speed_cnt = point.get_speed_values().filter(operator__id=operator.id, internet_speed__lte=max, internet_speed__gte=min).count()
+                    point_speed_cnt = point.get_speed_values().filter(operator__id=operator.id, internet_speed__lte=Decimal("%s" % max), internet_speed__gte=Decimal("%s" % min)).count()
                     all_pts_count = all_pts_count + point_speed_cnt
             else:
                 all_pts_count = 0
@@ -135,7 +135,7 @@ class City(models.Model):
                 max = (max / 8) * convert_parameter # todo: Не забыть переделать
                 min = (min / 8) * convert_parameter
                 for point in points_set:
-                    point_speed_cnt = point.get_speed_values().filter(internet_speed__lte=max, internet_speed__gte=min).count()
+                    point_speed_cnt = point.get_speed_values().filter(internet_speed__lte=Decimal("%s" % max), internet_speed__gte=Decimal("%s" % min)).count()
                     all_pts_count = all_pts_count + point_speed_cnt
             else:
                 points_set = self.get_points()
