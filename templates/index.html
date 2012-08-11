@@ -251,6 +251,35 @@
                 return false;
         	});
 
+            $(".map_popup_op").live('click',function(){
+                $('.map_popup_op').removeClass('curr')
+                $(this).addClass("curr");
+                var op_class = $(this).find('img').attr('alt');
+                var curr_parent = $(this).parents('.tab')
+                var tab_parent = $(this).parents('.map_popup_op')
+                var cur_tab = $('div.'+op_class)
+                var tr_set = $('.map_popup_info_table img[alt="'+op_class+'"]').parents('.map_popup_op')
+                tr_set.addClass("curr");
+                $('div.tab').addClass('tab_hidden')
+                cur_tab.removeClass('tab_hidden')
+                if (!cur_tab.find('.map_popup_op_3gspeed').is('.curr'))
+                    {//отодвигаем балун
+                        /*pointsSet.each(function (item) {
+                            item.options.set('balloonImageOffset',[-191, -344])
+                        });*/
+                    }
+                else
+                    {
+                        /* pointsSet.each(function (item) {
+                            item.options.set('balloonImageOffset',[-191, -305])
+
+                        });*/
+                    }
+
+            });
+
+
+
         });
     });
     </script>

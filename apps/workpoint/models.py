@@ -116,12 +116,33 @@ class City(models.Model):
         points_set = Point.objects.filter(distinct__city__id=self.id)
         return points_set
 
-    def get_pts_count(self):
-        points_set = self.get_points()
-        all_pts_count = 0
-        for point in points_set:
-            point_speed_cnt = point.get_speed_values().count()
-            all_pts_count = all_pts_count + point_speed_cnt
+    def get_pts_count(self, operator=False, min=False, max=False):
+        if operator:
+            if min!=False or max!=False:
+                points_set = self.get_points()
+                all_pts_count = 0
+                max = (max / 8) * convert_parameter # todo: Не забыть переделать
+                min = (min / 8) * convert_parameter
+                for point in points_set:
+                    point_speed_cnt = point.get_speed_values().filter(operator__id=operator.id, internet_speed__lte=max, internet_speed__gte=min).count()
+                    all_pts_count = all_pts_count + point_speed_cnt
+            else:
+                all_pts_count = 0
+        else: # по всему городу
+            if min!=False or max!=False:
+                points_set = self.get_points()
+                all_pts_count = 0
+                max = (max / 8) * convert_parameter # todo: Не забыть переделать
+                min = (min / 8) * convert_parameter
+                for point in points_set:
+                    point_speed_cnt = point.get_speed_values().filter(internet_speed__lte=max, internet_speed__gte=min).count()
+                    all_pts_count = all_pts_count + point_speed_cnt
+            else:
+                points_set = self.get_points()
+                all_pts_count = 0
+                for point in points_set:
+                    point_speed_cnt = point.get_speed_values().count()
+                    all_pts_count = all_pts_count + point_speed_cnt
         return all_pts_count
 
     def get_city_speed(self, type='avg', operator=False, mdm_type=False):
@@ -177,7 +198,6 @@ class City(models.Model):
         modem_type_set = ModemType.objects.filter(id__in=modem_type_id_set)
         downlspd_modem_type_set = modem_type_set.values('download_speed').distinct().order_by('download_speed')
         return downlspd_modem_type_set
-
 
 
 class Distinct(models.Model):

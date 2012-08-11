@@ -44,6 +44,39 @@
                         $('div.stat_distinct').html('<div class="select_curr" name="all">Район<div></div></div><div class="select_drop"><ul></ul></div>')
                     }
                 });
+
+            // подгружаем среднюю скорость
+                $.ajax({
+                    url: "/load_city_avg_speed/",
+                    data: {
+                        id_city:id
+                    },
+                    type: "POST",
+                    success: function(data) {
+                        $('div.average').replaceWith(data)
+                    },
+                    error:function(jqXHR,textStatus,errorThrown) {
+                        $('div.average').replaceWith('')
+                    }
+                });
+
+            // подгружаем статистику по городу
+                $.ajax({
+                    url: "/load_city_stat/",
+                    data: {
+                        id_city:id
+                    },
+                    type: "POST",
+                    beforeSend: function(){
+                        $('div.stats_block').html("<div class='measurements_qty'><img style='position:relative;left: 50%;top: 50%;margin-top: -8px;margin-left: -110px;' src='/media/img/ajax-loader.gif' alt='' /></div>");
+                    },
+                    success: function(data) {
+                        $('div.stats_block').replaceWith(data)
+                    },
+                    error:function(jqXHR,textStatus,errorThrown) {
+                        $('div.stats_block').replaceWith('')
+                    }
+                });
             }
         return false;
     });
@@ -94,7 +127,6 @@
             </div>
         </div><!--/main_in-->
     </div><!--/overall-->
-
     {% include 'workpoint/stats_block.html' %}
 {% endblock %}
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls.defaults import patterns, include, url
 from django.views.decorators.csrf import csrf_exempt
-from apps.workpoint.views import load_modem_types, load_balloon_content, load_point_marker, about_page, statistic_page, load_city_distincts, load_stat_city_div
+from apps.workpoint.views import load_modem_types, load_balloon_content, load_point_marker, about_page, statistic_page, load_city_distincts, load_stat_city_div, load_city_stat, load_city_avg_speed
 from apps.newsboard.views import news_detail
 from views import index, db_copy
 #from apps.app.urls import urlpatterns as app_url
@@ -17,6 +17,8 @@ urlpatterns = patterns('',
     (r'^load_point_marker/$',csrf_exempt(load_point_marker)),
     (r'^load_city_distincts/$',csrf_exempt(load_city_distincts)),
     (r'^load_stat_city_div/$',csrf_exempt(load_stat_city_div)),
+    (r'^load_city_stat/$',csrf_exempt(load_city_stat)),
+    (r'^load_city_avg_speed/$',csrf_exempt(load_city_avg_speed)),
     #url(r'^faq/', include('apps.faq.urls')),
 
 
