@@ -1,4 +1,5 @@
 {% load thumbnail siteblocks_extras %}
+{% if operators %}
 <div class="stats_block">
     <div class="main_in">
     <div class="op_stats">
@@ -18,7 +19,7 @@
                     <div class="counter_val">{{ operator.curr_city_max_speed|formatted_float }}</div>
                     <div class="counter_glass"></div>
                 </div>
-                <div class="op_stat_lnk"><a href="/">Перейти на карту</a></div>
+                <div class="op_stat_lnk"><a href="/?city_id={{ city_curr.id }}&op_id={{ operator.id }}">Перейти на карту</a></div>
             </div>
         {% endfor %}
         <div class="op_stats_units">
@@ -50,7 +51,7 @@
                                 {% if mtype_avg.id_mtype|floatformat == city_mtype.type|floatformat %}
                                     <td>
                                         <div class="bar_line{% if city_mtype.value == mtype_avg.mtype_avg_value %} bar_line_active{% else %} bar_line_inactive{% endif %} ">
-                                            <div class="bar1 bar1_meg" style="width: {% if mtype_avg.max_avg_mtype %}118{% else %}{% if mtype_avg.avg_pos == 0 %}1{% else %}{{ mtype_avg.avg_pos|floatformat:0 }}{% endif %}{% endif %}px;"></div>
+                                            <div class="bar1 bar1_meg" style="width: {% if mtype_avg.max_avg_mtype %}{% if mtype_avg.mtype_avg_value == 0 %} 1{% else %} 118{% endif %}{% else %}{% if mtype_avg.avg_pos == 0 %}1{% else %}{{ mtype_avg.avg_pos|floatformat:0 }}{% endif %}{% endif %}px;"></div>
                                             <div class="bar_val">{{ mtype_avg.mtype_avg_value|formatted_float }} <div>Мбит/с</div></div>
                                         </div>
                                     </td>
@@ -92,3 +93,8 @@
     </div><!--measurements_qty-->
     </div><!--/main_in-->
 </div>
+{% else %}
+<div class="stats_block">
+    <div class="h_line"><h2>Нет статистики по данному городу</h2></div>
+</div>
+{% endif %}
