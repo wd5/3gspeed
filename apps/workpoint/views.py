@@ -352,6 +352,17 @@ class LoadCityStatistics(View):
             if 'id_city' not in request.POST:
                 return HttpResponseBadRequest()
 
+            id_city = request.POST['id_city']
+            try:
+                id_city = int(id_city)
+            except ValueError:
+                return HttpResponseBadRequest()
+            try:
+                city_curr = City.objects.published().get(id=id_city)
+            except City.DoesNotExist:
+                return HttpResponseBadRequest()
+
+
             if 'id_distinct' in request.POST:
                 id_distinct = request.POST['id_distinct']
             else:
@@ -450,6 +461,7 @@ class LoadCityStatistics(View):
                     html = render_to_string(
                         'workpoint/stats_block.html',
                             {
+                            'city_curr': city_curr,
                             'operators': operators,
                             'interval_array': interval_array,
                             'city_mtypes_max_val_set': city_mtypes_max_val_set
@@ -461,15 +473,6 @@ class LoadCityStatistics(View):
                     else:
                         return HttpResponseBadRequest()
 
-            id_city = request.POST['id_city']
-            try:
-                id_city = int(id_city)
-            except ValueError:
-                return HttpResponseBadRequest()
-            try:
-                city_curr = City.objects.published().get(id=id_city)
-            except City.DoesNotExist:
-                return HttpResponseBadRequest()
             operators = Operator.objects.published()
             max_avg = 0
             max_max = 0
@@ -553,6 +556,7 @@ class LoadCityStatistics(View):
             html = render_to_string(
                 'workpoint/stats_block.html',
                     {
+                    'city_curr': city_curr,
                     'operators': operators,
                     'interval_array': interval_array,
                     'city_mtypes_max_val_set': city_mtypes_max_val_set
