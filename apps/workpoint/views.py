@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from decimal import Decimal
 import os, md5
 from datetime import datetime, date, timedelta
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, HttpResponseForbidden
@@ -9,7 +10,7 @@ from apps.siteblocks.models import Settings
 from apps.newsboard.models import News
 from django.views.generic import ListView, DetailView, DetailView, TemplateView, View
 
-from models import Operator, ModemType, Point, SpeedAtPoint, City, Distinct
+from models import Operator, ModemType, Point, SpeedAtPoint, City, Distinct, Ability, convert_parameter
 
 
 class LoadMTypesAdmin(View):
@@ -185,13 +186,15 @@ load_balloon_content = LoadBalloonContent.as_view()
 class LoadPointMarker(View):
     def post(self, request, *args, **kwargs):
         if request.is_ajax():
-            if 'id_point' not in request.POST or 'op_title' not in request.POST or 'mdm_type' not in request.POST:
+            if 'id_point' not in request.POST or 'op_title' not in request.POST or 'mdm_type' not in request.POST or 'min' not in request.POST or 'max' not in request.POST:
                 return HttpResponseBadRequest()
 
             id_point = request.POST['id_point']
             op_title = request.POST['op_title']
             mdm_type = request.POST['mdm_type']
             mdm_type = mdm_type.replace(',', '.')
+            minMBs = request.POST['min']
+            maxMBs = request.POST['max']
 
             try:
                 id_point = int(id_point)
@@ -203,8 +206,29 @@ class LoadPointMarker(View):
             except Operator.DoesNotExist:
                 return HttpResponseBadRequest()
 
+            if minMBs=='false' or maxMBs=='false':
+                is_interval = 'yes'
+            else:
+                checked_abilities_set = Ability.objects.filter(download_speed__gte=Decimal("%s" % minMBs),download_speed__lte=Decimal("%s" % maxMBs))
+
+                if op_title in [u'Оператор',u'Все'] and mdm_type == u'Тип модема':
+                    point_abilities = curr_point.get_abilities().latest()
+                    filtered_set = checked_abilities_set.filter(id=point_abilities.id)
+                    if filtered_set:
+                        is_interval = 'yes'
+                    else:
+                        is_interval = 'no'
+                else:
+                    point_abilities = curr_point.get_abilities_additional(op_title, mdm_type).latest()
+                    filtered_set = checked_abilities_set.filter(id=point_abilities.id)
+                    if filtered_set:
+                        is_interval = 'yes'
+                    else:
+                        is_interval = 'no'
+
             html_content = curr_point.get_abilitiy_icon_additional(op_title, mdm_type)
-            return HttpResponse(html_content)
+            data = u'''{"url":'%s',"is_in_interval":'%s'}''' % (html_content, is_interval)
+            return HttpResponse(data)
         else:
             return HttpResponseBadRequest(u'')
 

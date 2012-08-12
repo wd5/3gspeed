@@ -21,18 +21,15 @@ def get_average_speed_MBs(op, point):
     MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
     return MBs
 
-
 def get_point_spd_set(op, point):
     point_spd_set = SpeedAtPoint.objects.filter(operator__id=op.id, point__id=point.id).order_by(
         'modem_type__download_speed')
     return point_spd_set
 
-
 def get_abilities_by_speed(speed):
     speed = Decimal("%s" % speed)
     abilities_set = Ability.objects.filter(download_speed__lte=speed)
     return abilities_set
-
 
 def str_price(price):
     if not price:
@@ -55,10 +52,8 @@ def str_price(price):
     else:
         return u'%s' % value
 
-
 def file_path_icons(instance, filename):
     return os.path.join('images', 'operatorIcons', translify(filename).replace(' ', '_'))
-
 
 def file_path_ability_icons(instance, filename):
     return os.path.join('images', 'abilityIcons', translify(filename).replace(' ', '_'))
@@ -89,7 +84,6 @@ class Ability(models.Model):
         if rez < min_pos:
             rez = min_pos
         return rez
-
 
 class City(models.Model):
     title = models.CharField(verbose_name=u'Название', max_length=100, )
@@ -207,7 +201,6 @@ class City(models.Model):
         modem_type_set = ModemType.objects.filter(id__in=modem_type_id_set)
         downlspd_modem_type_set = modem_type_set.values('download_speed').distinct().order_by('download_speed')
         return downlspd_modem_type_set
-
 
 class Distinct(models.Model):
     city = models.ForeignKey(City, verbose_name=u'город')
@@ -404,6 +397,63 @@ class Point(models.Model):
             abilities_set = []
         return abilities_set
 
+    def get_abilities_additional(self, op_title=False, mdm_type=False):
+        try:
+            orerator = Operator.objects.get(title=op_title)
+        except:
+            orerator = False
+        if orerator:
+            try:
+                mdm_type = Decimal("%s" % mdm_type)
+                modem_type_set = ModemType.objects.filter(operator=orerator, download_speed=mdm_type)
+                modem_type_list = []
+                for modem_type in modem_type_set:
+                    modem_type_list.append(modem_type.id)
+            except:
+                modem_type_list = False
+            try:
+                if modem_type_list:
+                    cur_spd_set = SpeedAtPoint.objects.filter(point=self, operator=orerator,
+                        modem_type__id__in=modem_type_list)
+                else:
+                    if modem_type_list == False:
+                        cur_spd_set = SpeedAtPoint.objects.filter(point=self, operator=orerator)
+                    else:
+                        cur_spd_set = False
+            except:
+                cur_spd_set = False
+            if cur_spd_set:
+                point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
+                MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+                abililies_set = get_abilities_by_speed(MBs)
+            else:
+                abililies_set = False
+        else:
+            try:
+                mdm_type = Decimal("%s" % mdm_type)
+                modem_type_set = ModemType.objects.filter(download_speed=mdm_type)
+                modem_type_list = []
+                for modem_type in modem_type_set:
+                    modem_type_list.append(modem_type.id)
+            except:
+                modem_type_set = False
+
+            if modem_type_set:
+                cur_spd_set = SpeedAtPoint.objects.filter(point=self, modem_type__id__in=modem_type_list)
+            else:
+                cur_spd_set = False
+
+            if cur_spd_set:
+                point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
+                MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+                abililies_set = get_abilities_by_speed(MBs)
+            else:
+                if modem_type_set == False:
+                    abililies_set = self.get_abilities()
+                else:
+                    abililies_set = []
+        return abililies_set
+
     def get_abilitiy_icon(self):
         abilities = self.get_abilities()
         if abilities:
@@ -475,7 +525,6 @@ class Point(models.Model):
             url = '/media/img/map_ic0.png'
         return url
 
-
 class Operator(models.Model):
     title = models.CharField(verbose_name=u'Название', max_length=100, )
     icon = ImageField(verbose_name=u'картинка', upload_to=file_path_icons)
@@ -499,7 +548,6 @@ class Operator(models.Model):
     def get_points_speeds_types(self):
         return self.speedatpoint_set.all()
 
-
 class ModemType(models.Model):
     operator = models.ForeignKey(Operator, verbose_name=u'оператор')
     vendor = models.CharField(verbose_name=u'производитель', max_length=100, )
@@ -522,7 +570,6 @@ class ModemType(models.Model):
         value = round(value, 1)
         value = str(value).replace(',', '.')
         return value
-
 
 class SpeedAtPoint(models.Model):
     point = models.ForeignKey(Point, verbose_name=u'точка')

@@ -10,7 +10,6 @@
     <script src="http://api-maps.yandex.ru/2.0/?load=package.full&mode=debug&lang=ru-RU" type="text/javascript"></script>
     <script type="text/javascript">
     $(function(){
-
         ymaps.ready(function () {
             {% if city_curr %} // если выбран текущий город, то ставин карту в его центр
                 var map = new ymaps.Map("map",
@@ -41,7 +40,7 @@
                         balloonContent: '',
                         point_id: '{{ point.id }}',
                         city_id: '{{ city_curr.id }}',
-                        operators_titles: ['Все',{% for operator in point.get_operators_without_params %}'{{ operator.title }}'{% if not forloop.last %},{% endif %}{% endfor %}]
+                        operators_titles: ['Оператор','Все',{% for operator in point.get_operators_without_params %}'{{ operator.title }}'{% if not forloop.last %},{% endif %}{% endfor %}]
                     },
                     {
                         // Не скрывать иконку метки при открытии балуна
@@ -88,10 +87,6 @@
 
             {% endfor %}
 
-/*            pointsSet.events.add('click', function (item) {
-                alert(item.balloon.isOpen())
-            });*/
-
             {% for city in cities %}
                 {% for point in city.get_points %}
                     var point_{{ point.id }} = new ymaps.Placemark([{{ point.coord }}],
@@ -106,6 +101,7 @@
                             hideIconOnBalloonOpen: false,
                             openBalloonOnClick: false,
                             // Изображение иконки метки
+                            iconImageHref: '',
                             {% if op_curr %}
                                 // если выбран какой-либо оператор - то ставим иконку для него
                                 iconImageHref: '{% call "point.get_abilitiy_icon_additional" with op_curr.title %}',
@@ -240,11 +236,13 @@
                     });
                     }
 
-                var pointsSetRemoved = new ymaps.GeoObjectCollection(); // удаленные
-
                 if ((parent.is('.map_op_select')) || (parent.is('.map_modem_select')))
                     {
-                        map.geoObjects.each(function (collection) {
+                        var vals = $('#map_slider').slider( "option", "values" )
+                        var minMBs = (vals[0]/250)-0.4
+                        var maxMBs = (vals[1]/250)-0.4
+                        LoadPMarker(curr_op,curr_mtype,minMBs,maxMBs)
+                        /*map.geoObjects.each(function (collection) {
                             collection.each(function (item) {
                                 var id_point = item.properties.get('point_id')
                                 var op_list = item.properties.get('operators_titles')
@@ -258,9 +256,11 @@
                                     },
                                     type: "POST",
                                     success: function(data) {
+                                        data = eval('(' + data + ')');
                                         if (op_list.indexOf(curr_op)!=-1)
                                             {
-                                                item.options.set('iconImageHref', data);
+                                                item.options.set('iconImageHref', data.url);
+                                                item.options.set('iconImageHrefId', data.id);
                                             }
                                         else
                                             {
@@ -270,8 +270,9 @@
                                     }
                                 });
                             });
-                        });
+                        });*/
                     }
+
 
                 return false;
         	});
@@ -302,6 +303,81 @@
                     }
 
             });
+
+            $("#map_slider").slider({
+            		range: true,
+            		min: 100,
+            		max: 850,
+            		values: [ 100, 850 ],
+                    value: 1,
+                    step: 1,
+                    slide: function(event, ui) {
+                        var vals = $(this).slider( "option", "values" )
+                        var icons_set = $('div.map_slider_ics span')
+                        var length = icons_set.length
+                        for (var i = 0; i <= length-1; i++)
+                            {
+                                var elem = icons_set.eq(i)
+                                var css_lft = elem.css('left').replace("px","")
+                                css_lft = parseInt(css_lft)
+                                if ((vals[1]>css_lft) && (vals[0]<css_lft))
+                                    {elem.addClass("map_slider_active")}
+                                else
+                                    {elem.removeClass("map_slider_active")}
+                            }
+                    },
+                    stop: function(event, ui) {
+                        var vals = $(this).slider( "option", "values" )
+                        var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","")
+                        var curr_mtype =$('div.map_modem_select div.select_curr').html().replace("<div></div>","")
+                        var minMBs = (vals[0]/250)-0.4
+                        var maxMBs = (vals[1]/250)-0.4
+                        LoadPMarker(curr_op,curr_mtype, minMBs, maxMBs)
+                    }
+            	});
+
+            function LoadPMarker(curr_op,curr_mtype,min,max)
+                {
+                    //$('#map').prepend('<div style="background: #f3f3f3;width:1200px;height: 610px;z-index:10;position: absolute;opacity: 0.7;" class="loader"><img style="position:relative;left: 50%;top: 50%;margin-top: -8px;margin-left: -110px;" src="/media/img/ajax-loader.gif" alt="" /></div>');
+                    map.geoObjects.each(function (collection) {
+                        collection.each(function (item) {
+                            var id_point = item.properties.get('point_id')
+                            var op_list = item.properties.get('operators_titles')
+                            collection.remove(item)
+                            $.ajax({
+                                url: "/load_point_marker/",
+                                data: {
+                                    id_point:id_point,
+                                    op_title:curr_op,
+                                    mdm_type:curr_mtype,
+                                    min: min,
+                                    max: max
+                                },
+                                type: "POST",
+                                success: function(data) {
+                                    data = eval('(' + data + ')');
+                                    if ((op_list.indexOf(curr_op)!=-1) && (data.is_in_interval=='yes'))
+                                        {
+                                            item.options.set('iconImageHref', data.url);
+                                            item.options.set('iconImageHrefId', data.id);
+                                        }
+                                    else
+                                        {
+                                            item.options.set('iconImageHref', '');
+                                        }
+                                    collection.add(item)
+                                },
+                                error:function(jqXHR,textStatus,errorThrown) {
+                                    item.options.set('iconImageHref', '');
+                                    collection.add(item)
+                                }
+                            });
+                        });
+
+                    });
+                    //$('#map .loader').remove();
+                }
+
         });
     });
     </script>
