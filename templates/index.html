@@ -40,14 +40,25 @@
                     {
                         balloonContent: '',
                         point_id: '{{ point.id }}',
-                        city_id: '{{ city_curr.id }}'
+                        city_id: '{{ city_curr.id }}',
+                        operators_titles: ['Все',{% for operator in point.get_operators_without_params %}'{{ operator.title }}'{% if not forloop.last %},{% endif %}{% endfor %}]
                     },
                     {
                         // Не скрывать иконку метки при открытии балуна
                         hideIconOnBalloonOpen: false,
                         openBalloonOnClick: false,
                         // Изображение иконки метки
-                        iconImageHref: '{{ point.get_abilitiy_icon }}',
+                        {% if op_curr %}
+                            // если выбран какой-либо оператор - то ставим иконку для него
+                            iconImageHref: '',
+                            {% for operator in point.get_operators_without_params %}
+                                {% if operator.id == op_curr.id %}
+                                    iconImageHref: '{% call "point.get_abilitiy_icon_additional" with op_curr.title %}',
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            iconImageHref: '{{ point.get_abilitiy_icon }}',
+                        {% endif %}
                         // Задаем макет балуна - пользовательская картинка с контентом
                         balloonLayout: "default#imageWithContent",
                         // Размеры содержимого балуна
@@ -59,7 +70,6 @@
                     }
                 );
                 pointsSet.add(point_{{ point.id }});
-
 
                 //map.geoObjects.add(point_{{ point.id }});
 /*                point_{{ point.id }}.events.add('balloonopen', function () {
@@ -88,14 +98,20 @@
                         {
                             balloonContent: '',
                             point_id: '{{ point.id }}',
-                            city_id: '{{ city.id }}'
+                            city_id: '{{ city.id }}',
+                            operators_titles: ['Все',{% for operator in point.get_operators_without_params %}"{{ operator.title }}"{% if not forloop.last %},{% endif %}{% endfor %}]
                         },
                         {
                             // Не скрывать иконку метки при открытии балуна
                             hideIconOnBalloonOpen: false,
                             openBalloonOnClick: false,
                             // Изображение иконки метки
-                            iconImageHref: '{{ point.get_abilitiy_icon }}',
+                            {% if op_curr %}
+                                // если выбран какой-либо оператор - то ставим иконку для него
+                                iconImageHref: '{% call "point.get_abilitiy_icon_additional" with op_curr.title %}',
+                            {% else %}
+                                iconImageHref: '{{ point.get_abilitiy_icon }}',
+                            {% endif %}
                             // Задаем макет балуна - пользовательская картинка с контентом
                             balloonLayout: "default#imageWithContent",
                             // Размеры содержимого балуна
@@ -148,7 +164,6 @@
             map.events.add('click', function (item) {
                 map.balloon.close()
             });
-
 
             $(".select_drop li a").live('click', function(){
         		var el = $(this)
@@ -225,11 +240,14 @@
                     });
                     }
 
+                var pointsSetRemoved = new ymaps.GeoObjectCollection(); // удаленные
+
                 if ((parent.is('.map_op_select')) || (parent.is('.map_modem_select')))
                     {
                         map.geoObjects.each(function (collection) {
                             collection.each(function (item) {
                                 var id_point = item.properties.get('point_id')
+                                var op_list = item.properties.get('operators_titles')
                                 collection.remove(item)
                                 $.ajax({
                                     url: "/load_point_marker/",
@@ -240,7 +258,14 @@
                                     },
                                     type: "POST",
                                     success: function(data) {
-                                        item.options.set('iconImageHref', data);
+                                        if (op_list.indexOf(curr_op)!=-1)
+                                            {
+                                                item.options.set('iconImageHref', data);
+                                            }
+                                        else
+                                            {
+                                                item.options.set('iconImageHref', '');
+                                            }
                                         collection.add(item)
                                     }
                                 });
@@ -277,9 +302,6 @@
                     }
 
             });
-
-
-
         });
     });
     </script>
@@ -308,12 +330,14 @@
                 {% endif %}
                 {% if operators %}
                 <div class="map_op_select select">
-                    <div class="select_curr">Оператор<div></div></div>
+                    <div class="select_curr">{% if op_curr %}{{ op_curr.title }}{% else %}Оператор{% endif %}<div></div></div>
                     <div class="select_drop">
                         <ul>
                             <li><a href="#">Все</a></li>
                             {% for operator in operators %}
-                                <li><a href="#">{{ operator.title }}</a></li>
+                                {% if op_curr.id != operator.id %}
+                                    <li><a href="#">{{ operator.title }}</a></li>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                     </div>
@@ -402,7 +426,7 @@
                     <h2>Количество замеров</h2>
                     <div class="measure_qty">{{ curr_city_pts_count }}</div>
                     <div class="measure_label">замеров скорости интернета в Санкт-Петербурге</div>
-                    <div class="measure_all"><a href="/statistic/">Вся статистика</a></div>
+                    <div class="measure_all"><a href="/statistic/?city={{ city_curr.id }}">Вся статистика</a></div>
                 </div>
             </div>
         </div><!--/index_calcs-->

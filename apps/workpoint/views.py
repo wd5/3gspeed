@@ -96,7 +96,7 @@ class LoadCityStatDivs(View):
                 html = render_to_string(
                     'workpoint/pt_count_block_template.html',
                         {
-                        'title': curr_city.title_second,
+                        'curr_city': curr_city,
                         'count': curr_city_pts_count
                     })
                 return HttpResponse(html)
@@ -239,10 +239,17 @@ class StatisticView(TemplateView):
         cities = City.objects.published()
         try:
             try:
-                stat_curr_city_id = Settings.objects.get(name='stat_curr_city_id').value
-                city_curr = cities.get(id=stat_curr_city_id)
+                city_id = self.request.GET['city']
+                city_id = int(city_id)
+                city_curr = cities.get(id=city_id)
             except:
-                city_curr = cities[0]
+                city_id = False
+            if not city_id:
+                try:
+                    stat_curr_city_id = Settings.objects.get(name='stat_curr_city_id').value
+                    city_curr = cities.get(id=stat_curr_city_id)
+                except:
+                    city_curr = cities[0]
             context['cities'] = cities.exclude(id=city_curr.id)
             context['city_curr'] = city_curr
         except:

@@ -346,6 +346,15 @@ class Point(models.Model):
     def get_speed_values(self):
         return self.speedatpoint_set.all()
 
+    def get_operators_without_params(self):
+        speed_values = self.get_speed_values()
+        operators = speed_values.values('operator').distinct().order_by('operator')
+        id_operators = []
+        for id in operators:
+            id_operators.append(id['operator'])
+        operators_set = Operator.objects.published().filter(id__in=id_operators)
+        return operators_set
+
     def get_operators(self):
         speed_values = self.get_speed_values()
         operators = speed_values.values('operator').distinct().order_by('operator')

@@ -19,8 +19,18 @@ class IndexView(TemplateView):
         cities = City.objects.published()
         try:
             try:
-                map_curr_city_id = Settings.objects.get(name='map_curr_city_id').value
-                city_curr = cities.get(id=map_curr_city_id)
+                try:
+                    city_id = self.request.GET['city_id']
+                    city_id = int(city_id)
+                    city_curr = cities.get(id=city_id)
+                except:
+                    city_id = False
+                if not city_id:
+                    try:
+                        map_curr_city_id = Settings.objects.get(name='map_curr_city_id').value
+                        city_curr = cities.get(id=map_curr_city_id)
+                    except:
+                        city_curr = cities[0]
             except:
                 city_curr = cities[0]
             context['cities'] = cities.exclude(id=city_curr.id)
@@ -32,7 +42,6 @@ class IndexView(TemplateView):
             context['points'] = city_curr.get_points()
             context['curr_city_pts_count'] = city_curr.get_pts_count()
         operators = Operator.objects.published()
-        context['operators'] = operators
         if city_curr:
             max_avg = 0
             max_max = 0
@@ -62,6 +71,15 @@ class IndexView(TemplateView):
                 if operator.id != id_max and id_max != None:
                     setattr(operator, 'curr_city_max_speed_pos', max_mult * operator.curr_city_max_speed)
 
+
+        try:
+            op_id = self.request.GET['op_id']
+            op_id = int(op_id)
+            op_curr = operators.get(id=op_id)
+            context['op_curr'] = op_curr
+        except:
+            context['op_curr'] = False
+        context['operators'] = operators
         mtypes = ModemType.objects.values('download_speed').distinct().order_by('download_speed')
         context['mtypes'] = mtypes
         abilities = Ability.objects.all()
