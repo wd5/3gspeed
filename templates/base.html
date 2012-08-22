@@ -39,10 +39,9 @@
 			<img id="logo" src="/media/img/logo.png" alt="3GSpeed" />
 			<span id="logo_note">Измеряем мобильный интернет</span>
 		</a>
-
-		<div class="search">
-			<input class="search_input" type="text" placeholder="Поиск по адресу" />
-		</div>
+    		<div class="search"><form method="get" action="/">
+    			<input class="search_input" type="text" placeholder="Поиск по адресу" name="search" value="{{ search }}" />
+    		</form></div>
 
 		<div class="menu">
 			<ul>

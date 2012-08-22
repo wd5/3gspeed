@@ -16,9 +16,9 @@
     <div class="main_in">
         <div class="about">
             <div class="measurements_qty col">
-                <h2>{{ news_current.title }}</h2>
+                <h2 class="new_page_h">{{ news_current.title }}</h2>
                 <div class="timeline_date">{{ news_current.date_add|date:"j E Y" }}г</div>
-                <div class="{% if not news_current.text %}text{% else %}timeline_date{% endif %}">
+                <div class="{% if not news_current.text %}text{% else %}timeline_date{% endif %} new_page_short">
                     {{ news_current.short_text|safe }}
                 </div>
                 <div class="text">

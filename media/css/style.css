@@ -54,7 +54,7 @@ body {
 .wrapper {
 	box-shadow: 0px 3px 10px #888;
 	margin: 0 auto;
-	max-width: 1200px;
+	max-width: 1300px;
 	min-width: 998px;
 }
 
@@ -101,7 +101,7 @@ input, textarea {
 /*-----------------HEADER-----------------*/
 /*layout*/
 .header {
-	background: url('../img/colorline.png') no-repeat center 100%;
+	background: url('../img/colorline.png') repeat-x center 100%;
 	height: 120px;
 }
 .header_in {
@@ -241,6 +241,21 @@ input, textarea {
 	height: 57px;
 	position: absolute;
 }
+
+.map_preload {
+	background: url('../img/preload_bg.png');
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+}
+.preloader {
+	background: url('../img/preloader.gif') no-repeat;
+	width: 32px;
+	height: 32px;
+	margin: 240px auto 0 auto;
+}
 /*/index_map*/
 
 
@@ -250,6 +265,8 @@ input, textarea {
 	border: 3px solid #3189c7;
 	border-radius: 4px;
 	width: 360px;
+	height: 258px;
+	position: relative;
 }
 .map_popup_b {
 	background: url('../img/map_popup_b.png') no-repeat;
@@ -258,8 +275,8 @@ input, textarea {
 	height: 16px;
 	position: absolute;
     /*<!-- !!! -->*/
-	/*bottom: -16px;
-	left: -3px;*/
+	bottom: -16px;
+	left: -3px;
 }
 .map_popup_close {
 	cursor: pointer;
@@ -268,9 +285,9 @@ input, textarea {
 	height: 27px;
 	position: absolute;
     /*<!-- !!! -->*/
-	top: -8px;
+	top: -16px;
     /*<!-- !!! -->*/
-	right: -26px;
+	right: -16px;
 }
 
 .tab_hidden {
@@ -278,7 +295,7 @@ input, textarea {
 }
 
 .map_popup_info {
-	margin: 0 0 20px 0;
+	margin: 0 0 10px 0;
 }
 .map_popup_info_table {
 	border-collapse: collapse;
@@ -327,7 +344,8 @@ input, textarea {
 
 .map_popup_ics {
 	text-align: center;
-	padding: 10px 0 20px 0;
+	padding: 5px 0 10px 0;
+	height: 30px;
 }
 .map_popup_ics span {
 	background-position: 50% 0;
@@ -621,25 +639,25 @@ background-position: 50% -50px;
 	background-position: 0 -288px;
 	height: 33px;
 }
-.bar1_mts {
+.operator_1 .bar1 {
 	background-position: 0 0;
 	border-color: #b5575a;
 }
-.bar1_meg {
+.operator_2 .bar1 {
 	background-position: 0 -82px;
 	border-color: #64966c;
 }
-.bar1_bee {
+.operator_3 .bar1 {
 	background-position: 0 -41px;
 	border-color: #cca563;
 }
-.bar2_mts {
+.operator_1 .bar2 {
 	background-position: 0 -162px;
 }
-.bar2_meg {
+.operator_2 .bar2 {
 	background-position: 0 -246px;
 }
-.bar2_bee {
+.operator_3 .bar2 {
 	background-position: 0 -204px;
 }
 
@@ -1224,6 +1242,16 @@ background-position: 50% -50px;
 	padding: 23px 0 0 0;
 }
 
+.new_page_h {
+	font-size: 24px;
+	line-height: 30px;
+}
+.new_page_short {
+	color: #000;
+	font-style: italic;
+	font-size: 14px;
+	margin: 0 0 12px 0;
+}
 /*/timeline*/
 /*-----------------PAGE-END-----------------*/
 

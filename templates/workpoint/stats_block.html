@@ -49,7 +49,7 @@
                         {% for operator in operators %}
                             {% for mtype_avg in operator.mtype_avg_set %}
                                 {% if mtype_avg.id_mtype|floatformat == city_mtype.type|floatformat %}
-                                    <td>
+                                    <td class="operator_{{ operator.id }}">
                                         <div class="bar_line{% if city_mtype.value == mtype_avg.mtype_avg_value %} bar_line_active{% else %} bar_line_inactive{% endif %} ">
                                             <div class="bar1 bar1_meg" style="width: {% if mtype_avg.max_avg_mtype %}{% if mtype_avg.mtype_avg_value == 0 %} 1{% else %} 118{% endif %}{% else %}{% if mtype_avg.avg_pos == 0 %}1{% else %}{{ mtype_avg.avg_pos|floatformat:0 }}{% endif %}{% endif %}px;"></div>
                                             <div class="bar_val">{{ mtype_avg.mtype_avg_value|formatted_float }} <div>Мбит/с</div></div>
