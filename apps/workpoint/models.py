@@ -365,7 +365,7 @@ class Point(models.Model):
             speed_values = self.speedatpoint_all
         else:
             speed_values = self.speed_values
-        operators = dict()
+        operators = list()
 
         for item in speed_values:
             MBs = (item.internet_speed / convert_parameter) * 8
@@ -373,7 +373,7 @@ class Point(models.Model):
             op_values['op_id'] = int(item.operator_id)
             op_values['modem_id'] = int(item.modem_type_id)
             op_values['speed'] = round(MBs,1)
-            operators[item.id] = op_values
+            operators.append(op_values)
         #result = [x for x in set(operators)]
         return operators
     
