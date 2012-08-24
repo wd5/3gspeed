@@ -11,6 +11,7 @@ from apps.utils.utils import ImageField
 from django.db.models.signals import post_save
 from apps.utils.managers import PublishedManager
 from mptt.models import MPTTModel, TreeForeignKey, TreeManager
+from batch_select.models import BatchManager
 
 #convert_parameter = 1024 * 1024
 convert_parameter = 1000 * 1000
@@ -25,11 +26,6 @@ def get_point_spd_set(op, point):
     point_spd_set = SpeedAtPoint.objects.filter(operator__id=op.id, point__id=point.id).order_by(
         'modem_type__download_speed')
     return point_spd_set
-
-def get_abilities_by_speed(speed):
-    speed = Decimal("%s" % speed)
-    abilities_set = Ability.objects.filter(download_speed__lte=speed)
-    return abilities_set
 
 def str_price(price):
     if not price:
@@ -107,8 +103,13 @@ class City(models.Model):
         return self.distinct_set.published()
 
     def get_points(self):
-        points_set = Point.objects.filter(distinct__city__id=self.id)
+        #points_set = Point.objects.filter(distinct__city__id=self.id)
+        points_set = Point.objects.filter(distinct__city__id=self.id).batch_select('speedatpoint')
+
         return points_set
+
+    #здесь переделать, можно просто отдельно заново взять все точки
+
 
     def get_pts_count(self, operator=False, min=False, max=False):
         if operator:
@@ -138,6 +139,7 @@ class City(models.Model):
                 all_pts_count = 0
                 for point in points_set:
                     point_speed_cnt = point.get_speed_values().count()
+                    #point_speed_cnt = len(point.get_speed_values())
                     all_pts_count = all_pts_count + point_speed_cnt
         return all_pts_count
 
@@ -196,11 +198,9 @@ class City(models.Model):
         return speed_value
 
     def get_mtypes(self):
-        modem_type_id_set = SpeedAtPoint.objects.filter(point__distinct__city__id=self.id).values(
-            'modem_type').distinct().order_by('modem_type')
+        modem_type_id_set = SpeedAtPoint.objects.filter(point__distinct__city__id=self.id).values('modem_type__id')
         modem_type_set = ModemType.objects.filter(id__in=modem_type_id_set)
-        downlspd_modem_type_set = modem_type_set.values('download_speed').distinct().order_by('download_speed')
-        return downlspd_modem_type_set
+        return modem_type_set
 
 class Distinct(models.Model):
     city = models.ForeignKey(City, verbose_name=u'город')
@@ -317,11 +317,19 @@ class Point(models.Model):
     coord = models.CharField(max_length=100, verbose_name=u'Координаты точки')
     map = models.CharField(max_length=1, verbose_name=u'Карта', blank=True)
     datetime_create = models.DateTimeField(verbose_name=u'Дата создания точки', default=datetime.datetime.now)
+    
+    all_abilities = Ability.objects.all()
+    objects = BatchManager()
 
     class Meta:
         ordering = ['-datetime_create']
         verbose_name = _(u'point')
         verbose_name_plural = _(u'points')
+
+    def get_abilities_by_speed(self, speed):
+        speed = Decimal("%s" % speed)
+        abilities_set = self.all_abilities.filter(download_speed__lte=speed)
+        return abilities_set
 
     def __unicode__(self):
         return u'%s - %s' % (self.distinct.title, self.coord)
@@ -337,17 +345,38 @@ class Point(models.Model):
         return MBs
 
     def get_speed_values(self):
+        #list = self.speedatpoint_all
+        #queryset = SpeedAtPoint.objects.filter(id__in=[o.id for o in list])
+        #return list
         return self.speedatpoint_set.all()
 
     def get_operators_without_params(self):
         speed_values = self.get_speed_values()
         operators = speed_values.values('operator').distinct().order_by('operator')
+
         id_operators = []
         for id in operators:
             id_operators.append(id['operator'])
         operators_set = Operator.objects.published().filter(id__in=id_operators)
         return operators_set
+    
+    def get_operators_ids(self):
+        if not self.speed_values:
+            speed_values = self.speedatpoint_all
+        else:
+            speed_values = self.speed_values
+        operators = dict()
 
+        for item in speed_values:
+            MBs = (item.internet_speed / convert_parameter) * 8
+            op_values = dict()
+            op_values['op_id'] = int(item.operator_id)
+            op_values['modem_id'] = int(item.modem_type_id)
+            op_values['speed'] = round(MBs,1)
+            operators[item.id] = op_values
+        #result = [x for x in set(operators)]
+        return operators
+    
     def get_operators(self):
         speed_values = self.get_speed_values()
         operators = speed_values.values('operator').distinct().order_by('operator')
@@ -384,15 +413,25 @@ class Point(models.Model):
         return popup_html
 
     def get_abilities(self): # максимум из средних по операторам
-        speed_values = self.get_speed_values()
-        operators = speed_values.values('operator').annotate(avgspeed=Avg('internet_speed')).order_by('-avgspeed')
+        if not self.speed_values:
+            speed_values = self.speedatpoint_all
+        else:
+            speed_values = self.speed_values
+
+        #operators = speed_values.values('operator').annotate(avgspeed=Avg('internet_speed')).order_by('-avgspeed')
+        avg = 0
+        for item in speed_values:
+            avg = avg + item.internet_speed
+
         try:
-            operators_with_max_speed = operators[0]['avgspeed']
+            #operators_with_max_speed = operators[0]['avgspeed']
+            operators_with_max_speed = round(avg / len(speed_values), 1)
         except:
             operators_with_max_speed = False
+
         if operators_with_max_speed:
             MBs = (operators_with_max_speed / convert_parameter) * 8
-            abilities_set = get_abilities_by_speed(MBs)
+            abilities_set = self.get_abilities_by_speed(MBs)
         else:
             abilities_set = []
         return abilities_set
@@ -425,7 +464,7 @@ class Point(models.Model):
             if cur_spd_set:
                 point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
                 MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
-                abililies_set = get_abilities_by_speed(MBs)
+                abililies_set = self.get_abilities_by_speed(MBs)
             else:
                 abililies_set = False
         else:
@@ -446,7 +485,7 @@ class Point(models.Model):
             if cur_spd_set:
                 point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
                 MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
-                abililies_set = get_abilities_by_speed(MBs)
+                abililies_set = self.get_abilities_by_speed(MBs)
             else:
                 if modem_type_set == False:
                     abililies_set = self.get_abilities()
@@ -491,7 +530,7 @@ class Point(models.Model):
             if cur_spd_set:
                 point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
                 MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
-                abililies_set = get_abilities_by_speed(MBs)
+                abililies_set = self.get_abilities_by_speed(MBs)
             else:
                 abililies_set = False
         else:
@@ -512,7 +551,7 @@ class Point(models.Model):
             if cur_spd_set:
                 point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
                 MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
-                abililies_set = get_abilities_by_speed(MBs)
+                abililies_set = self.get_abilities_by_speed(MBs)
             else:
                 if modem_type_set == False:
                     abililies_set = self.get_abilities()
@@ -576,6 +615,8 @@ class SpeedAtPoint(models.Model):
     operator = models.ForeignKey(Operator, verbose_name=u'оператор')
     modem_type = models.ForeignKey(ModemType, verbose_name=u'тим модема')
     internet_speed = models.DecimalField(verbose_name=u'скорость загрузки', decimal_places=2, max_digits=10, )
+    
+    objects = BatchManager()
 
     class Meta:
         ordering = ['-point']

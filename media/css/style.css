@@ -346,6 +346,10 @@ input, textarea {
 	text-align: center;
 	padding: 5px 0 10px 0;
 	height: 30px;
+	width: 360px;
+	position: absolute;
+	left: 0;
+	bottom: 4px;
 }
 .map_popup_ics span {
 	background-position: 50% 0;
@@ -568,7 +572,7 @@ background-position: 50% -50px;
 	margin: 0 0 36px 0;
 }
 .index_calcs_in {
-	margin-left: -20px;
+	margin-left: -6px;
 }
 .index_calc {
 	background: #f3f3f3;
@@ -576,8 +580,11 @@ background-position: 50% -50px;
 	border-radius: 4px;
 	width: 252px;
 	height: 276px;
-	padding: 24px 24px 0 24px;
+	padding: 24px 23px 0 24px;
 	margin: 0 0 0 14px;
+}
+.avg_speed {
+	margin-left: 0;
 }
 .index_calc:hover {
 	border-color: #3189c7;

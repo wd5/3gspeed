@@ -26,13 +26,17 @@
 
             $.getJSON('/get_points_json/', function(json){
                 $.each(json.points, function(i, point){
+                    // -
+
+
+
                     coord = point.coord.split(',');
                     var placemark = new ymaps.Placemark(coord,
                         {
                             balloonContent: '',
                             point_id: point.id,
                             city_id: json.city_id,
-                            operators_titles: point.operators
+                            //operators_titles: point.operators
                         },
                         {
                             hideIconOnBalloonOpen: false,
@@ -242,10 +246,11 @@
                                 var elem = icons_set.eq(i)
                                 var css_lft = elem.css('left').replace("px","")
                                 css_lft = parseInt(css_lft)
-                                if ((vals[1]>css_lft) && (vals[0]<css_lft))
-                                    {elem.addClass("map_slider_active")}
-                                else
-                                    {elem.removeClass("map_slider_active")}
+                                if ((vals[1] > css_lft) && (vals[0] < css_lft)) {
+                                    elem.addClass("map_slider_active")
+                                } else {
+                                    elem.removeClass("map_slider_active")
+                                }
                             }
                     },
                     stop: function(event, ui) {
@@ -260,12 +265,45 @@
 
             function LoadPMarker(curr_op,curr_mtype,min,max)
                 {
-                    //$('#map').prepend('<div style="background: #f3f3f3;width:1200px;height: 610px;z-index:10;position: absolute;opacity: 0.7;" class="loader"><img style="position:relative;left: 50%;top: 50%;margin-top: -8px;margin-left: -110px;" src="/media/img/ajax-loader.gif" alt="" /></div>');
                     map.geoObjects.each(function (collection) {
-                        collection.each(function (item) {
-                            var id_point = item.properties.get('point_id')
-                            var op_list = item.properties.get('operators_titles')
-                            collection.remove(item)
+                        arr = collection._geoObjects;
+                        for (i in arr) {
+                            var item = arr[i].geoObject;
+                            var id_point = item.properties.get('point_id');
+                            var op_list = item.properties.get('operators_titles');
+                            collection.remove(item);
+                            $.ajax({
+                                url: "/load_point_marker/",
+                                data: {
+                                    id_point:id_point,
+                                    op_title:curr_op,
+                                    mdm_type:curr_mtype,
+                                    min: min,
+                                    max: max
+                                },
+                                type: "POST",
+                                success: function(data) {
+                                    data = eval('(' + data + ')');
+                                    if ((op_list.indexOf(curr_op)!=-1) && (data.is_in_interval=='yes'))
+                                        {
+                                            item.options.set('iconImageHref', data.url);
+                                            item.options.set('iconImageHrefId', data.id);
+                                        }
+                                    else
+                                        {
+                                            item.options.set('iconImageHref', '');
+                                        }
+                                    collection.add(item)
+                                },
+                                error:function(jqXHR,textStatus,errorThrown) {
+                                    item.options.set('iconImageHref', '');
+                                    collection.add(item);
+                                }
+                            });
+                        }
+                        
+                        /*
+                            
                             $.ajax({
                                 url: "/load_point_marker/",
                                 data: {
@@ -295,9 +333,9 @@
                                 }
                             });
                         });
+                        */
 
                     });
-                    //$('#map .loader').remove();
                 }
 
 

@@ -27,7 +27,7 @@ urlpatterns = patterns('',
 
 
     #(r'^shop_point_label/(?P<pk>\d*)/$',shop_point_label),
-    (r'^database_copy/$',db_copy),
+    #(r'^database_copy/$',db_copy),
 )
 #url(r'^captcha/', include('captcha.urls')),
 
