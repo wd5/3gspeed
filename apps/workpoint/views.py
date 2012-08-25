@@ -11,7 +11,7 @@ from apps.newsboard.models import News
 from django.views.generic import ListView, DetailView, DetailView, TemplateView, View
 
 from models import Operator, ModemType, Point, SpeedAtPoint, City, Distinct, Ability, convert_parameter
-
+from batch_select.models import BatchManager
 
 class LoadMTypesAdmin(View):
     def post(self, request, *args, **kwargs):
@@ -153,13 +153,10 @@ class LoadCityStatDivs(View):
 load_stat_city_div = LoadCityStatDivs.as_view()
 
 class LoadBalloonContent(View):
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         if request.is_ajax():
-            if 'id_point' not in request.POST or 'op_title' not in request.POST:
-                return HttpResponseBadRequest()
-
-            id_point = request.POST['id_point']
-            op_title = request.POST['op_title']
+            id_point = request.GET.get('id_point', None)
+            op_title = request.GET.get('op_title', None)
 
             try:
                 id_point = int(id_point)
@@ -167,16 +164,18 @@ class LoadBalloonContent(View):
                 return HttpResponseBadRequest()
 
             try:
-                operator = Operator.objects.published().get(title=op_title)
+                operator = Operator.objects.get(title=op_title)
             except:
                 operator = False
 
             try:
-                curr_point = Point.objects.get(id=id_point)
+                curr_point = Point.objects.filter(id=id_point).batch_select('speedatpoint')
+                curr_point = curr_point[0]
             except Operator.DoesNotExist:
                 return HttpResponseBadRequest()
 
             html_content = curr_point.get_popup_window(operator)
+
             return HttpResponse(html_content)
         else:
             return HttpResponseBadRequest(u'')
@@ -296,7 +295,7 @@ class StatisticView(TemplateView):
                 city_mtypes = city_curr.get_mtypes()
                 city_mtypes_max_val_set = []
                 for item in city_mtypes:
-                    city_mtypes_max_val_set.append({'type': '%s' % item['download_speed'], 'value': 0})
+                    city_mtypes_max_val_set.append({'type': '%s' % item.download_speed, 'value': 0})
                 for operator in operators:
                     avg_value = city_curr.get_city_speed('avg', operator)
                     max_value = city_curr.get_city_speed('max', operator)
@@ -312,19 +311,19 @@ class StatisticView(TemplateView):
                     tmodems_set = tmodems_set.values('download_speed').distinct().order_by('download_speed')
                     max_avg_mtype = 0
                     max_avg_mtype_set = []
-                    #for mtype in tmodems_set:
+                    
                     for mtype in city_mtypes:
-                        mtype_avg_value = city_curr.get_city_speed('avg', operator, mtype['download_speed'])
+                        mtype_avg_value = city_curr.get_city_speed('avg', operator, mtype.download_speed)
                         for item in city_mtypes_max_val_set:
-                            if item['type'] == '%s' % mtype['download_speed']:
+                            if item['type'] == '%s' % mtype.download_speed:
                                 if item['value'] < mtype_avg_value:
                                     item['value'] = round(mtype_avg_value, 1)
 
                         if max_avg_mtype < mtype_avg_value:
                             max_avg_mtype = mtype_avg_value
-                            id_avg_mtype = mtype['download_speed']
+                            id_avg_mtype = mtype.download_speed
                         max_avg_mtype_set.append(
-                                {'id_mtype': mtype['download_speed'], 'mtype_avg_value': round(mtype_avg_value, 1),
+                                {'id_mtype': mtype.download_speed, 'mtype_avg_value': round(mtype_avg_value, 1),
                                  'max_avg_mtype': False, 'avg_pos': 0})
                     for item in max_avg_mtype_set:
                         if item['id_mtype'] == id_avg_mtype:
@@ -333,6 +332,7 @@ class StatisticView(TemplateView):
                     for item in max_avg_mtype_set:
                         if item['id_mtype'] != id_avg_mtype:
                             item['avg_pos'] = avg_mtype_mult * item['mtype_avg_value']
+                    
                     setattr(operator, 'mtype_avg_set', max_avg_mtype_set)
 
                 for operator in operators:

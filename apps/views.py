@@ -41,9 +41,9 @@ class IndexView(TemplateView):
         except:
             context['cities'] = False
             city_curr = False
-        #if city_curr:
-            #context['points'] = city_curr.get_points()
-            #context['curr_city_pts_count'] = city_curr.get_pts_count() # - изза этих сстрочек много запросов - вытаскивается количество замеров по городу
+        if city_curr:
+            context['points'] = city_curr.get_points()
+            context['curr_city_pts_count'] = city_curr.get_pts_count()
         operators = Operator.objects.published()
         if city_curr:
             max_avg = 0
@@ -156,9 +156,6 @@ class PointsListJSON(View):
             context['modem_types'].append(ab_json)
 
         json_data = json.dumps(context, encoding='utf-8')
-        
-        from django.views.generic.simple import direct_to_template
-        #return direct_to_template(request, 'pages/base.html', locals())
         
         return http.HttpResponse(json_data, content_type='application/json')  
 

@@ -11,7 +11,7 @@ from apps.utils.utils import ImageField
 from django.db.models.signals import post_save
 from apps.utils.managers import PublishedManager
 from mptt.models import MPTTModel, TreeForeignKey, TreeManager
-from batch_select.models import BatchManager
+from batch_select.models import BatchManager, Batch
 
 #convert_parameter = 1024 * 1024
 convert_parameter = 1000 * 1000
@@ -19,7 +19,7 @@ convert_parameter = 1000 * 1000
 def get_average_speed_MBs(op, point):
     point_spd_set_avg = SpeedAtPoint.objects.filter(operator__id=op.id, point__id=point.id).aggregate(
         Avg('internet_speed'))
-    MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+    MBs = round((point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8, 1)
     return MBs
 
 def get_point_spd_set(op, point):
@@ -102,44 +102,60 @@ class City(models.Model):
     def get_distincts(self):
         return self.distinct_set.published()
 
-    def get_points(self):
-        #points_set = Point.objects.filter(distinct__city__id=self.id)
-        points_set = Point.objects.filter(distinct__city__id=self.id).batch_select('speedatpoint')
-
+    def get_points(self, min=False, max=False, operator=False):
+        points = Point.objects.filter(distinct__city__id=self.id)
+        if not min and not max and not operator:
+            points_set = points.batch_select('speedatpoint')
+        if min or max:
+            if operator:
+                points_set = points.batch_select(filtered_speed=Batch(
+                    'speedatpoint', 
+                    operator__id = operator.id,
+                    internet_speed__lte = Decimal("%s" % max), 
+                    internet_speed__gte=Decimal("%s" % min)
+                ))
+            else:
+                points_set = points.batch_select(filtered_speed=Batch(
+                    'speedatpoint',
+                    internet_speed__lte = Decimal("%s" % max), 
+                    internet_speed__gte=Decimal("%s" % min)
+                ))
         return points_set
-
-    #здесь переделать, можно просто отдельно заново взять все точки
-
 
     def get_pts_count(self, operator=False, min=False, max=False):
         if operator:
             if min != False or max != False:
-                points_set = self.get_points()
+                points_set = self.get_points(min, max, operator)
                 all_pts_count = 0
                 max = (max / 8) * convert_parameter # todo: Не забыть переделать
                 min = (min / 8) * convert_parameter
                 for point in points_set:
+                    '''
                     point_speed_cnt = point.get_speed_values().filter(operator__id=operator.id,
                         internet_speed__lte=Decimal("%s" % max), internet_speed__gte=Decimal("%s" % min)).count()
+                    '''
+                    point_speed_cnt = len(point.filtered_speed)
                     all_pts_count = all_pts_count + point_speed_cnt
             else:
                 all_pts_count = 0
         else: # по всему городу
             if min != False or max != False:
-                points_set = self.get_points()
+                points_set = self.get_points(min, max)
                 all_pts_count = 0
                 max = (max / 8) * convert_parameter # todo: Не забыть переделать
                 min = (min / 8) * convert_parameter
                 for point in points_set:
+                    '''
                     point_speed_cnt = point.get_speed_values().filter(internet_speed__lte=Decimal("%s" % max),
                         internet_speed__gte=Decimal("%s" % min)).count()
+                    '''
+                    point_speed_cnt = len(point.filtered_speed)
                     all_pts_count = all_pts_count + point_speed_cnt
             else:
                 points_set = self.get_points()
                 all_pts_count = 0
                 for point in points_set:
-                    point_speed_cnt = point.get_speed_values().count()
-                    #point_speed_cnt = len(point.get_speed_values())
+                    point_speed_cnt = len(point.speedatpoint_all)
                     all_pts_count = all_pts_count + point_speed_cnt
         return all_pts_count
 
@@ -162,7 +178,7 @@ class City(models.Model):
                     point_spd_set = SpeedAtPoint.objects.filter(operator=operator, point__distinct__city__id=self.id)
                     point_spd_set_avg = point_spd_set.aggregate(Avg('internet_speed'))
                     try:
-                        MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+                        MBs = round((point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8, 1)
                     except:
                         MBs = 0
                     speed_value = MBs
@@ -171,7 +187,7 @@ class City(models.Model):
                         modem_type__download_speed=mdm_type)
                     point_spd_set_avg = point_spd_set.aggregate(Avg('internet_speed'))
                     try:
-                        MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+                        MBs = round((point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8, 1)
                     except:
                         MBs = 0
                     speed_value = MBs
@@ -189,7 +205,7 @@ class City(models.Model):
                     point_spd_set = SpeedAtPoint.objects.filter(operator=operator, point__distinct__city__id=self.id)
                     point_spd_set_avg = point_spd_set.aggregate(Max('internet_speed'))
                     try:
-                        MBs = (point_spd_set_avg['internet_speed__max'] / convert_parameter) * 8
+                        MBs = round((point_spd_set_avg['internet_speed__max'] / convert_parameter) * 8, 1)
                     except:
                         MBs = 0
                     speed_value = MBs
@@ -239,7 +255,7 @@ class Distinct(models.Model):
                     point_spd_set = SpeedAtPoint.objects.filter(operator=operator, point__distinct__id=self.id)
                     point_spd_set_avg = point_spd_set.aggregate(Avg('internet_speed'))
                     try:
-                        MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+                        MBs = round((point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8, 1)
                     except:
                         MBs = 0
                     speed_value = MBs
@@ -248,7 +264,7 @@ class Distinct(models.Model):
                         modem_type__download_speed=mdm_type)
                     point_spd_set_avg = point_spd_set.aggregate(Avg('internet_speed'))
                     try:
-                        MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+                        MBs = round((point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8, 1)
                     except:
                         MBs = 0
                     speed_value = MBs
@@ -266,7 +282,7 @@ class Distinct(models.Model):
                     point_spd_set = SpeedAtPoint.objects.filter(operator=operator, point__distinct__id=self.id)
                     point_spd_set_avg = point_spd_set.aggregate(Max('internet_speed'))
                     try:
-                        MBs = (point_spd_set_avg['internet_speed__max'] / convert_parameter) * 8
+                        MBs = round((point_spd_set_avg['internet_speed__max'] / convert_parameter) * 8, 1)
                     except:
                         MBs = 0
                     speed_value = MBs
@@ -319,6 +335,7 @@ class Point(models.Model):
     datetime_create = models.DateTimeField(verbose_name=u'Дата создания точки', default=datetime.datetime.now)
     
     all_abilities = Ability.objects.all()
+    speed_values = None
     objects = BatchManager()
 
     class Meta:
@@ -336,12 +353,12 @@ class Point(models.Model):
 
     def get_max_speed(self):
         max_speed = self.get_speed_values().aggregate(Max('internet_speed'))['internet_speed__max']
-        MBs = (max_speed / convert_parameter) * 8
+        MBs = round((max_speed / convert_parameter) * 8, 1)
         return MBs
 
     def get_avg_speed(self):
         max_speed = self.get_speed_values().aggregate(Avg('internet_speed'))['internet_speed__avg']
-        MBs = (max_speed / convert_parameter) * 8
+        MBs = round((max_speed / convert_parameter) * 8, 1)
         return MBs
 
     def get_speed_values(self):
@@ -390,7 +407,7 @@ class Point(models.Model):
             MBs_str = str(MBs_str).replace(',', '.')
             setattr(operator, 'avg_speed', MBs_str)
             setattr(operator, 'avg_speed_num', MBs)
-            setattr(operator, 'abilities', get_abilities_by_speed(MBs))
+            setattr(operator, 'abilities', self.get_abilities_by_speed(MBs))
             setattr(operator, 'point_spd_set', get_point_spd_set(operator, self))
         return operators_set
 
@@ -418,19 +435,20 @@ class Point(models.Model):
         else:
             speed_values = self.speed_values
 
-        #operators = speed_values.values('operator').annotate(avgspeed=Avg('internet_speed')).order_by('-avgspeed')
+        operators = self.speedatpoint_set.values('operator').annotate(avgspeed=Avg('internet_speed')).order_by('-avgspeed')
+        '''
         avg = 0
         for item in speed_values:
             avg = avg + item.internet_speed
-
+        '''
         try:
-            #operators_with_max_speed = operators[0]['avgspeed']
-            operators_with_max_speed = round(avg / len(speed_values), 1)
+            operators_with_max_speed = operators[0]['avgspeed']
+            #operators_with_max_speed = round(avg / len(speed_values), 1)
         except:
             operators_with_max_speed = False
 
         if operators_with_max_speed:
-            MBs = (operators_with_max_speed / convert_parameter) * 8
+            MBs = round((operators_with_max_speed / convert_parameter) * 8, 1)
             abilities_set = self.get_abilities_by_speed(MBs)
         else:
             abilities_set = []
@@ -463,7 +481,7 @@ class Point(models.Model):
                 cur_spd_set = False
             if cur_spd_set:
                 point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
-                MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+                MBs = round((point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8, 1)
                 abililies_set = self.get_abilities_by_speed(MBs)
             else:
                 abililies_set = False
@@ -484,7 +502,7 @@ class Point(models.Model):
 
             if cur_spd_set:
                 point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
-                MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+                MBs = round((point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8, 1)
                 abililies_set = self.get_abilities_by_speed(MBs)
             else:
                 if modem_type_set == False:
@@ -529,7 +547,7 @@ class Point(models.Model):
                 cur_spd_set = False
             if cur_spd_set:
                 point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
-                MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+                MBs = round((point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8, 1)
                 abililies_set = self.get_abilities_by_speed(MBs)
             else:
                 abililies_set = False
@@ -550,7 +568,7 @@ class Point(models.Model):
 
             if cur_spd_set:
                 point_spd_set_avg = cur_spd_set.aggregate(Avg('internet_speed'))
-                MBs = (point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8
+                MBs = round((point_spd_set_avg['internet_speed__avg'] / convert_parameter) * 8, 1)
                 abililies_set = self.get_abilities_by_speed(MBs)
             else:
                 if modem_type_set == False:

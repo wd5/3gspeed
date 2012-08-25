@@ -1,5 +1,6 @@
 {% load thumbnail %}
 <div class="map_popup">
+<div style="display: none;">{{ point.id }}</div>
     <div class="tab op_all{% if curr_operator_id %} tab_hidden{% endif %}">
         <div class="map_popup_info">
             <table class="map_popup_info_table">
@@ -27,7 +28,7 @@
         </div>
 
         <div class="map_popup_ics">
-            {% for ability  in abilities %}
+            {% for ability in abilities %}
                 <span style="background-image: url('{{ ability.icon.url }}')"  title="{{ ability.title|title }}"></span>
             {% endfor %}
         </div>
