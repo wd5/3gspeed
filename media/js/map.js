@@ -3,181 +3,196 @@ $(function(){
         var abilities = new Array();
         var modem_types = new Array();
         ymaps.ready(function () {
-            /*{% if city_curr %} // если выбран текущий город, то ставин карту в его центр
-                var map = new ymaps.Map("map",
-                    {
-                        center: [$('#mapCenter').val().split(',')],
-                        zoom: 14,
-                        type: "yandex#map"
-                    }
-                );
-                map.controls.add("zoomControl");
-            {% else %} // в противном случае ставим центр в СПб
-            */
-                var map = new ymaps.Map("map",
-                    {
-                        center: [59.930879,30.329349],
-                        zoom: 14,
-                        type: "yandex#map"
-                    }
-                );
-                map.controls.add("zoomControl");
-            /*{% endif %}*/
+            // если выбран текущий город, то ставин карту в его центр
+            var curr_city_coord = [];
+            if ($('#mapCenter').val()){
+                curr_city_coord = $('#mapCenter').val().split(',');
+            } else { // в противном случае ставим центр в СПб*//*
+                curr_city_coord = [59.930879,30.329349];
+            }
+
+            var map = new ymaps.Map("map",
+                {
+                    center: curr_city_coord,
+                    zoom: 14,
+                    type: "yandex#map"
+                }
+            );
+            map.controls.add("zoomControl");
+
+
 
             // Создаем коллекцию, в которую будем добавлять метки
             var pointsSet = []
 
-            $.getJSON('/get_points_json/', function(json){
+            function getJSONPoints(id_city){
+                var url = '/get_points_json/';
+                if (id_city){
+                    url += '?city_id=' + id_city;
+                    $('.map_preload').show();
+                }
+                $.getJSON(url, function(json){
+                    pointsSet = [];
+                    operators = json.operators;
+                    abilities = json.abilities;
+                    modem_types = json.modem_types;
 
-                operators = json.operators;
-                abilities = json.abilities;
-                modem_types = json.modem_types;
+                    $.each(json.points, function(i, point){
 
-                $.each(json.points, function(i, point){
-
-                    var point_speed_values = {};
-                    var point_speed_values_mdm = {};
-                    // найдем среднюю скорость в точке по каждому оператору
-                    var speed_values_set = point.operators;
-                    var length = speed_values_set.length;
-                    for (var i = 0; i <= length-1; i++)
-                        {
-                            var list = [];
-                            if (point_speed_values[speed_values_set[i].op_id]) {
-                                point_speed_values[speed_values_set[i].op_id].push(speed_values_set[i].speed);
-                            } else { list.push(speed_values_set[i].speed);
-                            point_speed_values[speed_values_set[i].op_id] = list;
-                            }
-
-                            var list2 = [];
-                            if (point_speed_values_mdm[speed_values_set[i].modem_id]) {
-                                point_speed_values_mdm[speed_values_set[i].modem_id].push(speed_values_set[i].speed);
-                            } else { list2.push(speed_values_set[i].speed);
-                            point_speed_values_mdm[speed_values_set[i].modem_id] = list2;
-                            }
-                        }
-                    var max = 0;
-                    var id_op_max;
-                    for (item in point_speed_values) {
-                        var point_speed_values_array = point_speed_values[item];
-                        if (point_speed_values_array.length>1) { // - если больше чем 1 - усредняем
-                            var sum = 0;
-                            for(var k = 0; k < point_speed_values_array.length; k++) {
-                                sum += point_speed_values_array[k];
-                            }
-                            var avg = sum/point_speed_values_array.length;
-                            point_speed_values[item] = Math.round(avg*10)/10;
-                        } else {
-                            point_speed_values[item] = point_speed_values[item][0];
-                        }
-                        if (max<=point_speed_values[item]){
-                            max = point_speed_values[item]; // максимум среди усредненных по операторам скоростей
-                            id_op_max = item;
-                        }
-                    }
-                    for (item in point_speed_values_mdm) {
-                        var point_speed_values_array = point_speed_values_mdm[item];
-                        if (point_speed_values_array.length>1) { // - если больше чем 1 - усредняем
-                            var sum = 0;
-                            for(var k = 0; k < point_speed_values_array.length; k++) {
-                                sum += point_speed_values_array[k];
-                            }
-                            var avg = sum/point_speed_values_array.length;
-                            point_speed_values_mdm[item] = Math.round(avg*10)/10;
-                        } else {
-                            point_speed_values_mdm[item] = point_speed_values_mdm[item][0];
-                        }
-                    }
-
-                    var ability_icon_url = '/media/img/map_ic0.png';
-                    // выставим нужный маркер для точки в зависимости от максимальной скорости по операторам в ней
-                    for (var i = 0; i <= abilities.length-1; i++){
-                        if (max>=abilities[i].speed){
-                            ability_icon_url = abilities[i].marker;
-                        }
-                    }
-
-                    coord = point.coord.split(',');
-                    var placemark = new ymaps.Placemark(coord,
-                        {
-                            balloonContent: '',
-                            point_id: point.id,
-                            city_id: json.city_id,
-                            speed_values: speed_values_set,
-                            speed_values_by_op: point_speed_values,
-                            speed_values_by_mdm: point_speed_values_mdm,
-                            max_avg_spd_by_op: max
-                        },
-                        {
-                            hideIconOnBalloonOpen: false,
-                            openBalloonOnClick: false,
-                            // Изображение иконки метки
-                            /*
-                            {% if op_curr %}
-                                // если выбран какой-либо оператор - то ставим иконку для него
-                                iconImageHref: '',
-                                {% for operator in point.get_operators_without_params %}
-                                    {% if operator.id == op_curr.id %}
-                                        iconImageHref: '{% call "point.get_abilitiy_icon_additional" with op_curr.title %}',
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                iconImageHref: '{{ point.get_abilitiy_icon }}',
-                            {% endif %}
-                            */
-                            iconImageHref: ability_icon_url,
-                            iconImageSize: [37, 40],
-                            balloonLayout: "default#imageWithContent",
-                            balloonContentSize: [360, 0],
-                            balloonImageOffset: [-188, -320],
-                            balloonShadow: false
-                        }
-                    );
-                    placemark.events.add('click', function () {
-                        var curr_city =  $('div.map_city_select div.select_curr').html().replace("<div></div>","")
-                        var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","")
-                        var curr_mtype =$('div.map_modem_select div.select_curr').html().replace("<div></div>","")
-
-                        if(placemark.balloon.isOpen()) {
-                            placemark.balloon.close();
-                        }
-                        else {
-                            placemark.balloon.open();
-                        }
-                        var id_point = placemark.properties.get('point_id')
-                        $.get('/load_balloon_content/', {id_point: id_point, op_title: curr_op}, function(data){
-                            placemark.properties.set('balloonContent', data);
-                            //var point_coord = placemark.geometry.getCoordinates();
-                            //map.setCenter(point_coord);
-                            });
-
-                        /*$.ajax({
-                                url: "/load_balloon_content/",
-                                data: {
-                                    id_point:id_point,
-                                    op_title:curr_op,
-                                    mdm_type:curr_mtype
-                                },
-                                type: "POST",
-                                success: function(data) {
-                                    placemark.properties.set('balloonContent', data);
-                                    var point_coord = placemark.geometry.getCoordinates();
-                                    //map.setCenter(point_coord);
+                        var point_speed_values = {};
+                        var point_speed_values_mdm = {};
+                        // найдем среднюю скорость в точке по каждому оператору
+                        var speed_values_set = point.operators;
+                        var length = speed_values_set.length;
+                        for (var i = 0; i <= length-1; i++)
+                            {
+                                var list = [];
+                                if (point_speed_values[speed_values_set[i].op_id]) {
+                                    point_speed_values[speed_values_set[i].op_id].push(speed_values_set[i].speed);
+                                } else { list.push(speed_values_set[i].speed);
+                                point_speed_values[speed_values_set[i].op_id] = list;
                                 }
-                            });*/
+
+                                var list2 = [];
+                                if (point_speed_values_mdm[speed_values_set[i].modem_id]) {
+                                    point_speed_values_mdm[speed_values_set[i].modem_id].push(speed_values_set[i].speed);
+                                } else { list2.push(speed_values_set[i].speed);
+                                point_speed_values_mdm[speed_values_set[i].modem_id] = list2;
+                                }
+                            }
+                        var max = 0;
+                        var id_op_max;
+                        for (item in point_speed_values) {
+                            var point_speed_values_array = point_speed_values[item];
+                            if (point_speed_values_array.length>1) { // - если больше чем 1 - усредняем
+                                var sum = 0;
+                                for(var k = 0; k < point_speed_values_array.length; k++) {
+                                    sum += point_speed_values_array[k];
+                                }
+                                var avg = sum/point_speed_values_array.length;
+                                point_speed_values[item] = Math.round(avg*10)/10;
+                            } else {
+                                point_speed_values[item] = point_speed_values[item][0];
+                            }
+                            if (max<=point_speed_values[item]){
+                                max = point_speed_values[item]; // максимум среди усредненных по операторам скоростей
+                                id_op_max = item;
+                            }
+                        }
+                        for (item in point_speed_values_mdm) {
+                            var point_speed_values_array = point_speed_values_mdm[item];
+                            if (point_speed_values_array.length>1) { // - если больше чем 1 - усредняем
+                                var sum = 0;
+                                for(var k = 0; k < point_speed_values_array.length; k++) {
+                                    sum += point_speed_values_array[k];
+                                }
+                                var avg = sum/point_speed_values_array.length;
+                                point_speed_values_mdm[item] = Math.round(avg*10)/10;
+                            } else {
+                                point_speed_values_mdm[item] = point_speed_values_mdm[item][0];
+                            }
+                        }
+
+                        var ability_icon_url = '/media/img/map_ic0.png';
+                        // выставим нужный маркер для точки в зависимости от максимальной скорости по операторам в ней
+                        for (var i = 0; i <= abilities.length-1; i++){
+                            if (max>=abilities[i].speed){
+                                ability_icon_url = abilities[i].marker;
+                            }
+                        }
+
+                        coord = point.coord.split(',');
+                        var placemark = new ymaps.Placemark(coord,
+                            {
+                                balloonContent: '',
+                                point_id: point.id,
+                                city_id: json.city_id,
+                                speed_values: speed_values_set,
+                                speed_values_by_op: point_speed_values,
+                                speed_values_by_mdm: point_speed_values_mdm,
+                                max_avg_spd_by_op: max
+                            },
+                            {
+                                hideIconOnBalloonOpen: false,
+                                openBalloonOnClick: false,
+                                // Изображение иконки метки
+                                /*
+                                {% if op_curr %}
+                                    // если выбран какой-либо оператор - то ставим иконку для него
+                                    iconImageHref: '',
+                                    {% for operator in point.get_operators_without_params %}
+                                        {% if operator.id == op_curr.id %}
+                                            iconImageHref: '{% call "point.get_abilitiy_icon_additional" with op_curr.title %}',
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    iconImageHref: '{{ point.get_abilitiy_icon }}',
+                                {% endif %}
+                                */
+                                iconImageHref: ability_icon_url,
+                                iconImageSize: [37, 40],
+                                balloonLayout: "default#imageWithContent",
+                                balloonContentSize: [360, 0],
+                                balloonImageOffset: [-188, -320],
+                                balloonShadow: false
+                            }
+                        );
+                        placemark.events.add('click', function () {
+                            var curr_city =  $('div.map_city_select div.select_curr').html().replace("<div></div>","")
+                            var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","")
+                            var curr_mtype =$('div.map_modem_select div.select_curr').html().replace("<div></div>","")
+
+                            if(placemark.balloon.isOpen()) {
+                                placemark.balloon.close();
+                            }
+                            else {
+                                placemark.balloon.open();
+                            }
+                            var id_point = placemark.properties.get('point_id')
+                            $.get('/load_balloon_content/', {id_point: id_point, op_title: curr_op}, function(data){
+                                placemark.properties.set('balloonContent', data);
+                                //var point_coord = placemark.geometry.getCoordinates();
+                                //map.setCenter(point_coord);
+                                });
+
+                            /*$.ajax({
+                                    url: "/load_balloon_content/",
+                                    data: {
+                                        id_point:id_point,
+                                        op_title:curr_op,
+                                        mdm_type:curr_mtype
+                                    },
+                                    type: "POST",
+                                    success: function(data) {
+                                        placemark.properties.set('balloonContent', data);
+                                        var point_coord = placemark.geometry.getCoordinates();
+                                        //map.setCenter(point_coord);
+                                    }
+                                });*/
+                        });
+                        pointsSet.push(placemark);
                     });
-                    pointsSet.push(placemark);
+
+                    clusterer = new ymaps.Clusterer();
+                    clusterer.add(pointsSet);
+                    map.geoObjects.add(clusterer);
+                    $('.map_preload').hide();
+                    searchAddress();
+
+                    if (($('#opTITLE').val())){
+                        LoadPMarker($('#opTITLE').val(), 'Все', 0, 3);
+                    }
                 });
+            }
 
-                clusterer = new ymaps.Clusterer();
-                clusterer.add(pointsSet);
-                map.geoObjects.add(clusterer);
-                $('.map_preload').hide();
-                searchAddress();
-            });
+            if ($('#cityID').val()){
+                getJSONPoints($('#cityID').val());
+            } else {
+                getJSONPoints();
+            }
 
 
-                //поиск
+            //поиск
             var searchAddress = function() {
                 var search_text = $('.search_input').val();
                 if (search_text.length > 0) {
@@ -203,7 +218,7 @@ $(function(){
             });
             //не понял, зачем здесь это?
             map.events.add('click', function (item) {
-                map.balloon.close()
+                map.balloon.close();
             });
 
             $(".map_popup_op").live('click',function(){
@@ -255,6 +270,7 @@ $(function(){
                     {
                     var coords = select_curr_div.attr('name');
                     var city_param_array = coords.split('|');
+                    var curr_city_id = parseInt(city_param_array[1]);
                     coords_array = city_param_array[0].split(',');
                     map.panTo([parseFloat(coords_array[0]),parseFloat(coords_array[1])], {flying: true});
                     //вытащим плашку со средней скоростью
@@ -293,6 +309,12 @@ $(function(){
                             $('div.pt_count').replaceWith(data)
                         }
                     });
+
+                    // удалим старые точки и вытащим точки к городу
+                    map.geoObjects.each(function (collection) { // удалим текущие элементы карты
+                        map.geoObjects.remove(collection);
+                    });
+                    getJSONPoints(curr_city_id);
                     }
 
                 if ((parent.is('.map_op_select')) || (parent.is('.map_modem_select')))
@@ -527,44 +549,5 @@ $(function(){
                     clusterer.add(NewPointsSet);
                     map.geoObjects.add(clusterer); // добавляем новый кластеризированный сет
                 }
-
-
         });
     });
-
-/*
-            {% for city in cities %}
-                {% for point in city.get_points %}
-                    var point_{{ point.id }} = new ymaps.Placemark([{{ point.coord }}],
-                        {
-                            balloonContent: '',
-                            point_id: '{{ point.id }}',
-                            city_id: '{{ city.id }}',
-                            operators_titles: ['Все',{% for operator in point.get_operators_without_params %}"{{ operator.title }}"{% if not forloop.last %},{% endif %}{% endfor %}]
-                        },
-                        {
-                            // Не скрывать иконку метки при открытии балуна
-                            hideIconOnBalloonOpen: false,
-                            openBalloonOnClick: false,
-                            // Изображение иконки метки
-                            iconImageHref: '',
-                            {% if op_curr %}
-                                // если выбран какой-либо оператор - то ставим иконку для него
-                                iconImageHref: '{% call "point.get_abilitiy_icon_additional" with op_curr.title %}',
-                            {% else %}
-                                iconImageHref: '{{ point.get_abilitiy_icon }}',
-                            {% endif %}
-                            // Задаем макет балуна - пользовательская картинка с контентом
-                            balloonLayout: "default#imageWithContent",
-                            // Размеры содержимого балуна
-                            balloonContentSize: [360, 0],
-                            // Смещение картинки балуна
-                            balloonImageOffset: [-191, -305],
-                            // Балун не имеет тени
-                            balloonShadow: false
-                        }
-                    );
-                    pointsSet.add(point_{{ point.id }});
-                {% endfor %}
-            {% endfor %}
-*/

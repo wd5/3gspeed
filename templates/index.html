@@ -59,7 +59,7 @@
                         </div>
                     </div>
                 {% endif %}
-                <div class="map_fullscreen" title="Во весь экран"></div>
+                <!--<div class="map_fullscreen" title="Во весь экран"></div>-->
             </div><!--/map_ctrls-->
             <div class="map_preload"><div class="preloader"></div></div>
             <div class="map_filter">
@@ -158,5 +158,8 @@
         </div>
     </div><!--/main_in-->
 <input id="mapCenter" type="hidden" value="{{ city_curr.coord }}" />
+<input id="cityID" type="hidden" value="{{ city_curr.id }}" />
+<input id="opTITLE" type="hidden" value="{{ op_curr.title }}" />
+
 {% endblock %}
 

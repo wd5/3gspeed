@@ -125,10 +125,10 @@ class City(models.Model):
     def get_pts_count(self, operator=False, min=False, max=False):
         if operator:
             if min != False or max != False:
-                points_set = self.get_points(min, max, operator)
                 all_pts_count = 0
                 max = (max / 8) * convert_parameter # todo: Не забыть переделать
                 min = (min / 8) * convert_parameter
+                points_set = self.get_points(min, max, operator)
                 for point in points_set:
                     '''
                     point_speed_cnt = point.get_speed_values().filter(operator__id=operator.id,
@@ -140,10 +140,10 @@ class City(models.Model):
                 all_pts_count = 0
         else: # по всему городу
             if min != False or max != False:
-                points_set = self.get_points(min, max)
                 all_pts_count = 0
                 max = (max / 8) * convert_parameter # todo: Не забыть переделать
                 min = (min / 8) * convert_parameter
+                points_set = self.get_points(min, max)
                 for point in points_set:
                     '''
                     point_speed_cnt = point.get_speed_values().filter(internet_speed__lte=Decimal("%s" % max),
@@ -216,6 +216,14 @@ class City(models.Model):
     def get_mtypes(self):
         modem_type_id_set = SpeedAtPoint.objects.filter(point__distinct__city__id=self.id).values('modem_type__id')
         modem_type_set = ModemType.objects.filter(id__in=modem_type_id_set)
+        downlspd_modem_type_set = modem_type_set.values('download_speed').distinct().order_by('download_speed')
+        return downlspd_modem_type_set
+
+    def get_mtypes_2(self):
+        modem_type_id_set = SpeedAtPoint.objects.filter(point__distinct__city__id=self.id).values('modem_type__id')
+        modem_type_set = ModemType.objects.filter(id__in=modem_type_id_set)
+        #downlspd_modem_type_set = modem_type_set.values('download_speed').distinct().order_by('download_speed')
+        #return downlspd_modem_type_set
         return modem_type_set
 
 class Distinct(models.Model):

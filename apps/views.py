@@ -144,7 +144,7 @@ class PointsListJSON(View):
             op_json['title'] = item.title
             context['operators'].append(op_json)
 
-        modem_types = city_curr.get_mtypes()
+        modem_types = city_curr.get_mtypes_2()
         context['modem_types'] = list()
         for item in modem_types:
             ab_json = dict()

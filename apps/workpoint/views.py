@@ -295,7 +295,7 @@ class StatisticView(TemplateView):
                 city_mtypes = city_curr.get_mtypes()
                 city_mtypes_max_val_set = []
                 for item in city_mtypes:
-                    city_mtypes_max_val_set.append({'type': '%s' % item.download_speed, 'value': 0})
+                    city_mtypes_max_val_set.append({'type': '%s' % item['download_speed'], 'value': 0})
                 for operator in operators:
                     avg_value = city_curr.get_city_speed('avg', operator)
                     max_value = city_curr.get_city_speed('max', operator)
@@ -313,17 +313,17 @@ class StatisticView(TemplateView):
                     max_avg_mtype_set = []
                     
                     for mtype in city_mtypes:
-                        mtype_avg_value = city_curr.get_city_speed('avg', operator, mtype.download_speed)
+                        mtype_avg_value = city_curr.get_city_speed('avg', operator, mtype['download_speed'])
                         for item in city_mtypes_max_val_set:
-                            if item['type'] == '%s' % mtype.download_speed:
+                            if item['type'] == '%s' % mtype['download_speed']:
                                 if item['value'] < mtype_avg_value:
                                     item['value'] = round(mtype_avg_value, 1)
 
                         if max_avg_mtype < mtype_avg_value:
                             max_avg_mtype = mtype_avg_value
-                            id_avg_mtype = mtype.download_speed
+                            id_avg_mtype = mtype['download_speed']
                         max_avg_mtype_set.append(
-                                {'id_mtype': mtype.download_speed, 'mtype_avg_value': round(mtype_avg_value, 1),
+                                {'id_mtype': mtype['download_speed'], 'mtype_avg_value': round(mtype_avg_value, 1),
                                  'max_avg_mtype': False, 'avg_pos': 0})
                     for item in max_avg_mtype_set:
                         if item['id_mtype'] == id_avg_mtype:
@@ -342,11 +342,11 @@ class StatisticView(TemplateView):
                     if operator.id == id_max:
                         setattr(operator, 'max_max', True)
                         max_mult = 140 / operator.curr_city_max_speed
-                for operator in operators:
-                    if operator.id != id_avg:
-                        setattr(operator, 'curr_city_avg_speed_pos', avg_mult * operator.curr_city_avg_speed)
-                    if operator.id != id_max:
-                        setattr(operator, 'curr_city_max_speed_pos', max_mult * operator.curr_city_max_speed)
+#                for operator in operators: # - кажись не используется :)
+#                    if operator.id != id_avg:
+#                        setattr(operator, 'curr_city_avg_speed_pos', avg_mult * operator.curr_city_avg_speed)
+#                    if operator.id != id_max:
+#  :)                    setattr(operator, 'curr_city_max_speed_pos', max_mult * operator.curr_city_max_speed)
 
                 context['city_mtypes_max_val_set'] = city_mtypes_max_val_set
 
