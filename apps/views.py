@@ -284,7 +284,7 @@ class DBCopyView(TemplateView):
 #                point.delete()
 
 
-        # услежним замеры по повторяющимся типам модемов
+        # усредним замеры по повторяющимся типам модемов
 #        for curr_point in points:
 #            curr_point_speed_values = curr_point.get_speed_values()
 #            for curr_value in curr_point_speed_values:

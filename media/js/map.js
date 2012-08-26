@@ -20,11 +20,41 @@ $(function(){
             );
             map.controls.add("zoomControl");
 
-
+            $("#map_slider").slider({
+                    range: true,
+                    min: 100,
+                    max: 850,
+                    values: [ 100, 850 ],
+                    value: 1,
+                    step: 1,
+                    slide: function(event, ui) {
+                        var vals = $(this).slider( "option", "values" );
+                        var icons_set = $('div.map_slider_ics span');
+                        var length = icons_set.length;
+                        for (var i = 0; i <= length-1; i++)
+                            {
+                                var elem = icons_set.eq(i);
+                                var css_lft = elem.css('left').replace("px","");
+                                css_lft = parseInt(css_lft);
+                                if ((vals[1] > css_lft) && (vals[0] < css_lft)) {
+                                    elem.addClass("map_slider_active");
+                                } else {
+                                    elem.removeClass("map_slider_active");
+                                }
+                            }
+                    },
+                    stop: function(event, ui) {
+                        var vals = $(this).slider( "option", "values" );
+                        var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","");
+                        var curr_mtype =$('div.map_modem_select div.select_curr').html().replace("<div></div>","");
+                        var minMBs = (vals[0]/250)-0.4;
+                        var maxMBs = (vals[1]/250)-0.4;
+                        LoadPMarker(curr_op,curr_mtype, minMBs, maxMBs);
+                    }
+                });
 
             // Создаем коллекцию, в которую будем добавлять метки
             var pointsSet = []
-
             function getJSONPoints(id_city){
                 var url = '/get_points_json/';
                 if (id_city){
@@ -149,7 +179,7 @@ $(function(){
                                 placemark.balloon.open();
                             }
                             var id_point = placemark.properties.get('point_id')
-                            $.get('/load_balloon_content/', {id_point: id_point, op_title: curr_op}, function(data){
+                            $.get('/load_balloon_content/', {id_point: id_point, op_title: curr_op }, function(data){
                                 var pk = placemark.geometry.getCoordinates();
                                 var bounds = map.getBounds();
                                 var delta = (bounds[1][0] - bounds[0][0]) / 4; //0.0050000000;
@@ -158,6 +188,29 @@ $(function(){
                                 map.panTo(pk, {
                                     callback: function () {
                                         placemark.properties.set('balloonContent', data);
+                                        if ($('.map_popup').html()) {
+                                            var vals = $('#map_slider').slider( "option", "values" );
+                                            var minMBs = (vals[0]/250)-0.4;
+                                            var maxMBs = (vals[1]/250)-0.4;
+                                            var map_popup_info_val_set = $('td.map_popup_info_val');
+                                            for (var i = 0; i <= map_popup_info_val_set.length; i++) {
+                                                var value = parseFloat(map_popup_info_val_set.eq(i).html());
+                                                if ((value) || (value==0)) {
+                                                    if ((value<minMBs) || (value>maxMBs)) {
+                                                        map_popup_info_val_set.eq(i).css('color','#999');
+                                                    }
+                                                }
+                                            }
+                                            var counter_val_set = $('div.counter_val');
+                                            for (var i = 0; i <= counter_val_set.length; i++) {
+                                                var value = parseFloat(counter_val_set.eq(i).html());
+                                                if ((value) || (value==0)) {
+                                                    if ((value<minMBs) || (value>maxMBs)) {
+                                                        counter_val_set.eq(i).css('color','#999');
+                                                    }
+                                                }
+                                            }
+                                        }
                                     },
                                     flying: 1
                                 });
@@ -198,7 +251,6 @@ $(function(){
             } else {
                 getJSONPoints();
             }
-
 
             //поиск
             var searchAddress = function() {
@@ -336,40 +388,6 @@ $(function(){
 
                 return false;
             });
-
-
-            $("#map_slider").slider({
-                    range: true,
-                    min: 100,
-                    max: 850,
-                    values: [ 100, 850 ],
-                    value: 1,
-                    step: 1,
-                    slide: function(event, ui) {
-                        var vals = $(this).slider( "option", "values" );
-                        var icons_set = $('div.map_slider_ics span');
-                        var length = icons_set.length;
-                        for (var i = 0; i <= length-1; i++)
-                            {
-                                var elem = icons_set.eq(i);
-                                var css_lft = elem.css('left').replace("px","");
-                                css_lft = parseInt(css_lft);
-                                if ((vals[1] > css_lft) && (vals[0] < css_lft)) {
-                                    elem.addClass("map_slider_active");
-                                } else {
-                                    elem.removeClass("map_slider_active");
-                                }
-                            }
-                    },
-                    stop: function(event, ui) {
-                        var vals = $(this).slider( "option", "values" );
-                        var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","");
-                        var curr_mtype =$('div.map_modem_select div.select_curr').html().replace("<div></div>","");
-                        var minMBs = (vals[0]/250)-0.4;
-                        var maxMBs = (vals[1]/250)-0.4;
-                        LoadPMarker(curr_op,curr_mtype, minMBs, maxMBs);
-                    }
-                });
 
             function CheckAppropriateSpdVal(speed_value, min, max){
                 var ok = false;
