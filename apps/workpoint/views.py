@@ -325,7 +325,7 @@ class StatisticView(TemplateView):
                             max_avg_mtype = mtype_avg_value
                             id_avg_mtype = mtype['download_speed']
                         max_avg_mtype_set.append(
-                                {'id_mtype': mtype['download_speed'], 'mtype_avg_value': round(mtype_avg_value, 1),
+                                {'id_mtype': mtype['download_speed'], 'mtype_avg_value': abs(round(mtype_avg_value, 1)),
                                  'max_avg_mtype': False, 'avg_pos': 0})
                     #for item in max_avg_mtype_set:
                         #if item['id_mtype'] == id_avg_mtype:
@@ -444,7 +444,7 @@ class LoadCityStatistics(View):
                                 max_avg_mtype = mtype_avg_value
                                 id_avg_mtype = mtype['download_speed']
                             max_avg_mtype_set.append(
-                                    {'id_mtype': mtype['download_speed'], 'mtype_avg_value': round(mtype_avg_value, 1),
+                                    {'id_mtype': mtype['download_speed'], 'mtype_avg_value': abs(round(mtype_avg_value, 1)),
                                      'max_avg_mtype': False, 'avg_pos': 0})
 
                         for item in max_avg_mtype_set:
@@ -531,7 +531,7 @@ class LoadCityStatistics(View):
                         max_avg_mtype = mtype_avg_value
                         id_avg_mtype = mtype['download_speed']
                     max_avg_mtype_set.append(
-                            {'id_mtype': mtype['download_speed'], 'mtype_avg_value': round(mtype_avg_value, 1),
+                            {'id_mtype': mtype['download_speed'], 'mtype_avg_value': abs(round(mtype_avg_value, 1)),
                              'max_avg_mtype': False, 'avg_pos': 0})
 
                 for item in max_avg_mtype_set:
