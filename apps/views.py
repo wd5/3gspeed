@@ -18,7 +18,7 @@ class IndexView(TemplateView):
             context['about_text'] = Settings.objects.get(name='about_project').value
         except:
             context['about_text'] = ''
-        context['news'] = News.objects.exclude(short_text='', text='')[:3]
+        context['news'] = News.objects.all()[:3]
         cities = City.objects.published()
         context['search'] = city_id = self.request.GET.get('search', '')
         try:

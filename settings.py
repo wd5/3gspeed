@@ -36,3 +36,5 @@ TEMPLATE_CONTEXT_PROCESSORS += (
     'apps.siteblocks.context_processors.settings',
     'apps.workpoint.context_processors.is_processing',
 )
+
+#from settings_DebugToolbar import *
