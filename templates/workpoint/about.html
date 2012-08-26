@@ -64,7 +64,11 @@
                                 {% endthumbnail %}
                             {% endfor %}
                         </div>
-                        <div class="timeline_media_more"><a href="/news/{{ new.id }}/">Еще 12 фотографий</a></div>
+                        {% if new.get_count_images > 3 %}
+                            <div class="timeline_media_more"><a href="/news/{{ new.id }}/">Еще {{ new.get_count_images|add:"-3" }} фотографий</a></div>
+                        {% else %}
+                            <div class="timeline_media_more"><a href="/news/{{ new.id }}/">Читать новость</a></div>
+                        {% endif %}
                     {% endif %}
 
                     <div class="timeline_arr"></div>
