@@ -2,7 +2,7 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.decorators.csrf import csrf_exempt
 from apps.workpoint.views import load_modem_types, load_balloon_content, load_point_marker, about_page, statistic_page, load_city_distincts, load_stat_city_div, load_city_stat, load_city_avg_speed
-from apps.newsboard.views import news_detail
+from apps.newsboard.views import news_detail, load_items_news_about
 from views import index, db_copy, points_list_json
 from django.views.decorators.cache import cache_page
 from apps.utils.items_loader.views import items_loader
@@ -12,6 +12,7 @@ from apps.utils.items_loader.views import items_loader
 urlpatterns = patterns('',
     url(r'^$',index, name='index'),
     (r'^load_items/$',csrf_exempt(items_loader)),
+    (r'^load_items_news_about/$',csrf_exempt(load_items_news_about)),
     url(r'^get_points_json/$', points_list_json),
     url(r'^about/$',about_page, name='about'),
     url(r'^statistic/$',cache_page(statistic_page, 60 * 15), name='statistic'),

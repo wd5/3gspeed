@@ -7,6 +7,10 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
+from django.views.generic import View
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
+from django.db.models.loading import get_model
+from django.template.loader import render_to_string
 
 from models import News
 
@@ -36,7 +40,6 @@ class NewsListView(ListView):
 
 news_list = NewsListView.as_view()
 
-
 class NewsDetailView(DetailView):
     context_object_name = 'news_current'
     model = News
@@ -60,8 +63,6 @@ class NewsDetailView(DetailView):
 
 news_detail = NewsDetailView.as_view()
 
-
-
 class LatestNewsFeed(Feed):
     title = u'Новости'
     link = '/news/'
@@ -75,3 +76,51 @@ class LatestNewsFeed(Feed):
 
     def item_description(self, item):
         return item.short_text
+
+def isodd(num):
+    return num & 1 and True or False
+
+class LoadNewsView(View):
+    def post(self, request, *args, **kwargs):
+        if not request.is_ajax():
+            return HttpResponseRedirect('/')
+        else:
+            if 'already_loaded' not in request.POST:
+                return HttpResponseBadRequest()
+
+            already_loaded = request.POST['already_loaded']
+            try:
+                already_loaded = int(already_loaded)
+            except ValueError:
+                return HttpResponseBadRequest()
+
+            count = 1
+
+            if already_loaded:
+              is_odd = isodd(already_loaded)
+            else:
+              is_odd = False
+
+            endrange = already_loaded + count
+
+            try:
+                queryset = News.objects.published()
+            except:
+                return HttpResponseBadRequest()
+
+            remaining_count = queryset.count() - endrange
+            queryset = queryset[already_loaded:endrange]
+            if count < remaining_count:
+                remaining_count = False
+
+            response = HttpResponse()
+            items_html = render_to_string(
+                'items_loader/new2_load_template.html',
+                    {'items': queryset, 'endrange': endrange, 'is_odd': is_odd,
+                     'remaining_count': remaining_count, }
+            )
+            response.content = items_html
+            return response
+
+load_items_news_about = LoadNewsView.as_view()
+

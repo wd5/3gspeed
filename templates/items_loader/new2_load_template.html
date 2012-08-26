@@ -1,0 +1,50 @@
+{% load pytils_numeral thumbnail %}
+{% for item in items %}
+    <div class="timeline_new {% if not is_odd %}{% cycle 'timeline_r' 'timeline_l' %}{% else %}{% cycle 'timeline_l' 'timeline_r' %}{% endif %}
+    {% if item.get_images or item.code_video %} timeline_media {% if not is_odd %}{% cycle 'timeline_media_r' 'timeline_media_l' %}{% else %}{% cycle 'timeline_media_l' 'timeline_media_r' %}{% endif %}{% endif %}
+    {% if not initial %} loaded" style="display: none;{% endif %}">
+        <h3>{{ item.title }}</h3>
+        <div class="timeline_date">{{ item.date_add|date:"j E Y" }}г</div>
+        {% if not item.get_images %}
+            {% if item.code_video %}
+                <div class="timeline_video">
+                    {{ item.code_video|safe }}
+                </div>
+                {% if item.text %}
+                    <div class="timeline_media_more"><a href="/news/{{ item.id }}/">Читать новость</a></div>
+                {% endif %}
+            {% else %}
+                {% if item.short_text %}
+                    <div class="timeline_text text">
+                        {{ item.short_text|safe }}
+                    </div>
+                {% endif %}
+
+                {% if item.text %}
+                    <div class="timeline_new_more"><a href="/news/{{ item.id }}/">Читать полностью</a></div>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <div class="timeline_photos">
+                {% for image  in item.get_three_images %}
+                    {% thumbnail image.image "1000" upscale=0 as big %}
+                        {% thumbnail image.image "131x131" crop="center" as im %}
+                            <a href="{{ big.url }}" rel="{{ item.id }}" class="fancybox"><img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="" /></a>
+                        {% endthumbnail %}
+                    {% endthumbnail %}
+                {% endfor %}
+            </div>
+            {% if item.get_count_images > 3 %}
+                <div class="timeline_media_more"><a href="/news/{{ item.id }}/">Еще {{ item.get_count_images|add:"-3" }} фотографий</a></div>
+            {% else %}
+                <div class="timeline_media_more"><a href="/news/{{ item.id }}/">Читать новость</a></div>
+            {% endif %}
+        {% endif %}
+
+        <div class="timeline_arr"></div>
+        <div class="timeline_point"></div>
+    </div>
+{% endfor %}
+
+<input type="hidden" id="endrange" autocomplete="off" value="{{ endrange }}">
+<input type="hidden" id="remaining_count" autocomplete="off" value="{{ remaining_count }}">

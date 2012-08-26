@@ -3,7 +3,13 @@
 {% for item in items %}
     <div class="index_new {% if not initial %} loaded" style="display: none;{% endif %}">
         <div class="index_new_date">{{ item.date_add|date:"j E" }}, {{ item.date_add|date:"l"|lower }}</div>
-        <h3><a href="/news/{{ item.id }}/">{{ item.title }}</a></h3>
+        <h3>
+            {% if item.short_text and item.text %}
+                <a href="/news/{{ item.id }}/">{{ item.title }}</a>
+            {% else %}
+                <span style="color: #2C5D7E;" href="/news/{{ item.id }}/">{{ item.title }}</span>
+            {% endif %}
+        </h3>
         <div class="index_new_short"><p>{{ item.short_text|safe }}</p></div>
     </div>
 {% endfor %}

@@ -67,7 +67,7 @@ class LoadCityDistincts(View):
             id_distincts = []
             for id in distincts_by_pts:
                 id_distincts.append(id['distinct'])
-            distincts_set = Distinct.objects.published().filter(id__in=id_distincts)
+            distincts_set = Distinct.objects.published().filter(id__in=id_distincts).order_by('title')
             html_code = u''
             for distinct in distincts_set:
                 html_code = u'%s<li><a href="#" name="%s">%s</a></li>' % ( html_code, distinct.id, distinct.title[:30])
@@ -282,11 +282,11 @@ class StatisticView(TemplateView):
             city_curr = False
         if city_curr:
             distincts_by_pts = Point.objects.filter(distinct__city__id=city_curr.id).values(
-                'distinct').distinct().order_by('distinct')
+                'distinct').distinct().order_by('-distinct')
             id_distincts = []
             for id in distincts_by_pts:
                 id_distincts.append(id['distinct'])
-            distincts_set = Distinct.objects.published().filter(id__in=id_distincts)
+            distincts_set = Distinct.objects.published().filter(id__in=id_distincts).order_by('title')
             context['distincts'] = distincts_set[
                                    :20] # todo: не забыть убрать - ограничение на вывод районов на странице статистики
             if distincts_by_pts:
@@ -397,6 +397,7 @@ class LoadCityStatistics(View):
             else:
                 id_distinct = False
             avg_mtype_mult = 118 / 3
+            if id_distinct == '0': id_distinct = False
             if id_distinct:
                 try:
                     id_distinct = int(id_distinct)
@@ -594,7 +595,7 @@ class LoadCityAvgSpeed(View):
                 id_distinct = request.POST['id_distinct']
             else:
                 id_distinct = False
-
+            if id_distinct == '0': id_distinct = False;
             if id_distinct:
                 try:
                     id_distinct = int(id_distinct)

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load thumbnail %}
+{% load thumbnail items_loader_extras %}
 
 {% block title %}
     О проекте &mdash;
@@ -30,55 +30,56 @@
         {% if news %}
         <div class="timeline">
             <div class="cl"></div>
-            {% for new in news %}
-                <div class="timeline_new {% cycle 'timeline_r' 'timeline_l' %}{% if new.get_images or new.code_video %} timeline_media {% cycle 'timeline_media_r' 'timeline_media_l' %}{% endif %}">
-                    <h3>{{ new.title }}</h3>
-                    <div class="timeline_date">{{ new.date_add|date:"j E Y" }}г</div>
-                    {% if not new.get_images %}
-                        {% if new.code_video %}
-                            <div class="timeline_video">
-                                {{ new.code_video|safe }}
-                            </div>
-                            {% if new.text %}
+            <div class="load_block">
+                {% for new in news %}
+                    <div class="timeline_new {% cycle 'timeline_r' 'timeline_l' %}{% if new.get_images or new.code_video %} timeline_media {% cycle 'timeline_media_r' 'timeline_media_l' %}{% endif %}">
+                        <h3>{{ new.title }}</h3>
+                        <div class="timeline_date">{{ new.date_add|date:"j E Y" }}г</div>
+                        {% if not new.get_images %}
+                            {% if new.code_video %}
+                                <div class="timeline_video">
+                                    {{ new.code_video|safe }}
+                                </div>
+                                {% if new.text %}
 
+                                    <div class="timeline_media_more"><a href="/news/{{ new.id }}/">Читать новость</a></div>
+                                {% endif %}
+                            {% else %}
+                                {% if new.short_text %}
+                                    <div class="timeline_text text">
+                                        {{ new.short_text|safe }}
+                                    </div>
+                                {% endif %}
+
+                                {% if new.text %}
+                                    <div class="timeline_new_more"><a href="/news/{{ new.id }}/">Читать полностью</a></div>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <div class="timeline_photos">
+                                {% for image  in new.get_three_images %}
+                                    {% thumbnail image.image "1000" upscale=0 as big %}
+                                        {% thumbnail image.image "131x131" crop="center" as im %}
+                                            <a href="{{ big.url }}" rel="{{ new.id }}" class="fancybox"><img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="" /></a>
+                                        {% endthumbnail %}
+                                    {% endthumbnail %}
+                                {% endfor %}
+                            </div>
+                            {% if new.get_count_images > 3 %}
+                                <div class="timeline_media_more"><a href="/news/{{ new.id }}/">Еще {{ new.get_count_images|add:"-3" }} фотографий</a></div>
+                            {% else %}
                                 <div class="timeline_media_more"><a href="/news/{{ new.id }}/">Читать новость</a></div>
                             {% endif %}
-                        {% else %}
-                            {% if new.short_text %}
-                                <div class="timeline_text text">
-                                    {{ new.short_text|safe }}
-                                </div>
-                            {% endif %}
-
-                            {% if new.text %}
-                                <div class="timeline_new_more"><a href="/news/{{ new.id }}/">Читать полностью</a></div>
-                            {% endif %}
                         {% endif %}
-                    {% else %}
-                        <div class="timeline_photos">
-                            {% for image  in new.get_three_images %}
-                                {% thumbnail image.image "1000" upscale=0 as big %}
-                                    {% thumbnail image.image "131x131" crop="center" as im %}
-                                        <a href="{{ big.url }}" rel="{{ new.id }}" class="fancybox"><img src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}" alt="" /></a>
-                                    {% endthumbnail %}
-                                {% endthumbnail %}
-                            {% endfor %}
-                        </div>
-                        {% if new.get_count_images > 3 %}
-                            <div class="timeline_media_more"><a href="/news/{{ new.id }}/">Еще {{ new.get_count_images|add:"-3" }} фотографий</a></div>
-                        {% else %}
-                            <div class="timeline_media_more"><a href="/news/{{ new.id }}/">Читать новость</a></div>
-                        {% endif %}
-                    {% endif %}
 
-                    <div class="timeline_arr"></div>
-                    <div class="timeline_point"></div>
-                </div>
-            {% endfor %}
-
+                        <div class="timeline_arr"></div>
+                        <div class="timeline_point"></div>
+                    </div>
+                {% endfor %}
+            </div>
             <div class="cl"></div>
-
-            <div class="more_news"><a href="#">Больше новостей</a></div>
+            <div class="more_news more_news_abt"><a href="#">Больше новостей</a></div>
+            <input type="hidden" id="already_loaded" value="{{ news|length }}">
         </div><!--/timeline-->
         {% endif %}
 
