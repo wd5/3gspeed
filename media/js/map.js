@@ -305,21 +305,40 @@ $(function(){
                         if (parent.is('.map_city_select'))
                             {el.parents('ul').prepend('<li><a href="#" name="'+select_curr_div.attr('name')+'">' + select_curr_div_val + '</a></li>');}
                         else
-                            {el.parents('ul').prepend('<li><a href="#">' + select_curr_div_val + '</a></li>');}
+                            {el.parents('ul').prepend('<li><a href="#" name="'+select_curr_div.attr('name')+'">' + select_curr_div_val + '</a></li>');}
+                            //{el.parents('ul').prepend('<li><a href="#">' + select_curr_div_val + '</a></li>');}
                     }
                 else
                     {if (select_curr_div_val == 'Тип модема')
                         {
-                            el.parents('ul').prepend('<li><a href="#">Все</a></li>');
+                            el.parents('ul').prepend('<li><a href="#" name="0">Все</a></li>');
                         }
                     }
                 select_curr_div.html(el.html()+'<div></div>');
-                if (parent.is('.map_city_select'))
-                    {select_curr_div.attr('name',el.attr('name'))}
-                else
-                    {}
+                select_curr_div.attr('name',el.attr('name'));
                 el.parent().remove();
                 parent.toggleClass("select_dropped");
+
+
+                if (!parent.is('.map_city_select')) {
+                    var values = parent.find('a');
+                    for (var j=0; j<=values.length-2; j++) {
+                        for (var i=0; i<=values.length-1-j; i++) {
+                            var bufATTR;
+                            var bufHTML;
+                            var val1 = parseInt(values.eq(i).attr('name'));
+                            var val2 = parseInt(values.eq(i+1).attr('name'));
+                            if (val1>val2) {
+                                bufATTR = values.eq(i).attr('name');
+                                bufHTML = values.eq(i).html();
+                                values.eq(i).attr('name',val2);
+                                values.eq(i).html(values.eq(i+1).html());
+                                values.eq(i+1).attr('name',bufATTR);
+                                values.eq(i+1).html(bufHTML);
+                            }
+                        }
+                    }
+                }
 
 
                 var curr_city =  $('div.map_city_select div.select_curr').html().replace("<div></div>","")

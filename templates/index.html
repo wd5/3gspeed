@@ -37,10 +37,10 @@
                     <div class="select_curr">{% if op_curr %}{{ op_curr.title }}{% else %}Оператор{% endif %}<div></div></div>
                     <div class="select_drop">
                         <ul>
-                            <li><a href="#">Все</a></li>
+                            <li><a href="#" name="0">Все</a></li>
                             {% for operator in operators %}
                                 {% if op_curr.id != operator.id %}
-                                    <li><a href="#">{{ operator.title }}</a></li>
+                                    <li><a href="#" name="{{ forloop.counter }}">{{ operator.title }}</a></li>
                                 {% endif %}
                             {% endfor %}
                         </ul>
@@ -53,7 +53,7 @@
                         <div class="select_drop">
                             <ul>
                                 {% for type in mtypes %}
-                                    <li><a href="#">{{ type.download_speed|floatformat }}</a></li>
+                                    <li><a href="#" name="{{ forloop.counter }}">{{ type.download_speed|floatformat }}</a></li>
                                 {% endfor %}
                             </ul>
                         </div>
