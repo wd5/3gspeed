@@ -13,6 +13,8 @@ from django.views.generic import ListView, DetailView, DetailView, TemplateView,
 from models import Operator, ModemType, Point, SpeedAtPoint, City, Distinct, Ability, convert_parameter
 from batch_select.models import BatchManager
 
+max_interval_value = 3.5
+
 class LoadMTypesAdmin(View):
     def post(self, request, *args, **kwargs):
         if request.is_ajax():
@@ -325,28 +327,24 @@ class StatisticView(TemplateView):
                         max_avg_mtype_set.append(
                                 {'id_mtype': mtype['download_speed'], 'mtype_avg_value': round(mtype_avg_value, 1),
                                  'max_avg_mtype': False, 'avg_pos': 0})
+                    #for item in max_avg_mtype_set:
+                        #if item['id_mtype'] == id_avg_mtype:
+                            #item['max_avg_mtype'] = True
+                            #avg_mtype_mult = 118 / item['mtype_avg_value']
+                    avg_mtype_mult = 118 / 3 # максимум 3 МБс
                     for item in max_avg_mtype_set:
-                        if item['id_mtype'] == id_avg_mtype:
-                            item['max_avg_mtype'] = True
-                            avg_mtype_mult = 118 / item['mtype_avg_value']
-                    for item in max_avg_mtype_set:
-                        if item['id_mtype'] != id_avg_mtype:
+                        if item['mtype_avg_value'] <= 3:
                             item['avg_pos'] = avg_mtype_mult * item['mtype_avg_value']
+                        else:
+                            item['avg_pos'] = avg_mtype_mult * 3
                     
                     setattr(operator, 'mtype_avg_set', max_avg_mtype_set)
 
                 for operator in operators:
                     if operator.id == id_avg:
                         setattr(operator, 'max_avg', True)
-                        avg_mult = 140 / operator.curr_city_avg_speed
                     if operator.id == id_max:
                         setattr(operator, 'max_max', True)
-                        max_mult = 140 / operator.curr_city_max_speed
-#                for operator in operators: # - кажись не используется :)
-#                    if operator.id != id_avg:
-#                        setattr(operator, 'curr_city_avg_speed_pos', avg_mult * operator.curr_city_avg_speed)
-#                    if operator.id != id_max:
-#  :)                    setattr(operator, 'curr_city_max_speed_pos', max_mult * operator.curr_city_max_speed)
 
                 context['city_mtypes_max_val_set'] = city_mtypes_max_val_set
 
@@ -362,7 +360,7 @@ class StatisticView(TemplateView):
                 interval_array = []
                 counter = 0
                 next = 0
-                while next != 2.5:
+                while next != max_interval_value:
                     next = counter + 0.5
                     interval_array.append({'min': counter, 'max': next, 'pts_count_op': [], 'pts_count_city': 0})
                     counter = next
@@ -398,7 +396,7 @@ class LoadCityStatistics(View):
                 id_distinct = request.POST['id_distinct']
             else:
                 id_distinct = False
-
+            avg_mtype_mult = 118 / 3
             if id_distinct:
                 try:
                     id_distinct = int(id_distinct)
@@ -447,30 +445,19 @@ class LoadCityStatistics(View):
                             max_avg_mtype_set.append(
                                     {'id_mtype': mtype['download_speed'], 'mtype_avg_value': round(mtype_avg_value, 1),
                                      'max_avg_mtype': False, 'avg_pos': 0})
+
                         for item in max_avg_mtype_set:
-                            if item['id_mtype'] == id_avg_mtype:
-                                item['max_avg_mtype'] = True
-                                try:
-                                    avg_mtype_mult = 118 / item['mtype_avg_value']
-                                except:
-                                    avg_mtype_mult = 118 / 1
-                        for item in max_avg_mtype_set:
-                            if item['id_mtype'] != id_avg_mtype and id_avg_mtype != None:
+                            if item['mtype_avg_value'] <= 3:
                                 item['avg_pos'] = avg_mtype_mult * item['mtype_avg_value']
+                            else:
+                                item['avg_pos'] = avg_mtype_mult * 3
                         setattr(operator, 'mtype_avg_set', max_avg_mtype_set)
 
                     for operator in operators:
                         if operator.id == id_avg:
                             setattr(operator, 'max_avg', True)
-                            avg_mult = 140 / operator.curr_city_avg_speed
                         if operator.id == id_max:
                             setattr(operator, 'max_max', True)
-                            max_mult = 140 / operator.curr_city_max_speed
-                    for operator in operators:
-                        if operator.id != id_avg and id_avg != None:
-                            setattr(operator, 'curr_city_avg_speed_pos', avg_mult * operator.curr_city_avg_speed)
-                        if operator.id != id_max and id_max != None:
-                            setattr(operator, 'curr_city_max_speed_pos', max_mult * operator.curr_city_max_speed)
 
                     # количества по интервалам
                     # массив с интервалами
@@ -478,7 +465,7 @@ class LoadCityStatistics(View):
                     interval_array = []
                     counter = 0
                     next = 0
-                    while next != 2.5:
+                    while next != max_interval_value:
                         next = counter + 0.5
                         interval_array.append({'min': counter, 'max': next, 'pts_count_op': [], 'pts_count_city': 0})
                         counter = next
@@ -545,13 +532,12 @@ class LoadCityStatistics(View):
                     max_avg_mtype_set.append(
                             {'id_mtype': mtype['download_speed'], 'mtype_avg_value': round(mtype_avg_value, 1),
                              'max_avg_mtype': False, 'avg_pos': 0})
+
                 for item in max_avg_mtype_set:
-                    if item['id_mtype'] == id_avg_mtype:
-                        item['max_avg_mtype'] = True
-                        avg_mtype_mult = 118 / item['mtype_avg_value']
-                for item in max_avg_mtype_set:
-                    if item['id_mtype'] != id_avg_mtype and id_avg_mtype != None:
+                    if item['mtype_avg_value'] <= 3:
                         item['avg_pos'] = avg_mtype_mult * item['mtype_avg_value']
+                    else:
+                        item['avg_pos'] = avg_mtype_mult * 3
                 setattr(operator, 'mtype_avg_set', max_avg_mtype_set)
 
             for operator in operators:
@@ -573,7 +559,7 @@ class LoadCityStatistics(View):
             interval_array = []
             counter = 0
             next = 0
-            while next != 2.5:
+            while next != max_interval_value:
                 next = counter + 0.5
                 interval_array.append({'min': counter, 'max': next, 'pts_count_op': [], 'pts_count_city': 0})
                 counter = next
