@@ -1,0 +1,23 @@
+{% load pytils_numeral %}
+
+{% for item in items %}
+    <div class="index_new {% if not initial %} loaded" style="display: none;{% endif %}">
+        <div class="index_new_date">{{ item.date_add|date:"j E" }}, {{ item.date_add|date:"l"|lower }}</div>
+        <h3><a href="/news/{{ item.id }}/">{{ item.title }}</a></h3>
+        <div class="index_new_short"><p>{{ item.short_text|safe }}</p></div>
+    </div>
+{% endfor %}
+
+{% if initial and next_count %}
+    <div class="index_news_more service_load_button">
+        {% if next_count < load_count %}
+            <a href="#" class="load_items">Больше новостей<span style="display: none;" class="cnt">{{ next_count }}</span></a>
+        {% else %}
+            <a href="#" class="load_items">Больше новостей<span style="display: none;" class="cnt">{{ load_count }}</span></a>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% if remaining_count %}
+    <input type="hidden" id="remaining_count_text" value="Ещё <span class='cnt'>{{ remaining_count }}</span> запис{{ remaining_count|choose_plural:"ь,и,ей" }}">
+{% endif %}

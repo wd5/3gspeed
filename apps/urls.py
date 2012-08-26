@@ -5,11 +5,13 @@ from apps.workpoint.views import load_modem_types, load_balloon_content, load_po
 from apps.newsboard.views import news_detail
 from views import index, db_copy, points_list_json
 from django.views.decorators.cache import cache_page
+from apps.utils.items_loader.views import items_loader
 #from apps.app.urls import urlpatterns as app_url
 
 
 urlpatterns = patterns('',
     url(r'^$',index, name='index'),
+    (r'^load_items/$',csrf_exempt(items_loader)),
     url(r'^get_points_json/$', points_list_json),
     url(r'^about/$',about_page, name='about'),
     url(r'^statistic/$',cache_page(statistic_page, 60 * 15), name='statistic'),
