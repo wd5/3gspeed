@@ -206,7 +206,7 @@ $(function(){
                                                 var value = parseFloat(counter_val_set.eq(i).html());
                                                 if ((value) || (value==0)) {
                                                     if ((value<minMBs) || (value>maxMBs)) {
-                                                        counter_val_set.eq(i).css('color','#999');
+                                                        counter_val_set.eq(i).css('color','#666');
                                                     }
                                                 }
                                             }
