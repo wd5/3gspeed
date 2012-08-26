@@ -23,8 +23,16 @@ def get_average_speed_MBs(op, point):
     return MBs
 
 def get_point_spd_set(op, point):
-    point_spd_set = SpeedAtPoint.objects.filter(operator__id=op.id, point__id=point.id).order_by(
-        'modem_type__download_speed')
+#    point_spd_set = SpeedAtPoint.objects.filter(operator__id=op.id, point__id=point.id).order_by(
+#        'modem_type__download_speed')
+
+    point_spd_set = SpeedAtPoint.objects.filter(operator__id=op.id, point__id=point.id).values('modem_type__download_speed').annotate(avgspeed=Avg('internet_speed')).order_by('modem_type__download_speed')
+    for item in point_spd_set:
+        MBs = round((item['avgspeed'] / convert_parameter) * 8, 1)
+        MBs = str(MBs).replace(',', '.')
+        item['avgspeed'] = MBs
+        value = round(item['modem_type__download_speed'], 1)
+        item['modem_type__download_speed'] = str(value).replace(',', '.')
     return point_spd_set
 
 def str_price(price):

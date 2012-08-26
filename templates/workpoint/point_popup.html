@@ -64,7 +64,7 @@
                         <tr>
                             <td rowspan="4">
                                 <div class="counter">
-                                    <div class="counter_val">{{ operator.avg_speed }}</div>
+                                    <div class="counter_val" style="color: #666;">{{ operator.avg_speed }}</div>
                                     <div class="counter_glass"></div>
                                 </div>
                                 <div>Мбит/с</div>
@@ -73,8 +73,10 @@
                             {% if not forloop.first %}
                             <tr {% cycle 'class="row2"' '' %}>
                             {% endif %}
-                                <td>{{ pt_speed.modem_type.get_download_speed_type }}</td>
-                                <td>{{ pt_speed.get_MBs }}</td>
+                                {% comment %}<td>{{ pt_speed.modem_type.get_download_speed_type }}</td>
+                                <td>{{ pt_speed.get_MBs }}</td>{% endcomment %}
+                                <td>{{ pt_speed.modem_type__download_speed }}</td>
+                                <td>{{ pt_speed.avgspeed }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
