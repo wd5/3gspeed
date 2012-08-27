@@ -162,6 +162,79 @@ class PointsListJSON(View):
 
 points_list_json = PointsListJSON.as_view()
 
+class PointsListJSONTest(View):
+    def get(self, request):
+        context = dict()
+
+        try:
+            city_id = int(self.request.GET.get('city_id'))
+            city_curr = City.objects.get(id=city_id)
+        except:
+            city_id = False
+            if not city_id:
+                try:
+                    map_curr_city_id = Settings.objects.get(name='map_curr_city_id').value
+                    city_curr = City.objects.get(id=map_curr_city_id)
+                except:
+                    pass
+
+        context['points'] = list()
+        
+        points = city_curr.get_points()
+
+        for point in points:
+            point_json = dict()
+            
+            point_json['id'] = point.id
+            point_json['coord'] = point.coord 
+
+            context['points'].append(point_json)
+            
+        context['city_id'] = city_curr.id
+
+        json_data = json.dumps(context, encoding='utf-8')
+        
+        return http.HttpResponse(json_data, content_type='application/json')  
+
+points_list_json_test = PointsListJSONTest.as_view()
+
+class IndexViewTest(TemplateView):
+    template_name = 'test.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexViewTest, self).get_context_data(**kwargs)
+
+        cities = City.objects.published()
+        try:
+            try:
+                try:
+                    city_id = self.request.GET['city_id']
+                    city_id = int(city_id)
+                    city_curr = cities.get(id=city_id)
+                except:
+                    city_id = False
+                if not city_id:
+                    try:
+                        map_curr_city_id = Settings.objects.get(name='map_curr_city_id').value
+                        city_curr = cities.get(id=map_curr_city_id)
+                    except:
+                        city_curr = cities[0]
+            except:
+                city_curr = cities[0]
+            context['cities'] = cities.exclude(id=city_curr.id)
+            context['city_curr'] = city_curr
+        except:
+            context['cities'] = False
+            city_curr = False
+        if city_curr:
+            #context['points'] = city_curr.get_points()
+            context['curr_city_pts_count'] = city_curr.get_pts_count()
+        operators = Operator.objects.published()
+
+        return context
+
+test = IndexViewTest.as_view()
+
 
 class DBCopyView(TemplateView):
     template_name = 'res.html'
