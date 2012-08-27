@@ -35,7 +35,19 @@
 {% endblock %}
 
 {% block main %}
-    {{ result }}
+    {{ result }}<br/><br/>
+    {{ nondist.count }}<br/>
+    {% for item in nondist %}
+        {{ item }}<br/>
+    {% endfor %}
+    <hr/><br/>
+    {{ samecoord.count }}<br/>
+    {% for items in samecoord %}
+        {% for item in items %}
+            {{ item }} {% if not forloop.last %} - {% endif %}
+        {% endfor %}<br/>
+    {% endfor %}
+
     <div class="index_map_out">
         <div class="index_map">
             <div class="map" id="map">
