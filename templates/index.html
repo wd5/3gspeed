@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load thumbnail siteblocks_extras items_loader_extras %}
+{% load thumbnail siteblocks_extras %}
 
 {% block title %}
     Главная &mdash;
@@ -139,15 +139,14 @@
             {% if news %}
                 <h2>Последние новости</h2>
                 <div class="load_block">
-                    {% block_items_loader news "news" "newsboard" "new" 3 "" "" %}
-                    {% comment %}{% for new in news %}
+                    {% for new in news %}
                         <div class="index_new">
                             <div class="index_new_date">{{ new.date_add|date:"j E" }}, {{ new.date_add|date:"l"|lower }}</div>
                           <h3><a href="/news/{{ new.id }}/">{{ new.title }}</a></h3>
                             <div class="index_new_short"><p>{{ new.short_text|safe }}</p></div>
                         </div>
                     {% endfor %}
-                    <div class="index_news_more"><a href="#">Больше новостей</a></div>{% endcomment %}
+                    <div class="index_news_more"><a href="/about/#news">Больше новостей</a></div>
                 </div>
             {% endif %}
         </div><!--/index_news-->
