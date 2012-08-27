@@ -35,7 +35,7 @@
                 {% endfor %}
             </div>
             {% if item.get_count_images > 3 %}
-                <div class="timeline_media_more"><a href="/news/{{ item.id }}/">Еще {{ item.get_count_images|add:"-3" }} фотографий</a></div>
+                <div class="timeline_media_more"><a href="/news/{{ item.id }}/">Еще {{ item.get_count_images|add:"-3" }} фотографи{{ item.get_count_images|add:"-3"|choose_plural:"я,и,й" }}</a></div>
             {% else %}
                 <div class="timeline_media_more"><a href="/news/{{ item.id }}/">Читать новость</a></div>
             {% endif %}

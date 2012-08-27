@@ -428,6 +428,10 @@ class Point(models.Model):
         return operators_set
 
     def get_popup_window(self, curr_operator_title=False):
+        if not self.speed_values:
+            speed_values = self.speedatpoint_all
+        else:
+            speed_values = self.speed_values
         operators = self.get_operators()
         try:
             curr_op = Operator.objects.get(title__contains=curr_operator_title)
@@ -439,6 +443,7 @@ class Point(models.Model):
                 {
                 'point': self,
                 'operators': operators,
+                'speed_values_cnt': len(speed_values),
                 'curr_operator_id': curr_op,
                 'abilities': self.get_abilities()
             })

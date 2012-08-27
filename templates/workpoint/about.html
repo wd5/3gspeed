@@ -32,7 +32,17 @@
             <div class="cl"></div>
             <div class="load_block">
                 {% for new in news %}
-                    <div class="timeline_new {% cycle 'timeline_r' 'timeline_l' %}{% if new.get_images or new.code_video %} timeline_media {% cycle 'timeline_media_r' 'timeline_media_l' %}{% endif %}">
+                    <div class="timeline_new
+                            {% if new.get_images or new.code_video %} timeline_media
+                                {% if forloop.counter|divisibleby:2 %}
+                                    {% cycle 'timeline_l timeline_media_l' 'timeline_r timeline_media_r' %}
+                                {% else %}
+                                    {% cycle 'timeline_r timeline_media_r' 'timeline_l timeline_media_l' %}
+                                {% endif %}
+                            {% else %}
+                                {% cycle 'timeline_r' 'timeline_l' %}
+                            {% endif %}">
+
                         <h3>{{ new.title }}</h3>
                         <div class="timeline_date">{{ new.date_add|date:"j E Y" }}г</div>
                         {% if not new.get_images %}

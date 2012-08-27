@@ -19,6 +19,79 @@ $(function(){
                 }
             );
             map.controls.add("zoomControl");
+            // Создаем коллекцию, в которую будем добавлять метки
+            var pointsSet = []
+
+            // точка текщих замеров
+            if ($('#currMeasurePointId').val()!=''){
+                coordCurr = $('#currMeasurePointCoord').val().split(',');
+                var CurrMeasurementPlacemark = new ymaps.Placemark(coordCurr,
+                    {
+                        balloonContent: '',
+                        point_id: $('#currMeasurePointId').val()
+                    },
+                    {
+                        openBalloonOnClick: false,
+                        iconImageHref: '/media/img/car_point.png',
+                        iconImageSize: [82, 82],
+                        iconImageOffset: [-36, -43],
+                        hideIconOnBalloonOpen: false,
+                        balloonLayout: "default#imageWithContent",
+                        balloonContentSize: [360, 0],
+                        balloonImageOffset: [-188, -320],
+                        balloonShadow: false
+                    }
+                );
+                CurrMeasurementPlacemark.events.add('click', function () {
+                    var curr_city =  $('div.map_city_select div.select_curr').html().replace("<div></div>","")
+                    var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","")
+                    var curr_mtype =$('div.map_modem_select div.select_curr').html().replace("<div></div>","")
+
+                    if(CurrMeasurementPlacemark.balloon.isOpen()) {
+                        CurrMeasurementPlacemark.balloon.close();
+                    }
+                    else {
+                        CurrMeasurementPlacemark.balloon.open();
+                    }
+                    var id_point = CurrMeasurementPlacemark.properties.get('point_id')
+                    $.get('/load_balloon_content/', {id_point: id_point, op_title: curr_op }, function(data){
+                        var pk = CurrMeasurementPlacemark.geometry.getCoordinates();
+                        var bounds = map.getBounds();
+                        var delta = (bounds[1][0] - bounds[0][0]) / 4; //0.0050000000;
+                        pk[0] = parseFloat(pk[0]) + delta;
+                        pk[1] = parseFloat(pk[1]);
+                        map.panTo(pk, {
+                            callback: function () {
+                                CurrMeasurementPlacemark.properties.set('balloonContent', data);
+                                if ($('.map_popup').html()) {
+                                    var vals = $('#map_slider').slider( "option", "values" );
+                                    var minMBs = (vals[0]/250)-0.4;
+                                    var maxMBs = (vals[1]/250)-0.4;
+                                    var map_popup_info_val_set = $('td.map_popup_info_val');
+                                    for (var i = 0; i <= map_popup_info_val_set.length; i++) {
+                                        var value = parseFloat(map_popup_info_val_set.eq(i).html());
+                                        if ((value) || (value==0)) {
+                                            if ((value<minMBs) || (value>maxMBs)) {
+                                                map_popup_info_val_set.eq(i).css('color','#999');
+                                            }
+                                        }
+                                    }
+                                    var counter_val_set = $('div.counter_val');
+                                    for (var i = 0; i <= counter_val_set.length; i++) {
+                                        var value = parseFloat(counter_val_set.eq(i).html());
+                                        if ((value) || (value==0)) {
+                                            if ((value<minMBs) || (value>maxMBs)) {
+                                                counter_val_set.eq(i).css('color','#666');
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            flying: 1
+                        });
+                    });
+                });
+            }
 
             $("#map_slider").slider({
                     range: true,
@@ -53,8 +126,6 @@ $(function(){
                     }
                 });
 
-            // Создаем коллекцию, в которую будем добавлять метки
-            var pointsSet = []
             function getJSONPoints(id_city){
                 var url = '/get_points_json/';
                 if (id_city){
@@ -146,19 +217,6 @@ $(function(){
                                 hideIconOnBalloonOpen: false,
                                 openBalloonOnClick: false,
                                 // Изображение иконки метки
-                                /*
-                                {% if op_curr %}
-                                    // если выбран какой-либо оператор - то ставим иконку для него
-                                    iconImageHref: '',
-                                    {% for operator in point.get_operators_without_params %}
-                                        {% if operator.id == op_curr.id %}
-                                            iconImageHref: '{% call "point.get_abilitiy_icon_additional" with op_curr.title %}',
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    iconImageHref: '{{ point.get_abilitiy_icon }}',
-                                {% endif %}
-                                */
                                 iconImageHref: ability_icon_url,
                                 iconImageSize: [37, 40],
                                 balloonLayout: "default#imageWithContent",
@@ -215,25 +273,13 @@ $(function(){
                                     flying: 1
                                 });
                             });
-
-                            /*$.ajax({
-                                    url: "/load_balloon_content/",
-                                    data: {
-                                        id_point:id_point,
-                                        op_title:curr_op,
-                                        mdm_type:curr_mtype
-                                    },
-                                    type: "POST",
-                                    success: function(data) {
-                                        placemark.properties.set('balloonContent', data);
-                                        var point_coord = placemark.geometry.getCoordinates();
-                                        //map.setCenter(point_coord);
-                                    }
-                                });*/
                         });
                         pointsSet.push(placemark);
                     });
 
+                    if ($('#currMeasurePointId').val()!=''){
+                        map.geoObjects.add(CurrMeasurementPlacemark);
+                    }
                     clusterer = new ymaps.Clusterer();
                     clusterer.add(pointsSet);
                     map.geoObjects.add(clusterer);
@@ -293,7 +339,6 @@ $(function(){
                 $('div.tab').addClass('tab_hidden');
                 cur_tab.removeClass('tab_hidden');
             });
-
 
             $(".select_drop li a").live('click', function(){
                 var el = $(this);
@@ -594,5 +639,10 @@ $(function(){
                     clusterer.add(NewPointsSet);
                     map.geoObjects.add(clusterer); // добавляем новый кластеризированный сет
                 }
+
+            $( ".map_fullscreen" ).click(function() {
+                $('body').toggleClass("fullscreen");
+                map.container.fitToViewport();
+            });
         });
     });

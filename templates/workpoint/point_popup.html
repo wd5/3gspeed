@@ -1,4 +1,4 @@
-{% load thumbnail %}
+{% load thumbnail pytils_numeral %}
 <div class="map_popup">
 <div style="display: none;">{{ point.id }}</div>
     <div class="tab op_all{% if curr_operator_id %} tab_hidden{% endif %}">
@@ -90,7 +90,7 @@
             </div>
         </div>
     {% endfor %}
-
+    <div class="map_popup_qty">{{ speed_values_cnt }} замер{{ speed_values_cnt|choose_plural:",а,ов" }}</div>
 
     <div class="map_popup_close"></div>
     <div class="map_popup_b"></div>

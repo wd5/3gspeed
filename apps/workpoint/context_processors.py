@@ -13,9 +13,9 @@ def is_processing(request):
     if period:
         td = datetime.timedelta(minutes=period)
         last_dtime = datetime.datetime.now() - td
-        point_set = Point.objects.filter(datetime_create__gte=last_dtime)
+        point_set = Point.objects.filter(datetime_create__gte=last_dtime).order_by('-datetime_create')
         if point_set:
-            processing = True
+            processing = point_set[0]
         else:
             processing = False
     else:

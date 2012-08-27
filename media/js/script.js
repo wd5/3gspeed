@@ -54,4 +54,3 @@ $(function() {
 		$(this).parent().toggleClass("select_dropped");
 	});
 });
-

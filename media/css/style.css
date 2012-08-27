@@ -45,6 +45,10 @@ textarea {resize: none;}
 
 
 /*-----------------MAIN-STYLES-----------------*/
+html, body {
+	min-height: 100%;
+	height: 100%;
+}
 body {
 	background: #fff;
 	color: #000;
@@ -288,6 +292,17 @@ input, textarea {
 	top: -16px;
     /*<!-- !!! -->*/
 	right: -16px;
+}
+
+.map_popup_qty {
+	font: bold 15px/24px 'Trebuchet MS', Arial, Helvetica, sans-serif;
+	color: #8a7a11;
+	background: url('../img/zamer_qty.png') no-repeat 0 0;
+	position: absolute;
+	top: -33px;
+	left: -3px;
+	height: 24px;
+	padding: 6px 6px 0 6px;
 }
 
 .tab_hidden {
@@ -1131,9 +1146,11 @@ background-position: 50% -50px;
 }
 .timeline_l {
 	float: left;
+	clear: left;
 }
 .timeline_r {
 	float: right;
+	clear: right;
 }
 
 .timeline_point {
@@ -1146,9 +1163,11 @@ background-position: 50% -50px;
 }
 .timeline_l .timeline_point {
 	right: -48px;
+	top: 80px;
 }
 .timeline_r .timeline_point {
-	left: -48px;
+	left: -47px;
+	top: 40px;
 }
 
 .timeline_arr {
@@ -1162,12 +1181,14 @@ background-position: 50% -50px;
 	width: 12px;
 	height: 21px;
 	right: -12px;
+	top: 80px;
 }
 .timeline_r .timeline_arr {
 	background-position: 0 -31px;
 	width: 10px;
 	height: 19px;
 	left: -10px;
+	top: 40px;
 }
 .timeline_media_l .timeline_arr {
 	background-position: 0 -60px;
@@ -1260,6 +1281,37 @@ background-position: 50% -50px;
 	margin: 0 0 12px 0;
 }
 /*/timeline*/
+
+
+
+
+
+/*fullscreen*/
+.fullscreen .header,
+.fullscreen .footer,
+.fullscreen .main_in {
+	display: none;
+}
+.fullscreen .wrapper,
+.fullscreen .page,
+.fullscreen .main,
+.fullscreen .index_map_out,
+.fullscreen .index_map,
+.fullscreen .map {
+	min-height: 100%;
+	height: 100%;
+	width: 100%;
+}
+.fullscreen .wrapper {
+	max-width: 100%;
+	box-shadow: none;
+}
+.fullscreen .index_map_out {
+	padding-bottom: 0;
+	margin: 0;
+}
+/*/fullscreen*/
+
 /*-----------------PAGE-END-----------------*/
 
 
