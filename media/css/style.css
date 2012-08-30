@@ -1008,7 +1008,6 @@ background-position: 50% -50px;
 	font-size: 12px;
 	line-height: 13px;
 	color: #999;
-	width: 96px;
 }
 .col_op span, .col_op img {
 	display: inline-block;
@@ -1020,7 +1019,8 @@ background-position: 50% -50px;
 	margin-left: 4px;
 }
 .col_op {
-	width: 276px;
+	width: 182px;
+	padding: 0 0 0 44px;
 }
 
 .modem_type_val {
