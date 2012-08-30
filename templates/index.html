@@ -7,8 +7,24 @@
 {% endblock %}
 
 {% block extended_js %}
-    <script src="http://api-maps.yandex.ru/2.0/?load=package.full&mode=debug&lang=ru-RU" type="text/javascript"></script>
-    <script src="/media/js/map.js?v2" type="text/javascript"></script>
+
+    {% if request.GET.gm == '1' %}
+
+        {# GoogleMaps #}
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        <script type="text/javascript" src="/media/js/googlemaps/markerclusterer.js"></script>
+        <script type="text/javascript" src="/media/js/googlemaps/infobox.js"></script>
+    {#    <script type="text/javascript" src="/media/js/googlemaps/map.js"></script>#}
+        <script type="text/javascript" src="/media/js/googlemaps/my_map.js"></script>
+
+    {% else %}
+        {#  YMaps  #}
+        <script src="http://api-maps.yandex.ru/2.0/?load=package.full&mode=debug&lang=ru-RU" type="text/javascript"></script>
+        <script src="/media/js/map.js?v2" type="text/javascript"></script>
+    {% endif %}
+
+
 {% endblock %}
 
 {% block main %}

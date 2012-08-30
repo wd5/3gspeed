@@ -36,16 +36,16 @@
         <table>
             <thead>
                 <tr>
-                    <th class="modem_type">Тип <br />модема</th>
+                    <th class="modem_type"></th>
                     {% for city_mtype in city_mtypes_max_val_set %}
-                        <th class="col_op">{{ city_mtype.type|floatformat }}</th>
+                        <th class="modem_type_val">{{ city_mtype.type|floatformat }}</th>
                     {% endfor %}
                 </tr>
             </thead>
             <tbody>
                 {% for operator in operators %}
                     <tr>
-                        <td class="modem_type_val"><img src="{{ operator.icon.url }}" width="35" height="35" alt="" /> <span>{{ operator.title }}</span></td>
+                        <td class="col_op"><img src="{{ operator.icon.url }}" width="35" height="35" alt="" /> <span>{{ operator.title }}</span></td>
                         {% for city_mtype in city_mtypes_max_val_set %}
                             {% for mtype_avg in operator.mtype_avg_set %}
                                 {% if mtype_avg.id_mtype|floatformat == city_mtype.type|floatformat %}

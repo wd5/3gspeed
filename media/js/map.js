@@ -302,7 +302,8 @@ $(function(){
             var searchAddress = function() {
                 var search_text = $('.search_input').val();
                 if (search_text.length > 0) {
-                    var myGeocoder = ymaps.geocode(search_text);
+                    var curr_city =  $('div.map_city_select div.select_curr').html().replace("<div></div>","");
+                    var myGeocoder = ymaps.geocode(curr_city + ', ' + search_text);
                     myGeocoder.then(
                         function (res) {
                             map.geoObjects.add(res.geoObjects);
@@ -466,6 +467,9 @@ $(function(){
 
             function LoadPMarker(curr_op,curr_mtype,min,max)
                 {
+                    if(max >= 3) {
+                        max = 40;
+                    }
                     var NewPointsSet = [];
                     var curr_mdm_ids = [];
                     if ((curr_mtype!='Тип модема') && (curr_mtype!='Все')){
