@@ -17,10 +17,10 @@ msgid "cities"
 msgstr "города"
 
 msgid "distinct"
-msgstr "район"
+msgstr "улица"
 
 msgid "distincts"
-msgstr "районы города"
+msgstr "улицы города"
 
 msgid "point"
 msgstr "координаты"

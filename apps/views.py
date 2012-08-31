@@ -245,7 +245,7 @@ class DBCopyView(TemplateView):
         not_distincts = []
         same_coord = []
         rows = MobileInternetSpeed.objects.all()
-        #будут районы
+
         routes = MobileInternetSpeed.objects.values('Route').distinct().order_by('Route')
         curr_city = City.objects.get(id=1)
         for route in routes:

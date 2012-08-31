@@ -4,13 +4,13 @@ $(function(){
         var parent = el.parents('div.select')
         var select_curr_div = parent.find('.select_curr')
         var select_curr_div_val = select_curr_div.html().replace("<div></div>","")
-        if (select_curr_div_val != 'Район')
+        if (select_curr_div_val != 'Улица')
             {
                 el.parents('ul').prepend('<li><a href="#" name="'+select_curr_div.attr('name')+'">' + select_curr_div_val + '</a></li>');
             }
         else
             {
-                el.parents('ul').prepend('<li><a href="#" name="0">Все районы</a></li>');
+                el.parents('ul').prepend('<li><a href="#" name="0">Все улицы</a></li>');
             }
 
         select_curr_div.html(el.html()+'<div></div>');

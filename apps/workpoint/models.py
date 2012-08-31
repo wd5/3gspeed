@@ -345,7 +345,7 @@ class Distinct(models.Model):
             return all_pts_count
 
 class Point(models.Model):
-    distinct = models.ForeignKey(Distinct, verbose_name=u'район')
+    distinct = models.ForeignKey(Distinct, verbose_name=u'улица')
     coord = models.CharField(max_length=100, verbose_name=u'Координаты точки')
     map = models.CharField(max_length=1, verbose_name=u'Карта', blank=True)
     datetime_create = models.DateTimeField(verbose_name=u'Дата создания точки', default=datetime.datetime.now)

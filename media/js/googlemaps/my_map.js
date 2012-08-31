@@ -462,19 +462,6 @@ $(function(){
             $('.map_preload').hide();
             searchAddress();
 
-/*  todo: вот тут
-            google.maps.event.addListener(markerCluster, 'click', function() {
-                var Markers = markerCluster.getClusters()
-                console.log(Markers);
-                var points_set = [];
-                    for(var i= 0; i <= Markers.length-1; i++){
-                          points_set.push(Markers[i].point_id);
-                    }
-                points_set = points_set.join(',');
-                console.log(points_set);
-
-            });*/
-
             if (($('#opTITLE').val())){
                 LoadPMarker($('#opTITLE').val(), 'Все', 0, 3);
             }
@@ -594,7 +581,7 @@ $(function(){
                             }
 
                             if (((curr_op=='Все') || (curr_op=='Оператор')) && ((curr_mtype=='Тип модема') || (curr_mtype=='Все'))){ //- провенряем только по скорости
-                                var speed_value = -1;
+                                var speed_value = 0;
                                 for (var k = 0; k <= speed_values.length-1; k++){ // выбираем максимальное по операторам
                                     if (speed_value<speed_values[k]){
                                         speed_value = speed_values[k];
@@ -616,7 +603,7 @@ $(function(){
                             }
 
                             if ((((curr_op!='Все') && (curr_op!='Оператор')) && ((curr_mtype=='Тип модема') || (curr_mtype=='Все')))){ //- провенряем по оператору и по его скорости
-                                var speed_value = -1;
+                                var speed_value = 0;
 
                                 if (metering_values_by_op[curr_op_id]!=undefined){ // если в данной точке есть измерения выбранного оператора - то ставим маркер для этого оператора и проверяем подходит ли скорость по оператору в интервал
                                     speed_value = metering_values_by_op[curr_op_id];
@@ -663,7 +650,7 @@ $(function(){
                             }
 
                             if ((((curr_op!='Все') && (curr_op!='Оператор')) && ((curr_mtype!='Тип модема') && (curr_mtype!='Все')))){
-                                var speed_value = -1;
+                                var speed_value = 0;
                                 var mdm_t_ids = [];
                                 for (var k = 0; k <= modem_t_ids.length-1; k++){
                                     if (curr_mdm_ids.indexOf(modem_t_ids[k])!=-1){

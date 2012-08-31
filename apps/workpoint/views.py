@@ -391,7 +391,7 @@ class StatisticView(TemplateView):
                 id_distincts.append(id['distinct'])
             distincts_set = Distinct.objects.published().filter(id__in=id_distincts).order_by('title')
             context['distincts'] = distincts_set[
-                                   :20] # todo: не забыть убрать - ограничение на вывод районов на странице статистики
+                                   :20] # todo: не забыть убрать - ограничение на вывод улиц на странице статистики
             if distincts_by_pts:
                 operators = Operator.objects.published()
                 context['operators'] = operators
@@ -706,7 +706,7 @@ class LoadCityAvgSpeed(View):
                         curr_distinct = Distinct.objects.published().get(id=id_distinct)
                     except Distinct.DoesNotExist:
                         return HttpResponseBadRequest()
-                        # найдем среднюю скорость по текущему району
+                        # найдем среднюю скорость по текущей улице
                     curr_distinct_avg_speed = curr_distinct.get_distinct_speed('avg')
                     curr_distinct_avg_speed = round(curr_distinct_avg_speed, 1)
                     curr_distinct_avg_speed = str(curr_distinct_avg_speed).replace(',', '.')
@@ -714,7 +714,7 @@ class LoadCityAvgSpeed(View):
                     html = render_to_string(
                         'workpoint/avg_block.html',
                             {
-                            'type': 'району',
+                            'type': 'улице',
                             'curr_city_avg_speed': curr_distinct_avg_speed
                         })
                     return HttpResponse(html)

@@ -84,7 +84,9 @@
             <tbody>
             {% for interval in interval_array %}
                 <tr>
-                    <td class="measurements_qty_interval">{{ interval.min|formatted_float }} - {{ interval.max|formatted_float }}</td>
+                    <td class="measurements_qty_interval">{{ interval.min|formatted_float }} - {{ interval.max|formatted_float }}
+                        {% if forloop.last %}+{% endif %}
+                    </td>
                     {% for op_cnt in interval.pts_count_op %}
                         <td class="measurements_qty_val">{{ op_cnt }}</td>
                     {% endfor %}
