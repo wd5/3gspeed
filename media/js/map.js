@@ -37,7 +37,7 @@ $(function(){
                         iconImageOffset: [-36, -43],
                         hideIconOnBalloonOpen: false,
                         balloonLayout: "default#imageWithContent",
-                        balloonContentSize: [360, 0],
+                        balloonContentSize: [366, 264],
                         balloonImageOffset: [-188, -320],
                         balloonShadow: false
                     }
@@ -220,7 +220,7 @@ $(function(){
                                 iconImageHref: ability_icon_url,
                                 iconImageSize: [37, 40],
                                 balloonLayout: "default#imageWithContent",
-                                balloonContentSize: [360, 0],
+                                balloonContentSize: [366, 264],
                                 balloonImageOffset: [-188, -320],
                                 balloonShadow: false
                             }

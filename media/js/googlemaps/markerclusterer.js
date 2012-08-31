@@ -179,13 +179,13 @@ ClusterIcon.prototype.onAdd = function () {
           enableEventPropagation: false
         };
 
-        var ib = new InfoBox(infobox_options);
         if(infowindow)
             {infowindow.close();}
-        ib.open(mc.getMap(), avgMarker);
-        var infowindow = ib;
 
-        google.maps.event.addListener(ib, 'domready', function() {
+        infowindow = new InfoBox(infobox_options);
+        infowindow.open(mc.getMap(), avgMarker);
+
+        google.maps.event.addListener(infowindow, 'domready', function() {
           $(".map_popup_op").click(function(){
               $('.map_popup_op').removeClass('curr')
               $(this).addClass("curr");

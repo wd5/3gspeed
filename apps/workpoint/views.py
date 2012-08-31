@@ -209,32 +209,61 @@ class LoadBalloonContentCluster(View):
 
             operators_set = Operator.objects.published()
             mtypes = ModemType.objects.values('download_speed').distinct().order_by('download_speed')
+            all_abilities = Ability.objects.all()
             meas_cnt = 0
             popup_values = dict()
             popup_values['main_tab'] = dict()
             for operator in operators_set:
                 popup_values[operator.id] = dict()
-                popup_values['main_tab'][operator.id] = [0,0]
+                popup_values['main_tab'][operator.id] = {'summ': 0, 'cnt': 0}
                 for item in mtypes:
-                    popup_values[operator.id][item['download_speed']] = [0,0]
+                    popup_values[operator.id][item['download_speed']] = {'summ': 0, 'cnt': 0}
 
             for point in curr_points:
                 speed_values_list = point.speedatpoint_all
-                #for item in speed_values_list:
-                    #item.id
                 meas_cnt += len(speed_values_list) # количество замеров в класдете
+                for item in speed_values_list:
+                    MBs = (item.internet_speed / convert_parameter) * 8
+                    popup_values['main_tab'][item.operator.id]['summ'] += MBs
+                    popup_values['main_tab'][item.operator.id]['cnt'] += 1
+                    popup_values[item.operator.id][item.modem_type.download_speed]['summ'] += MBs
+                    popup_values[item.operator.id][item.modem_type.download_speed]['cnt'] += 1
 
+            max_val = 0
+            for operator in operators_set:
+                if popup_values['main_tab'][operator.id]['cnt'] != 0:
+                    MBs = popup_values['main_tab'][operator.id]['summ']/popup_values['main_tab'][operator.id]['cnt']
+                else:
+                    MBs = 0
+                if max_val < MBs:
+                    max_val = MBs
+                MBs = MBs_str = round(MBs, 1)
+                MBs_str = str(MBs_str).replace(',', '.')
+                MBs = Decimal("%s" % MBs)
+                op_abilities_set = all_abilities.filter(download_speed__lte=MBs)
+                setattr(operator, 'avg_speed', MBs_str)
+                setattr(operator, 'avg_speed_num', MBs)
+                setattr(operator, 'abilities', op_abilities_set)
 
-#            for operator in operators_set:
-#                MBs = get_average_speed_MBs(operator, self)
-#                MBs_str = round(MBs, 1)
-#                MBs_str = str(MBs_str).replace(',', '.')
-#                setattr(operator, 'avg_speed', MBs_str)
-#                setattr(operator, 'avg_speed_num', MBs)
-#                setattr(operator, 'abilities', self.get_abilities_by_speed(MBs))
-#                setattr(operator, 'point_spd_set', get_point_spd_set(operator, self))
+                point_spd_set = list()
+                for item in mtypes:
+                    mdm_vals = dict()
+                    if popup_values[operator.id][item['download_speed']]['cnt'] != 0:
+                        mdm_t_avg_val = popup_values[operator.id][item['download_speed']]['summ']/popup_values[operator.id][item['download_speed']]['cnt']
+                    else:
+                        mdm_t_avg_val = False
+                    if mdm_t_avg_val:
+                        value = round(item['download_speed'], 1)
+                        mdm_vals['modem_type__download_speed'] = str(value).replace(',', '.')
+                        MBs = round(mdm_t_avg_val, 1)
+                        MBs = str(MBs).replace(',', '.')
+                        mdm_vals['avgspeed'] = MBs
+                        point_spd_set.append(mdm_vals)
 
+                setattr(operator, 'point_spd_set', point_spd_set)
 
+            max_val = Decimal("%s" % max_val)
+            abilities_set = all_abilities.filter(download_speed__lte=max_val)
 
             try:
                 curr_op = Operator.objects.get(title__contains=op_title)
@@ -245,10 +274,10 @@ class LoadBalloonContentCluster(View):
             popup_html = render_to_string(
                 'workpoint/point_popup.html',
                     {
-                    #'operators': operators,
+                    'operators': operators_set,
                     'speed_values_cnt': meas_cnt,
                     'curr_operator_id': curr_op,
-                    #'abilities': self.get_abilities()
+                    'abilities': abilities_set
                 })
             popup_html = popup_html.replace('\n', ' ')
             return HttpResponse(popup_html)

@@ -1,9 +1,10 @@
+var infowindow;
+
 $(function(){
 
     var operators = new Array();
     var abilities = new Array();
     var modem_types = new Array();
-    var infowindow;
     var searchMarker;
     // если выбран текущий город, то ставин карту в его центр
     var curr_city_coord;
