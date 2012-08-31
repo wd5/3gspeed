@@ -10,7 +10,7 @@ from apps.siteblocks.models import Settings
 from apps.newsboard.models import News
 from django.views.generic import ListView, DetailView, DetailView, TemplateView, View
 
-from models import Operator, ModemType, Point, SpeedAtPoint, City, Distinct, Ability, convert_parameter
+from models import Operator, ModemType, Point, SpeedAtPoint, City, Distinct, Ability, convert_parameter, get_average_speed_MBs, get_point_spd_set
 from batch_select.models import BatchManager
 
 max_interval_value = 3.5
@@ -106,45 +106,51 @@ class LoadCityStatDivs(View):
             elif type == 'avg':
                 operators = Operator.objects.published()
                 max_avg = 0
+                id_avg = False
                 for operator in operators:
                     avg_value = curr_city.get_city_speed('avg', operator)
                     if max_avg < avg_value:
                         max_avg = avg_value
                         id_avg = operator.id
                     setattr(operator, 'curr_city_avg_speed', round(avg_value, 1))
-                for operator in operators:
-                    if operator.id == id_avg:
-                        setattr(operator, 'max_avg', True)
-                        avg_mult = 140 / operator.curr_city_avg_speed
-                for operator in operators:
-                    if operator.id != id_avg:
-                        setattr(operator, 'curr_city_avg_speed_pos', avg_mult * operator.curr_city_avg_speed)
+                if id_avg:
+                    for operator in operators:
+                        if operator.id == id_avg:
+                            setattr(operator, 'max_avg', True)
+                            avg_mult = 140 / operator.curr_city_avg_speed
+                    for operator in operators:
+                        if operator.id != id_avg:
+                            setattr(operator, 'curr_city_avg_speed_pos', avg_mult * operator.curr_city_avg_speed)
                 html = render_to_string(
                     'workpoint/avg_speed_block_template.html',
                         {
-                        'operators': operators
-                    })
+                        'operators': operators,
+                        'id_avg': id_avg,
+                        })
                 return HttpResponse(html)
             elif type == 'max':
                 operators = Operator.objects.published()
                 max_max = 0
+                id_max = False
                 for operator in operators:
                     max_value = curr_city.get_city_speed('max', operator)
                     if max_max < max_value:
                         max_max = max_value
                         id_max = operator.id
                     setattr(operator, 'curr_city_max_speed', round(max_value, 1))
-                for operator in operators:
-                    if operator.id == id_max:
-                        setattr(operator, 'max_max', True)
-                        max_mult = 140 / operator.curr_city_max_speed
-                for operator in operators:
-                    if operator.id != id_max:
-                        setattr(operator, 'curr_city_max_speed_pos', max_mult * operator.curr_city_max_speed)
+                if id_max:
+                    for operator in operators:
+                        if operator.id == id_max:
+                            setattr(operator, 'max_max', True)
+                            max_mult = 140 / operator.curr_city_max_speed
+                    for operator in operators:
+                        if operator.id != id_max:
+                            setattr(operator, 'curr_city_max_speed_pos', max_mult * operator.curr_city_max_speed)
                 html = render_to_string(
                     'workpoint/max_speed_block_template.html',
                         {
-                        'operators': operators
+                        'operators': operators,
+                        'id_max': id_max
                     })
                 return HttpResponse(html)
             else:
@@ -173,7 +179,7 @@ class LoadBalloonContent(View):
             try:
                 curr_point = Point.objects.filter(id=id_point).batch_select('speedatpoint')
                 curr_point = curr_point[0]
-            except Operator.DoesNotExist:
+            except:
                 return HttpResponseBadRequest()
 
             html_content = curr_point.get_popup_window(operator)
@@ -183,6 +189,73 @@ class LoadBalloonContent(View):
             return HttpResponseBadRequest(u'')
 
 load_balloon_content = LoadBalloonContent.as_view()
+
+class LoadBalloonContentCluster(View):
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax():
+            points_set_ids = request.GET.get('points_set', None)
+            op_title = request.GET.get('op_title', None)
+            points_set = []
+            for point_id in points_set_ids.split(','):
+                try:
+                    points_set.append(int(point_id))
+                except:
+                    pass
+
+            try:
+                curr_points = Point.objects.filter(id__in=points_set).batch_select('speedatpoint')
+            except:
+                return HttpResponseBadRequest()
+
+            operators_set = Operator.objects.published()
+            mtypes = ModemType.objects.values('download_speed').distinct().order_by('download_speed')
+            meas_cnt = 0
+            popup_values = dict()
+            popup_values['main_tab'] = dict()
+            for operator in operators_set:
+                popup_values[operator.id] = dict()
+                popup_values['main_tab'][operator.id] = [0,0]
+                for item in mtypes:
+                    popup_values[operator.id][item['download_speed']] = [0,0]
+
+            for point in curr_points:
+                speed_values_list = point.speedatpoint_all
+                #for item in speed_values_list:
+                    #item.id
+                meas_cnt += len(speed_values_list) # количество замеров в класдете
+
+
+#            for operator in operators_set:
+#                MBs = get_average_speed_MBs(operator, self)
+#                MBs_str = round(MBs, 1)
+#                MBs_str = str(MBs_str).replace(',', '.')
+#                setattr(operator, 'avg_speed', MBs_str)
+#                setattr(operator, 'avg_speed_num', MBs)
+#                setattr(operator, 'abilities', self.get_abilities_by_speed(MBs))
+#                setattr(operator, 'point_spd_set', get_point_spd_set(operator, self))
+
+
+
+            try:
+                curr_op = Operator.objects.get(title__contains=op_title)
+                curr_op = curr_op.id
+            except:
+                curr_op = False
+
+            popup_html = render_to_string(
+                'workpoint/point_popup.html',
+                    {
+                    #'operators': operators,
+                    'speed_values_cnt': meas_cnt,
+                    'curr_operator_id': curr_op,
+                    #'abilities': self.get_abilities()
+                })
+            popup_html = popup_html.replace('\n', ' ')
+            return HttpResponse(popup_html)
+        else:
+            return HttpResponseBadRequest(u'')
+
+load_balloon_content_cluster = LoadBalloonContentCluster.as_view()
 
 class LoadPointMarker(View):
     def post(self, request, *args, **kwargs):
@@ -207,12 +280,13 @@ class LoadPointMarker(View):
             except Operator.DoesNotExist:
                 return HttpResponseBadRequest()
 
-            if minMBs=='false' or maxMBs=='false':
+            if minMBs == 'false' or maxMBs == 'false':
                 is_interval = 'yes'
             else:
-                checked_abilities_set = Ability.objects.filter(download_speed__gte=Decimal("%s" % minMBs),download_speed__lte=Decimal("%s" % maxMBs))
+                checked_abilities_set = Ability.objects.filter(download_speed__gte=Decimal("%s" % minMBs),
+                    download_speed__lte=Decimal("%s" % maxMBs))
 
-                if op_title in [u'Оператор',u'Все'] and mdm_type == u'Тип модема':
+                if op_title in [u'Оператор', u'Все'] and mdm_type == u'Тип модема':
                     point_abilities = curr_point.get_abilities().latest()
                     filtered_set = checked_abilities_set.filter(id=point_abilities.id)
                     if filtered_set:
@@ -313,7 +387,7 @@ class StatisticView(TemplateView):
                     tmodems_set = tmodems_set.values('download_speed').distinct().order_by('download_speed')
                     max_avg_mtype = 0
                     max_avg_mtype_set = []
-                    
+
                     for mtype in city_mtypes:
                         mtype_avg_value = city_curr.get_city_speed('avg', operator, mtype['download_speed'])
                         for item in city_mtypes_max_val_set:
@@ -327,17 +401,17 @@ class StatisticView(TemplateView):
                         max_avg_mtype_set.append(
                                 {'id_mtype': mtype['download_speed'], 'mtype_avg_value': abs(round(mtype_avg_value, 1)),
                                  'max_avg_mtype': False, 'avg_pos': 0})
-                    #for item in max_avg_mtype_set:
+                        #for item in max_avg_mtype_set:
                         #if item['id_mtype'] == id_avg_mtype:
-                            #item['max_avg_mtype'] = True
-                            #avg_mtype_mult = 118 / item['mtype_avg_value']
+                        #item['max_avg_mtype'] = True
+                        #avg_mtype_mult = 118 / item['mtype_avg_value']
                     avg_mtype_mult = 118 / 3 # максимум 3 МБс
                     for item in max_avg_mtype_set:
                         if item['mtype_avg_value'] <= 3:
                             item['avg_pos'] = avg_mtype_mult * item['mtype_avg_value']
                         else:
                             item['avg_pos'] = avg_mtype_mult * 3
-                    
+
                     setattr(operator, 'mtype_avg_set', max_avg_mtype_set)
 
                 for operator in operators:
@@ -391,7 +465,6 @@ class LoadCityStatistics(View):
             except City.DoesNotExist:
                 return HttpResponseBadRequest()
 
-
             if 'id_distinct' in request.POST:
                 id_distinct = request.POST['id_distinct']
             else:
@@ -444,7 +517,8 @@ class LoadCityStatistics(View):
                                 max_avg_mtype = mtype_avg_value
                                 id_avg_mtype = mtype['download_speed']
                             max_avg_mtype_set.append(
-                                    {'id_mtype': mtype['download_speed'], 'mtype_avg_value': abs(round(mtype_avg_value, 1)),
+                                    {'id_mtype': mtype['download_speed'],
+                                     'mtype_avg_value': abs(round(mtype_avg_value, 1)),
                                      'max_avg_mtype': False, 'avg_pos': 0})
 
                         for item in max_avg_mtype_set:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf.urls.defaults import patterns, include, url
 from django.views.decorators.csrf import csrf_exempt
-from apps.workpoint.views import load_modem_types, load_balloon_content, load_point_marker, about_page, statistic_page, load_city_distincts, load_stat_city_div, load_city_stat, load_city_avg_speed
+from apps.workpoint.views import load_modem_types, load_balloon_content, load_balloon_content_cluster, load_point_marker, about_page, statistic_page, load_city_distincts, load_stat_city_div, load_city_stat, load_city_avg_speed
 from apps.newsboard.views import news_detail, load_items_news_about
 from views import index, test, db_copy, points_list_json, points_list_json_test
 from django.views.decorators.cache import cache_page
@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     (r'^news/(?P<pk>\d*)/$', news_detail),
     (r'^load_modem_types/$',csrf_exempt(load_modem_types)),
     (r'^load_balloon_content/$',csrf_exempt(load_balloon_content)),
+    (r'^load_balloon_content_cluster/$',csrf_exempt(load_balloon_content_cluster)),
     (r'^load_point_marker/$',csrf_exempt(load_point_marker)),
     (r'^load_city_distincts/$',csrf_exempt(load_city_distincts)),
     (r'^load_stat_city_div/$',csrf_exempt(load_stat_city_div)),

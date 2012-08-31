@@ -142,37 +142,86 @@ ClusterIcon.prototype.onAdd = function () {
 	var avgMarker = new google.maps.Marker({
 		position: avgMarkerPosition
 	});
-	
-	var avgBeelineDownload = 0;
-	var avgBeelineUpload = 0;
-	var avgMegafonDownload = 0;
-	var avgMegafonUpload = 0;
-	var avgMtsDownload = 0;
-	var avgMtsUpload = 0;
-	
-	for (var i = 0; i < clusterMarkers.length; i++) {
-		avgBeelineDownload += parseFloat(clusterMarkers[i].downloadBeeline);
-		avgBeelineUpload += parseFloat(clusterMarkers[i].uploadBeeline);
-		avgMegafonDownload += parseFloat(clusterMarkers[i].downloadMegafon);
-		avgMegafonUpload += parseFloat(clusterMarkers[i].uploadMegafon);
-		avgMtsDownload += parseFloat(clusterMarkers[i].downloadMts);
-		avgMtsUpload += parseFloat(clusterMarkers[i].uploadMts);
-	}
-		
-	avgMarker.downloadBeeline = (avgBeelineDownload / clusterMarkers.length).toFixed(2);
-	avgMarker.uploadBeeline = (avgBeelineUpload / clusterMarkers.length).toFixed(2);
-	avgMarker.downloadMegafon = (avgMegafonDownload / clusterMarkers.length).toFixed(2);
-	avgMarker.uploadMegafon = (avgMegafonUpload / clusterMarkers.length).toFixed(2);
-	avgMarker.downloadMts = (avgMtsDownload / clusterMarkers.length).toFixed(2);
-	avgMarker.uploadMts = (avgMtsUpload / clusterMarkers.length).toFixed(2);
-	
-	$("#historyBox *").hide();	
-	var clusterWindow = createInfoWindow(avgMarker);
+
+/*	$("#historyBox *").hide();
+    var clusterWindow = createInfoWindow(avgMarker);
 	if(infowindow)
 		infowindow.close();
 	clusterWindow.open(map, avgMarker);
-	infowindow = clusterWindow;
-	
+	infowindow = clusterWindow;*/
+
+    var points_set = [];
+    for(var i= 0; i <= clusterMarkers.length-1; i++){
+          points_set.push(clusterMarkers[i].point_id);
+    }
+    points_set = points_set.join(',');
+    var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","");
+
+    $.get('/load_balloon_content_cluster/', {points_set: points_set, op_title: curr_op}, function(data){
+        var boxText = document.createElement("div");
+        var contentString = data;
+        boxText.innerHTML = contentString;
+
+        var infobox_options = {
+          content: boxText,
+          disableAutoPan: false,
+          maxWidth: 0,
+          pixelOffset: new google.maps.Size(-184, -315),
+          zIndex: 200,
+          boxStyle: {
+             opacity: 1
+          },
+          closeBoxMargin: "-13px -11px 0px 0px",
+          closeBoxURL: "",
+          infoBoxClearance: new google.maps.Size(1, 1),
+          isHidden: false,
+          pane: "floatPane",
+          enableEventPropagation: false
+        };
+
+        var ib = new InfoBox(infobox_options);
+        if(infowindow)
+            {infowindow.close();}
+        ib.open(mc.getMap(), avgMarker);
+        var infowindow = ib;
+
+        google.maps.event.addListener(ib, 'domready', function() {
+          $(".map_popup_op").click(function(){
+              $('.map_popup_op').removeClass('curr')
+              $(this).addClass("curr");
+              var op_class = $(this).find('img').attr('alt');
+              var curr_parent = $(this).parents('.tab')
+              var tab_parent = $(this).parents('.map_popup_op')
+              var cur_tab = $('div.'+op_class)
+              var tr_set = $('.map_popup_info_table img[alt="'+op_class+'"]').parents('.map_popup_op')
+              tr_set.addClass("curr");
+              $('div.tab').addClass('tab_hidden');
+              cur_tab.removeClass('tab_hidden');
+          });
+          $('.map_popup_close').click(function(){
+              if(infowindow)
+                  {infowindow.close();}
+          });
+          if ($('.map_popup').html()) {
+              var vals = $('#map_slider').slider( "option", "values" );
+              var minMBs = (vals[0]/250)-0.4;
+              var maxMBs = (vals[1]/250)-0.4;
+              if(maxMBs >= 3) {
+                  maxMBs = 40;
+              }
+              var map_popup_info_val_set = $('td.map_popup_info_val');
+              for (var i = 0; i <= map_popup_info_val_set.length; i++) {
+                  var value = parseFloat(map_popup_info_val_set.eq(i).html());
+                  if ((value) || (value==0)) {
+                      if ((value<minMBs) || (value>maxMBs)) {
+                          map_popup_info_val_set.eq(i).css('color','#999');
+                      }
+                  }
+              }
+          }
+        });
+      });
+
 	// The default click handler follows. Disable it by setting
     // the zoomOnClick property to false.
     if (mc.getZoomOnClick()) {
