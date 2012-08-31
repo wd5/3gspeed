@@ -68,8 +68,13 @@
                         <div class="select_curr">Тип модема<div></div></div>
                         <div class="select_drop">
                             <ul>
-                                {% for type in mtypes %}
+                                {% comment %}{% for type in mtypes %}
                                     <li><a href="#" name="{{ forloop.counter }}">{{ type.download_speed|floatformat }}</a></li>
+                                {% endfor %}{% endcomment %}
+                                {% for type in mtypes %}
+                                    {% if forloop.counter == 1 %}
+                                    <li><a href="#" name="{{ forloop.counter }}">{{ type.download_speed|floatformat }}</a></li>
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         </div>
@@ -180,5 +185,8 @@
 <input id="opTITLE" type="hidden" value="{{ op_curr.title }}" />
 <input id="currMeasurePointId" type="hidden" value="{{ processing.id }}" />
 <input id="currMeasurePointCoord" type="hidden" value="{{ processing.coord }}" />
+{% if request.GET.point_id %}
+<input id="IdMaxPoint" type="hidden" value="{{ request.GET.point_id }}" />
+{% endif %}
 {% endblock %}
 

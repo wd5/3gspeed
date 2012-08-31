@@ -369,7 +369,7 @@ $(function(){
                         var infobox_options = {
                             content: boxText,
                             alignBottom: true,
-                            disableAutoPan: false,
+                            disableAutoPan: true,
                             maxWidth: 0,
                             pixelOffset: new google.maps.Size(-184, -50),
                             zIndex: 200,
@@ -387,6 +387,15 @@ $(function(){
 
                         var ib = new InfoBox(infobox_options);
                         infowindow = ib;
+
+        var bounds = map.getBounds();
+        var ne = bounds.getNorthEast();
+        var sw = bounds.getSouthWest();
+        delta = (ne.lat() - sw.lat()) / 5;
+        pos = placemark.getPosition();
+        var latlng = new google.maps.LatLng(pos.lat() + delta, pos.lng());
+        map.panTo(latlng);
+
 
                         ib.open(map, placemark);
 
@@ -439,6 +448,100 @@ $(function(){
                 });
 
                 pointsSet.push(placemark);
+                if ($('#IdMaxPoint').val()){
+                    if ($('#IdMaxPoint').val()==point.id)
+                        {map.panTo(placemark.position);
+                        map.setZoom(19);
+
+                            var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","");
+                            var id_point = placemark.point_id;
+                            if(infowindow)
+                                {infowindow.close();}
+                            $.get('/load_balloon_content/', {id_point: id_point, op_title: curr_op }, function(data){
+                                var boxText = document.createElement("div");
+                                var contentString = data;
+                                boxText.innerHTML = contentString;
+
+                                var infobox_options = {
+                                    content: boxText,
+                                    alignBottom: true,
+                                    disableAutoPan: true,
+                                    maxWidth: 0,
+                                    pixelOffset: new google.maps.Size(-184, -50),
+                                    zIndex: 200,
+                                    boxStyle: {
+                                       opacity: 1
+                                    },
+                                    closeBoxMargin: "-13px -11px 0px 0px",
+                                    //closeBoxURL: "/media/img/close.png",
+                                    closeBoxURL: "",
+                                    infoBoxClearance: new google.maps.Size(1, 50),
+                                    isHidden: false,
+                                    pane: "floatPane",
+                                    enableEventPropagation: false
+                                };
+
+                                var ib = new InfoBox(infobox_options);
+                                infowindow = ib;
+
+                var bounds = map.getBounds();
+                var ne = bounds.getNorthEast();
+                var sw = bounds.getSouthWest();
+                delta = (ne.lat() - sw.lat()) / 5;
+                pos = placemark.getPosition();
+                var latlng = new google.maps.LatLng(pos.lat() + delta, pos.lng());
+                map.panTo(latlng);
+
+
+                                ib.open(map, placemark);
+
+                                google.maps.event.addListener(ib, 'domready', function() {
+                                    $(".map_popup_op").click(function(){
+                                        $('.map_popup_op').removeClass('curr')
+                                        $(this).addClass("curr");
+                                        var op_class = $(this).find('img').attr('alt');
+                                        var curr_parent = $(this).parents('.tab')
+                                        var tab_parent = $(this).parents('.map_popup_op')
+                                        var cur_tab = $('div.'+op_class)
+                                        var tr_set = $('.map_popup_info_table img[alt="'+op_class+'"]').parents('.map_popup_op')
+                                        tr_set.addClass("curr");
+                                        $('div.tab').addClass('tab_hidden');
+                                        cur_tab.removeClass('tab_hidden');
+                                    });
+                                    $('.map_popup_close').click(function(){
+                                        if(infowindow)
+                                            {infowindow.close();}
+                                    });
+                                    if ($('.map_popup').html()) {
+                                        var vals = $('#map_slider').slider( "option", "values" );
+                                        var minMBs = (vals[0]/250)-0.4;
+                                        var maxMBs = (vals[1]/250)-0.4;
+                                        if(maxMBs >= 3) {
+                                            maxMBs = 40;
+                                        }
+                                        var map_popup_info_val_set = $('td.map_popup_info_val');
+                                        for (var i = 0; i <= map_popup_info_val_set.length; i++) {
+                                            var value = parseFloat(map_popup_info_val_set.eq(i).html());
+                                            if ((value) || (value==0)) {
+                                                if ((value<minMBs) || (value>maxMBs)) {
+                                                    map_popup_info_val_set.eq(i).css('color','#999');
+                                                }
+                                            }
+                                        }
+                                        var counter_val_set = $('div.counter_val');
+                                        for (var i = 0; i <= counter_val_set.length; i++) {
+                                            var value = parseFloat(counter_val_set.eq(i).html());
+                                            if ((value) || (value==0)) {
+                                                if ((value<minMBs) || (value>maxMBs)) {
+                                                    counter_val_set.eq(i).css('color','#666');
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                }
             });
 
             if ($('#currMeasurePointId').val()!=''){

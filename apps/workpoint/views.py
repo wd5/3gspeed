@@ -384,14 +384,15 @@ class StatisticView(TemplateView):
             context['cities'] = False
             city_curr = False
         if city_curr:
-            distincts_by_pts = Point.objects.filter(distinct__city__id=city_curr.id).values(
-                'distinct').distinct().order_by('-distinct')
+
+            speed_at_pts_city = SpeedAtPoint.objects.filter(point__distinct__city__id=city_curr.id)
+
+            distincts_by_pts = Point.objects.filter(distinct__city__id=city_curr.id).values('distinct').distinct().order_by('-distinct')
             id_distincts = []
             for id in distincts_by_pts:
                 id_distincts.append(id['distinct'])
             distincts_set = Distinct.objects.published().filter(id__in=id_distincts).order_by('title')
-            context['distincts'] = distincts_set[
-                                   :20] # todo: не забыть убрать - ограничение на вывод улиц на странице статистики
+            context['distincts'] = distincts_set[:20] # todo: не забыть убрать
             if distincts_by_pts:
                 operators = Operator.objects.published()
                 context['operators'] = operators
@@ -402,6 +403,10 @@ class StatisticView(TemplateView):
                 for item in city_mtypes:
                     city_mtypes_max_val_set.append({'type': '%s' % item['download_speed'], 'value': 0})
                 for operator in operators:
+
+                    speed_vals = speed_at_pts_city.filter(operator=operator.id).order_by('-internet_speed')[0]
+                    setattr(operator, 'point_id', speed_vals.point_id)
+
                     avg_value = city_curr.get_city_speed('avg', operator)
                     max_value = city_curr.get_city_speed('max', operator)
                     if max_avg < avg_value:

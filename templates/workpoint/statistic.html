@@ -44,6 +44,12 @@
                         {% endfor %}
                     </ul>
                 </div>
+                {% comment %}<select class="combobox">
+                    <option value="" selected="selected">---------</option>
+                    {% for distinct in distincts %}
+                        <option value="{{ distinct.id }}">{{ distinct.title }}</option>
+                    {% endfor %}
+                </select>{% endcomment %}
                 {% endif %}
             </div>
 

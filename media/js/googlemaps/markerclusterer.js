@@ -182,6 +182,16 @@ ClusterIcon.prototype.onAdd = function () {
         if(infowindow)
             {infowindow.close();}
 
+        var bounds = mc.getMap().getBounds();
+        var ne = bounds.getNorthEast();
+        var sw = bounds.getSouthWest();
+        delta = (ne.lat() - sw.lat()) / 5;
+        pos = avgMarkerPosition;
+        var latlng = new google.maps.LatLng(pos.lat() + delta, pos.lng());
+          console.log(latlng);
+          //mc.getMap().setCenter(avgMarkerPosition);
+        mc.getMap().panTo(latlng);
+
         infowindow = new InfoBox(infobox_options);
         infowindow.open(mc.getMap(), avgMarker);
 

@@ -19,7 +19,7 @@
                     <div class="counter_val">{{ operator.curr_city_max_speed|formatted_float }}</div>
                     <div class="counter_glass"></div>
                 </div>
-                <div class="op_stat_lnk"><a href="/?city_id={{ city_curr.id }}&op_id={{ operator.id }}">Перейти на карту</a></div>
+                <div class="op_stat_lnk"><a href="/?city_id={{ city_curr.id }}&op_id={{ operator.id }}&point_id={{ operator.point_id }}">Перейти на карту</a></div>
             </div>
         {% endfor %}
         <div class="op_stats_units">
