@@ -238,13 +238,7 @@ $(function(){
                             }
                             var id_point = placemark.properties.get('point_id')
                             $.get('/load_balloon_content/', {id_point: id_point, op_title: curr_op }, function(data){
-                                var pk = placemark.geometry.getCoordinates();
-                                var bounds = map.getBounds();
-                                var delta = (bounds[1][0] - bounds[0][0]) / 4; //0.0050000000;
-                                pk[0] = parseFloat(pk[0]) + delta;
-                                pk[1] = parseFloat(pk[1]);
-                                map.panTo(pk, {
-                                    callback: function () {
+
                                         placemark.properties.set('balloonContent', data);
                                         if ($('.map_popup').html()) {
                                             var vals = $('#map_slider').slider( "option", "values" );
@@ -269,9 +263,6 @@ $(function(){
                                                 }
                                             }
                                         }
-                                    },
-                                    flying: 1
-                                });
                             });
                         });
                         pointsSet.push(placemark);
