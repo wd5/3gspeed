@@ -42,11 +42,12 @@ class IndexView(TemplateView):
         except:
             context['cities'] = False
             city_curr = False
-        if city_curr:
-            #context['points'] = city_curr.get_points()
-            context['curr_city_pts_count'] = city_curr.get_pts_count()
+
         operators = Operator.objects.published()
+
+        mtype_ids = False
         if city_curr:
+            context['curr_city_pts_count'] = city_curr.get_pts_count()
             max_avg = 0
             max_max = 0
             id_avg = None
@@ -75,6 +76,12 @@ class IndexView(TemplateView):
                 if operator.id != id_max and id_max != None:
                     setattr(operator, 'curr_city_max_speed_pos', max_mult * operator.curr_city_max_speed)
 
+            mtype_ids = list()
+            city_speedatpts = SpeedAtPoint.objects.filter(point__distinct__city__id=city_curr.id).values('modem_type__id').annotate()
+            for item in city_speedatpts:
+                mtype_ids.append(item['modem_type__id'])
+
+
 
         try:
             op_id = self.request.GET['op_id']
@@ -84,8 +91,9 @@ class IndexView(TemplateView):
         except:
             context['op_curr'] = False
         context['operators'] = operators
-        mtypes = ModemType.objects.values('download_speed').distinct().order_by('download_speed')
-        context['mtypes'] = mtypes
+        if mtype_ids:
+            mtypes = ModemType.objects.filter(id__in=mtype_ids).values('download_speed').distinct().order_by('download_speed')
+            context['mtypes'] = mtypes
         abilities = Ability.objects.all()
         context['abilities'] = abilities
         return context

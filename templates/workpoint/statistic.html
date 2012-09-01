@@ -7,6 +7,8 @@
 {% endblock %}
 
 {% block extended_js %}
+    <link href="/media/css/jquery-ui-1.8.23.custom.css" rel="stylesheet" type="text/css" />
+    <script src="/media/js/jquery-ui-1.8.23.custom.min.js" type="text/javascript"></script>
     <script src="/media/js/stats.js" type="text/javascript"></script>
 {% endblock %}
 
@@ -44,7 +46,8 @@
                         {% endfor %}
                     </ul>
                 </div>
-                {% comment %}<select class="combobox">
+                {% comment %} ГОТОВО!
+                <select class="combobox">
                     <option value="" selected="selected">---------</option>
                     {% for distinct in distincts %}
                         <option value="{{ distinct.id }}">{{ distinct.title }}</option>
@@ -52,7 +55,6 @@
                 </select>{% endcomment %}
                 {% endif %}
             </div>
-
             {% if curr_city_avg_speed %}
                 <div class="average">
                     <span class="average_label">Средняя скорость по городу</span>

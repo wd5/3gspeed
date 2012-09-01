@@ -1,0 +1,16 @@
+{% if mtypes %}
+    <div class="map_modem_select select">
+        <div class="select_curr">Тип модема<div></div></div>
+        <div class="select_drop">
+            <ul>
+                {% for type in mtypes %}
+                    <li><a href="#" name="{{ forloop.counter }}">{{ type.download_speed|floatformat }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% else %}
+    <div class="map_modem_select select">
+        <div class="select_curr">Тип модема<div></div></div>
+    </div>
+{% endif %}

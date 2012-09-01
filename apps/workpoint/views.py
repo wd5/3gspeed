@@ -70,7 +70,7 @@ class LoadCityDistincts(View):
             distincts_set = Distinct.objects.published().filter(id__in=id_distincts).order_by('title')
             html_code = u''
             for distinct in distincts_set:
-                html_code = u'%s<li><a href="#" name="%s">%s</a></li>' % ( html_code, distinct.id, distinct.title[:30])
+                html_code = u'%s<li><a href="#" name="%s">%s</a></li>' % ( html_code, distinct.id, distinct.title[:30]) # todo: Режу название улицы до 30 символов
             return HttpResponse(html_code)
         else:
             return HttpResponseBadRequest()
@@ -91,7 +91,7 @@ class LoadCityStatDivs(View):
             except City.DoesNotExist:
                 return HttpResponseBadRequest()
 
-            if type not in ['avg', 'max', 'count']:
+            if type not in ['avg', 'max', 'count', 'mtypes']:
                 return HttpResponseBadRequest()
 
             if type == 'count':
@@ -152,6 +152,23 @@ class LoadCityStatDivs(View):
                         'operators': operators,
                         'id_max': id_max
                     })
+                return HttpResponse(html)
+            elif type == 'mtypes':
+                mtype_ids = list()
+                city_speedatpts = SpeedAtPoint.objects.filter(point__distinct__city__id=curr_city.id).values('modem_type__id').annotate()
+                for item in city_speedatpts:
+                    mtype_ids.append(item['modem_type__id'])
+                if mtype_ids:
+                    mtypes = ModemType.objects.filter(id__in=mtype_ids).values('download_speed').distinct().order_by('download_speed')
+                else:
+                    mtypes = False
+
+                html = render_to_string(
+                    'workpoint/mtype_drop_block_template.html',
+                        {
+                        'mtypes': mtypes,
+                    })
+
                 return HttpResponse(html)
             else:
                 return HttpResponse('')
@@ -396,7 +413,7 @@ class StatisticView(TemplateView):
             for id in distincts_by_pts:
                 id_distincts.append(id['distinct'])
             distincts_set = Distinct.objects.published().filter(id__in=id_distincts).order_by('title')
-            context['distincts'] = distincts_set[:20] # todo: не забыть убрать
+            context['distincts'] = distincts_set#[:20] # todo: не забыть убрать
             if distincts_by_pts:
                 operators = Operator.objects.published()
                 context['operators'] = operators

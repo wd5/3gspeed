@@ -1,5 +1,5 @@
 $(function(){
-/*    $.widget("ui.combobox", {
+    $.widget("ui.combobox", {
         _create: function() {
             var input,
                 self = this,
@@ -110,7 +110,12 @@ $(function(){
         }
     });
 
-    $(".combobox").combobox();*/
+    $(".combobox").combobox({
+         selected: function(event, ui) {
+            alert('123');
+         } // selected
+      });
+
 
     $(".select_drop li a").live('click', function(){
         var el = $(this)
@@ -165,10 +170,10 @@ $(function(){
                     },
                     type: "POST",
                     success: function(data) {
-                        $('div.stat_distinct').html('<div class="select_curr" name="0">Район<div></div></div><div class="select_drop"><ul>'+ data +'</ul></div>')
+                        $('div.stat_distinct').html('<div class="select_curr" name="0">Улица<div></div></div><div class="select_drop"><ul>'+ data +'</ul></div>')
                     },
                     error:function(jqXHR,textStatus,errorThrown) {
-                        $('div.stat_distinct').html('<div class="select_curr" name="0">Район<div></div></div><div class="select_drop"><ul></ul></div>')
+                        $('div.stat_distinct').html('<div class="select_curr" name="0">Улица<div></div></div><div class="select_drop"><ul></ul></div>')
                     }
                 });
 

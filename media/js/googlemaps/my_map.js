@@ -21,7 +21,7 @@ $(function(){
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         mapTypeControl: false,
         streetViewControl: false,
-        overviewMapControl: false,
+        overviewMapControl: false
     };
 
     var map = new google.maps.Map(document.getElementById("map"), map_options);
@@ -73,82 +73,108 @@ $(function(){
             //origin
             new google.maps.Point(0,0),
             // anchor
-            new google.maps.Point(15, 40),
+            new google.maps.Point(40, 40),
             // ScaledSize
             new google.maps.Size(82, 82));
         var CurrMeasurementPlacemark = new google.maps.Marker({
             position: pointCurr,
             point_id: $('#currMeasurePointId').val(),
-            icon: image
+            icon: image,
+            map: map
         });
 
-        // todo: клик по маркеру
-        /*var CurrMeasurementPlacemark = new ymaps.Placemark(coordCurr,
-            {
-                balloonContent: '',
-                point_id: $('#currMeasurePointId').val()
-            },
-            {
-                openBalloonOnClick: false,
-                iconImageHref: '/media/img/car_point.png',
-                iconImageSize: [82, 82],
-                iconImageOffset: [-36, -43],
-                hideIconOnBalloonOpen: false,
-                balloonLayout: "default#imageWithContent",
-                balloonContentSize: [360, 0],
-                balloonImageOffset: [-188, -320],
-                balloonShadow: false
-            }
-        );
-        CurrMeasurementPlacemark.events.add('click', function () {
-            var curr_city =  $('div.map_city_select div.select_curr').html().replace("<div></div>","")
-            var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","")
-            var curr_mtype =$('div.map_modem_select div.select_curr').html().replace("<div></div>","")
+        map.panTo(CurrMeasurementPlacemark.position);
 
-            if(CurrMeasurementPlacemark.balloon.isOpen()) {
-                CurrMeasurementPlacemark.balloon.close();
-            }
-            else {
-                CurrMeasurementPlacemark.balloon.open();
-            }
-            var id_point = CurrMeasurementPlacemark.properties.get('point_id')
+        google.maps.event.addListener(CurrMeasurementPlacemark, 'click', function() {
+            var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","");
+            var id_point = CurrMeasurementPlacemark.point_id;
+            if(infowindow)
+                {infowindow.close();}
             $.get('/load_balloon_content/', {id_point: id_point, op_title: curr_op }, function(data){
-                var pk = CurrMeasurementPlacemark.geometry.getCoordinates();
+                var boxText = document.createElement("div");
+                var contentString = data;
+                boxText.innerHTML = contentString;
+
+                var infobox_options = {
+                    content: boxText,
+                    alignBottom: true,
+                    disableAutoPan: true,
+                    maxWidth: 0,
+                    pixelOffset: new google.maps.Size(-184, -50),
+                    zIndex: 200,
+                    boxStyle: {
+                       opacity: 1
+                    },
+                    closeBoxMargin: "-13px -11px 0px 0px",
+                    //closeBoxURL: "/media/img/close.png",
+                    closeBoxURL: "",
+                    infoBoxClearance: new google.maps.Size(1, 50),
+                    isHidden: false,
+                    pane: "floatPane",
+                    enableEventPropagation: false
+                };
+
+                var ib = new InfoBox(infobox_options);
+                infowindow = ib;
+
                 var bounds = map.getBounds();
-                var delta = (bounds[1][0] - bounds[0][0]) / 4; //0.0050000000;
-                pk[0] = parseFloat(pk[0]) + delta;
-                pk[1] = parseFloat(pk[1]);
-                map.panTo(pk, {
-                    callback: function () {
-                        CurrMeasurementPlacemark.properties.set('balloonContent', data);
-                        if ($('.map_popup').html()) {
-                            var vals = $('#map_slider').slider( "option", "values" );
-                            var minMBs = (vals[0]/250)-0.4;
-                            var maxMBs = (vals[1]/250)-0.4;
-                            var map_popup_info_val_set = $('td.map_popup_info_val');
-                            for (var i = 0; i <= map_popup_info_val_set.length; i++) {
-                                var value = parseFloat(map_popup_info_val_set.eq(i).html());
-                                if ((value) || (value==0)) {
-                                    if ((value<minMBs) || (value>maxMBs)) {
-                                        map_popup_info_val_set.eq(i).css('color','#999');
-                                    }
-                                }
-                            }
-                            var counter_val_set = $('div.counter_val');
-                            for (var i = 0; i <= counter_val_set.length; i++) {
-                                var value = parseFloat(counter_val_set.eq(i).html());
-                                if ((value) || (value==0)) {
-                                    if ((value<minMBs) || (value>maxMBs)) {
-                                        counter_val_set.eq(i).css('color','#666');
-                                    }
+                var ne = bounds.getNorthEast();
+                var sw = bounds.getSouthWest();
+                delta = (ne.lat() - sw.lat()) / 5;
+                pos = CurrMeasurementPlacemark.getPosition();
+                var latlng = new google.maps.LatLng(pos.lat() + delta, pos.lng());
+                map.panTo(latlng);
+
+
+                ib.open(map, CurrMeasurementPlacemark);
+
+                google.maps.event.addListener(ib, 'domready', function() {
+                    $(".map_popup_op").click(function(){
+                        $('.map_popup_op').removeClass('curr')
+                        $(this).addClass("curr");
+                        var op_class = $(this).find('img').attr('alt');
+                        var curr_parent = $(this).parents('.tab')
+                        var tab_parent = $(this).parents('.map_popup_op')
+                        var cur_tab = $('div.'+op_class)
+                        var tr_set = $('.map_popup_info_table img[alt="'+op_class+'"]').parents('.map_popup_op')
+                        tr_set.addClass("curr");
+                        $('div.tab').addClass('tab_hidden');
+                        cur_tab.removeClass('tab_hidden');
+                    });
+                    $('.map_popup_close').click(function(){
+                        if(infowindow)
+                            {infowindow.close();}
+                    });
+                    if ($('.map_popup').html()) {
+                        var vals = $('#map_slider').slider( "option", "values" );
+                        var minMBs = (vals[0]/250)-0.4;
+                        var maxMBs = (vals[1]/250)-0.4;
+                        if(maxMBs >= 3) {
+                            maxMBs = 40;
+                        }
+                        var map_popup_info_val_set = $('td.map_popup_info_val');
+                        for (var i = 0; i <= map_popup_info_val_set.length; i++) {
+                            var value = parseFloat(map_popup_info_val_set.eq(i).html());
+                            if ((value) || (value==0)) {
+                                if ((value<minMBs) || (value>maxMBs)) {
+                                    map_popup_info_val_set.eq(i).css('color','#999');
                                 }
                             }
                         }
-                    },
-                    flying: 1
+                        var counter_val_set = $('div.counter_val');
+                        for (var i = 0; i <= counter_val_set.length; i++) {
+                            var value = parseFloat(counter_val_set.eq(i).html());
+                            if ((value) || (value==0)) {
+                                if ((value<minMBs) || (value>maxMBs)) {
+                                    counter_val_set.eq(i).css('color','#666');
+                                }
+                            }
+                        }
+                    }
                 });
             });
-        });*/
+
+        });
     }
 
             $(".select_drop li a").live('click', function(){
@@ -158,11 +184,11 @@ $(function(){
                 var select_curr_div_val = select_curr_div.html().replace("<div></div>","");
                 if ((select_curr_div_val != 'Оператор') && (select_curr_div_val != 'Тип модема'))
                     {
-                        if (parent.is('.map_city_select'))
+                    /*    if (parent.is('.map_city_select'))
                             {el.parents('ul').prepend('<li><a href="#" name="'+select_curr_div.attr('name')+'">' + select_curr_div_val + '</a></li>');}
                         else
                             {el.parents('ul').prepend('<li><a href="#" name="'+select_curr_div.attr('name')+'">' + select_curr_div_val + '</a></li>');}
-                            //{el.parents('ul').prepend('<li><a href="#">' + select_curr_div_val + '</a></li>');}
+                            //{el.parents('ul').prepend('<li><a href="#">' + select_curr_div_val + '</a></li>');}*/
                     }
                 else
                     {if (select_curr_div_val == 'Тип модема')
@@ -170,95 +196,89 @@ $(function(){
                             el.parents('ul').prepend('<li><a href="#" name="0">Все</a></li>');
                         }
                     }
+
                 select_curr_div.html(el.html()+'<div></div>');
                 select_curr_div.attr('name',el.attr('name'));
-                el.parent().remove();
+                //el.parent().remove();
                 parent.toggleClass("select_dropped");
 
+                var curr_city =  $('div.map_city_select div.select_curr').html().replace("<div></div>","");
+                var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","");
+                var curr_mtype = $('div.map_modem_select div.select_curr').html().replace("<div></div>","");
 
-                if (!parent.is('.map_city_select')) {
-                    var values = parent.find('a');
-                    for (var j=0; j<=values.length-2; j++) {
-                        for (var i=0; i<=values.length-1-j; i++) {
-                            var bufATTR;
-                            var bufHTML;
-                            var val1 = parseInt(values.eq(i).attr('name'));
-                            var val2 = parseInt(values.eq(i+1).attr('name'));
-                            if (val1>val2) {
-                                bufATTR = values.eq(i).attr('name');
-                                bufHTML = values.eq(i).html();
-                                values.eq(i).attr('name',val2);
-                                values.eq(i).html(values.eq(i+1).html());
-                                values.eq(i+1).attr('name',bufATTR);
-                                values.eq(i+1).html(bufHTML);
+                if (select_curr_div_val!=el.html()) { // если это не повторное нажатие - тогда работаем
+
+                    if (parent.is('.map_city_select'))
+                        {
+                        var coords = select_curr_div.attr('name');
+                        var city_param_array = coords.split('|');
+                        var curr_city_id = parseInt(city_param_array[1]);
+                        coords_array = city_param_array[0].split(',');
+                        city_coord = new google.maps.LatLng(coords_array[0], coords_array[1]);
+                        map.setCenter(city_coord);
+                        //вытащим плашку со средней скоростью
+                        $.ajax({
+                            url: "/load_stat_city_div/",
+                            data: {
+                                city_title:curr_city,
+                                type:'avg'
+                            },
+                            type: "POST",
+                            success: function(data) {
+                                $('div.avg_speed').replaceWith(data)
                             }
+                        });
+                        //вытащим плашку с максимальной скоростью
+                        $.ajax({
+                            url: "/load_stat_city_div/",
+                            data: {
+                                city_title:curr_city,
+                                type:'max'
+                            },
+                            type: "POST",
+                            success: function(data) {
+                                $('div.max_speed').replaceWith(data)
+                            }
+                        });
+                        //вытащим плашку с количеством точек по городу
+                        $.ajax({
+                            url: "/load_stat_city_div/",
+                            data: {
+                                city_title:curr_city,
+                                type:'count'
+                            },
+                            type: "POST",
+                            success: function(data) {
+                                $('div.pt_count').replaceWith(data)
+                            }
+                        });
+                        //вытащим типы модемов для выбранного города
+                        $.ajax({
+                            url: "/load_stat_city_div/",
+                            data: {
+                                city_title:curr_city,
+                                type:'mtypes'
+                            },
+                            type: "POST",
+                            success: function(data) {
+                                $('div.map_modem_select').replaceWith(data)
+                            }
+                        });
+
+                        // удалим старые точки и вытащим точки к городу
+                        markerCluster.clearMarkers();
+                        pointsSet = [];
+                        getJSONPoints(curr_city_id);
                         }
-                    }
+
+                    if ((parent.is('.map_op_select')) || (parent.is('.map_modem_select')))
+                        {
+                            var vals = $('#map_slider').slider( "option", "values" );
+                            var minMBs = (vals[0]/250)-0.4;
+                            var maxMBs = (vals[1]/250)-0.4;
+                            LoadPMarker(curr_op,curr_mtype,minMBs,maxMBs);
+                        }
                 }
-
-
-                var curr_city =  $('div.map_city_select div.select_curr').html().replace("<div></div>","")
-                var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","")
-                var curr_mtype = $('div.map_modem_select div.select_curr').html().replace("<div></div>","")
-
-                if (parent.is('.map_city_select'))
-                    {
-                    var coords = select_curr_div.attr('name');
-                    var city_param_array = coords.split('|');
-                    var curr_city_id = parseInt(city_param_array[1]);
-                    coords_array = city_param_array[0].split(',');
-                    city_coord = new google.maps.LatLng(coords_array[0], coords_array[1]);
-                    map.setCenter(city_coord);
-                    //вытащим плашку со средней скоростью
-                    $.ajax({
-                        url: "/load_stat_city_div/",
-                        data: {
-                            city_title:curr_city,
-                            type:'avg'
-                        },
-                        type: "POST",
-                        success: function(data) {
-                            $('div.avg_speed').replaceWith(data)
-                        }
-                    });
-                    //вытащим плашку с максимальной скоростью
-                    $.ajax({
-                        url: "/load_stat_city_div/",
-                        data: {
-                            city_title:curr_city,
-                            type:'max'
-                        },
-                        type: "POST",
-                        success: function(data) {
-                            $('div.max_speed').replaceWith(data)
-                        }
-                    });
-                    //вытащим плашку с количеством точек по городу
-                    $.ajax({
-                        url: "/load_stat_city_div/",
-                        data: {
-                            city_title:curr_city,
-                            type:'count'
-                        },
-                        type: "POST",
-                        success: function(data) {
-                            $('div.pt_count').replaceWith(data)
-                        }
-                    });
-
-                    // удалим старые точки и вытащим точки к городу
-                    markerCluster.removeMarkers();
-                    getJSONPoints(curr_city_id);
-                    }
-
-                if ((parent.is('.map_op_select')) || (parent.is('.map_modem_select')))
-                    {
-                        var vals = $('#map_slider').slider( "option", "values" );
-                        var minMBs = (vals[0]/250)-0.4;
-                        var maxMBs = (vals[1]/250)-0.4;
-                        LoadPMarker(curr_op,curr_mtype,minMBs,maxMBs);
-                    }
-
 
                 return false;
             });
@@ -544,10 +564,6 @@ $(function(){
                 }
             });
 
-            if ($('#currMeasurePointId').val()!=''){
-                CurrMeasurementPlacemark.map = map;
-            }
-
             var cluster_options = {
                 maxZoom: 18,
                 zoomOnClick: false,
@@ -795,7 +811,7 @@ $(function(){
 
             $( ".map_fullscreen" ).click(function() {
                 $('body').toggleClass("fullscreen");
-                //map.container.fitToViewport();
+                google.maps.event.trigger(map, 'resize');
             });
 
 });

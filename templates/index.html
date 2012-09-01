@@ -40,6 +40,7 @@
                         {% if cities %}
                             <div class="select_drop">
                                 <ul>
+                                    <li><a href="#" name="{{ city_curr.coord }}|{{ city_curr.id }}">{{ city_curr.title }}</a></li>
                                     {% for city in cities %}
                                         <li><a href="#" name="{{ city.coord }}|{{ city.id }}">{{ city.title }}</a></li>
                                     {% endfor %}
@@ -55,9 +56,7 @@
                         <ul>
                             <li><a href="#" name="0">Все</a></li>
                             {% for operator in operators %}
-                                {% if op_curr.id != operator.id %}
-                                    <li><a href="#" name="{{ forloop.counter }}">{{ operator.title }}</a></li>
-                                {% endif %}
+                                <li><a href="#" name="{{ forloop.counter }}">{{ operator.title }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -68,16 +67,15 @@
                         <div class="select_curr">Тип модема<div></div></div>
                         <div class="select_drop">
                             <ul>
-                                {% comment %}{% for type in mtypes %}
-                                    <li><a href="#" name="{{ forloop.counter }}">{{ type.download_speed|floatformat }}</a></li>
-                                {% endfor %}{% endcomment %}
                                 {% for type in mtypes %}
-                                    {% if forloop.counter == 1 %}
                                     <li><a href="#" name="{{ forloop.counter }}">{{ type.download_speed|floatformat }}</a></li>
-                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         </div>
+                    </div>
+                {% else %}
+                    <div class="map_modem_select select">
+                        <div class="select_curr">Тип модема<div></div></div>
                     </div>
                 {% endif %}
                 <div class="map_fullscreen" title="Во весь экран"></div>
