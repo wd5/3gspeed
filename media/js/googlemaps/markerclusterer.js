@@ -157,7 +157,7 @@ ClusterIcon.prototype.onAdd = function () {
     points_set = points_set.join(',');
     var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","");
 
-    $.get('/load_balloon_content_cluster/', {points_set: points_set, op_title: curr_op}, function(data){
+    $.post('/load_balloon_content_cluster/', {points_set: points_set, op_title: curr_op}, function(data){
         var boxText = document.createElement("div");
         var contentString = data;
         boxText.innerHTML = contentString;
