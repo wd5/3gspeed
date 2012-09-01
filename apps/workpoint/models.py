@@ -131,6 +131,8 @@ class City(models.Model):
         return points_set
 
     def get_pts_count(self, operator=False, min=False, max=False):
+        if max != False and max == 3.5:
+            max = 40
         if operator:
             if min != False or max != False:
                 all_pts_count = 0
