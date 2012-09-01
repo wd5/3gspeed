@@ -193,8 +193,8 @@ load_balloon_content = LoadBalloonContent.as_view()
 class LoadBalloonContentCluster(View):
     def get(self, request, *args, **kwargs):
         if request.is_ajax():
-            points_set_ids = request.GET.get('points_set', None)
-            op_title = request.GET.get('op_title', None)
+            points_set_ids = self.request.GET.get('points_set', None)
+            op_title = self.request.GET.get('op_title', None)
             points_set = []
             for point_id in points_set_ids.split(','):
                 try:
@@ -208,7 +208,8 @@ class LoadBalloonContentCluster(View):
                 return HttpResponseBadRequest()
 
             operators_set = Operator.objects.published()
-            mtypes = ModemType.objects.values('download_speed').distinct().order_by('download_speed')
+            mtypes_all = ModemType.objects.all()
+            mtypes = mtypes_all.values('download_speed').distinct().order_by('download_speed')
             all_abilities = Ability.objects.all()
             meas_cnt = 0
             popup_values = dict()
@@ -218,16 +219,19 @@ class LoadBalloonContentCluster(View):
                 popup_values['main_tab'][operator.id] = {'summ': 0, 'cnt': 0}
                 for item in mtypes:
                     popup_values[operator.id][item['download_speed']] = {'summ': 0, 'cnt': 0}
+            modem_types_set = dict()
+            for mt in mtypes_all:
+                modem_types_set[mt.id] = mt.download_speed
 
             for point in curr_points:
                 speed_values_list = point.speedatpoint_all
                 meas_cnt += len(speed_values_list) # количество замеров в класдете
                 for item in speed_values_list:
                     MBs = (item.internet_speed / convert_parameter) * 8
-                    popup_values['main_tab'][item.operator.id]['summ'] += MBs
-                    popup_values['main_tab'][item.operator.id]['cnt'] += 1
-                    popup_values[item.operator.id][item.modem_type.download_speed]['summ'] += MBs
-                    popup_values[item.operator.id][item.modem_type.download_speed]['cnt'] += 1
+                    popup_values['main_tab'][item.operator_id]['summ'] += MBs
+                    popup_values['main_tab'][item.operator_id]['cnt'] += 1
+                    popup_values[item.operator_id][modem_types_set[item.modem_type_id]]['summ'] += MBs
+                    popup_values[item.operator_id][modem_types_set[item.modem_type_id]]['cnt'] += 1
 
             max_val = 0
             for operator in operators_set:
