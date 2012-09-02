@@ -244,16 +244,16 @@ class LoadBalloonContentCluster(View):
                 speed_values_list = point.speedatpoint_all
                 meas_cnt += len(speed_values_list) # количество замеров в класдете
                 for item in speed_values_list:
-                    MBs = (item.internet_speed / convert_parameter) * 8
-                    popup_values['main_tab'][item.operator_id]['summ'] += MBs
+                    popup_values['main_tab'][item.operator_id]['summ'] += item.internet_speed
                     popup_values['main_tab'][item.operator_id]['cnt'] += 1
-                    popup_values[item.operator_id][modem_types_set[item.modem_type_id]]['summ'] += MBs
+                    popup_values[item.operator_id][modem_types_set[item.modem_type_id]]['summ'] += item.internet_speed
                     popup_values[item.operator_id][modem_types_set[item.modem_type_id]]['cnt'] += 1
 
             max_val = 0
             for operator in operators_set:
                 if popup_values['main_tab'][operator.id]['cnt'] != 0:
-                    MBs = popup_values['main_tab'][operator.id]['summ']/popup_values['main_tab'][operator.id]['cnt']
+                    AvgInternetSpeed = popup_values['main_tab'][operator.id]['summ']/popup_values['main_tab'][operator.id]['cnt']
+                    MBs = (AvgInternetSpeed / convert_parameter) * 8
                 else:
                     MBs = 0
                 if max_val < MBs:
@@ -271,6 +271,7 @@ class LoadBalloonContentCluster(View):
                     mdm_vals = dict()
                     if popup_values[operator.id][item['download_speed']]['cnt'] != 0:
                         mdm_t_avg_val = popup_values[operator.id][item['download_speed']]['summ']/popup_values[operator.id][item['download_speed']]['cnt']
+                        mdm_t_avg_val = (mdm_t_avg_val / convert_parameter) * 8
                     else:
                         mdm_t_avg_val = False
                     if mdm_t_avg_val:

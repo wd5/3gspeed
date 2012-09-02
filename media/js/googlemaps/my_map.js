@@ -266,8 +266,6 @@ $(function(){
                         });
 
                         // удалим старые точки и вытащим точки к городу
-                        markerCluster.clearMarkers();
-                        pointsSet = [];
                         getJSONPoints(curr_city_id);
                         }
 
@@ -284,6 +282,10 @@ $(function(){
             });
 
     function getJSONPoints(id_city){
+        if (markerCluster){
+            markerCluster.clearMarkers();
+            pointsSet = [];
+        }
         var url = '/get_points_json/';
         if (id_city){
             url += '?city_id=' + id_city;
@@ -593,19 +595,20 @@ $(function(){
                 if (search_text.length > 0) {
                     var curr_city =  $('div.map_city_select div.select_curr').html().replace("<div></div>","");
                     search_text = curr_city + ', ' + search_text;
-                    console.log(search_text);
                     geocoder = new google.maps.Geocoder();
                     geocoder.geocode( { 'address': search_text}, function(results, status) {
-                      if (status == google.maps.GeocoderStatus.OK) {
-                        if (searchMarker) {
+                      console.log(curr_city, results[0].address_components[2].long_name);
+                      if ((status == google.maps.GeocoderStatus.OK) && (curr_city==results[0].address_components[2].long_name)) {
+                        /*if (searchMarker) {
                             searchMarker.setMap(null);
-                        }
+                        }*/
                         map.setCenter(results[0].geometry.location);
-                        $('.search_input').val(results[0].formatted_address);
-                        searchMarker = new google.maps.Marker({
+                        map.setZoom(15);
+                          $('.search_input').val(results[0].formatted_address);
+                        /*searchMarker = new google.maps.Marker({
                             map: map,
                             position: results[0].geometry.location
-                        });
+                        });*/
                       }
                     });
                 }
