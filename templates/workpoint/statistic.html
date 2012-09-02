@@ -38,21 +38,21 @@
 
             <div class="select stat_distinct">
                 {% if distincts != False %}
-                <div class="select_curr" name="0">Улица<div></div></div>
+                {% comment %}<div class="select_curr" name="0">Улица<div></div></div>
                 <div class="select_drop">
                     <ul>
                         {% for distinct in distincts %}
                             <li><a href="#" name="{{ distinct.id }}">{{ distinct.title|truncatewords:2 }}</a></li>
                         {% endfor %}
                     </ul>
-                </div>
-                {% comment %} ГОТОВО!
+                </div>{% endcomment %}
                 <select class="combobox">
                     <option value="" selected="selected">---------</option>
+                    <option value="0">Все улицы</option>
                     {% for distinct in distincts %}
                         <option value="{{ distinct.id }}">{{ distinct.title }}</option>
                     {% endfor %}
-                </select>{% endcomment %}
+                </select>
                 {% endif %}
             </div>
             {% if curr_city_avg_speed %}

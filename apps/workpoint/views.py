@@ -70,7 +70,8 @@ class LoadCityDistincts(View):
             distincts_set = Distinct.objects.published().filter(id__in=id_distincts).order_by('title')
             html_code = u''
             for distinct in distincts_set:
-                html_code = u'%s<li><a href="#" name="%s">%s</a></li>' % ( html_code, distinct.id, distinct.title[:30]) # todo: Режу название улицы до 30 символов
+                #html_code = u'%s<li><a href="#" name="%s">%s</a></li>' % ( html_code, distinct.id, distinct.title)
+                html_code = u'%s<option value="%s">%s</option>' % ( html_code, distinct.id, distinct.title)
             return HttpResponse(html_code)
         else:
             return HttpResponseBadRequest()
