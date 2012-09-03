@@ -19,7 +19,6 @@ INSTALLED_APPS += (
     #'apps.faq',
     'apps.newsboard',
     'apps.workpoint',
-    'apps.workpoint',
     'apps.utils.items_loader',
 
     'sorl.thumbnail',
