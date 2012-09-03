@@ -10,7 +10,7 @@ $(function(){
                     .addClass( "ui-combobox" )
                     .insertAfter( select );
 
-            input = $( "<input>" )
+            input = $( "<input placeholder='Все улицы'>" )
                 .appendTo( wrapper )
                 .val( value )
                 .addClass( "ui-state-default ui-combobox-input" )
@@ -151,6 +151,13 @@ $(function(){
             });
          } // selected
       });
+
+    $("input.ui-autocomplete-input").live('click', function(){
+        if ($("input.ui-autocomplete-input").val()=='Все улицы'){
+            $("input.ui-autocomplete-input").val('');
+        }
+        $("a.ui-combobox-toggle").click();
+    });
 
 
     $(".select_drop li a").live('click', function(){
