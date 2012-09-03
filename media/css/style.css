@@ -464,6 +464,37 @@ input, textarea {
 	height: 31px;
 	margin-left: 10px;
 }
+
+.ui-combobox {
+	position: relative;
+}
+input.ui-autocomplete-input {
+	text-align: left;
+	background: none;
+	font-size: 13px;
+	font-weight: normal;
+	outline: none;
+	border: none;
+	display: inline-block;
+	vertical-align: top;
+	height: 30px;
+	width: 150px;
+	padding: 1px 30px 0 12px;
+	position
+}
+.ui-combobox-toggle {
+	cursor: pointer;
+	background: url('../img/select_arr.png') no-repeat 0 0;
+	width: 12px;
+	height: 12px;
+	position: absolute;
+	top: 10px;
+	right: 12px;
+}
+ul.ui-autocomplete a {
+	color: #004358;
+	font-size: 13px;
+}
 /*map_ctrls*/
 
 
