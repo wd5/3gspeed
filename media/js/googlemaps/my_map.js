@@ -598,10 +598,12 @@ $(function(){
                     geocoder = new google.maps.Geocoder();
                     geocoder.geocode( { 'address': search_text}, function(results, status) {
                       console.log(curr_city, results[0].address_components[2].long_name);
-                      if ((status == google.maps.GeocoderStatus.OK) && (curr_city==results[0].address_components[2].long_name)) {
+                      if ((status == google.maps.GeocoderStatus.OK) && ((curr_city==results[0].address_components[1].long_name) || (curr_city==results[0].address_components[2].long_name) || (curr_city==results[0].address_components[3].long_name)) ) {
                         /*if (searchMarker) {
                             searchMarker.setMap(null);
                         }*/
+                        if(infowindow)
+                            {infowindow.close();}
                         map.setCenter(results[0].geometry.location);
                         map.setZoom(15);
                           $('.search_input').val(results[0].formatted_address);
@@ -624,6 +626,11 @@ $(function(){
     } else {
         getJSONPoints();
     }
+
+    google.maps.event.addListener(map, 'zoom_changed', function() {
+        if(infowindow)
+            {infowindow.close();}
+    });
 
             function GetIconImg(ability_icon_url){
                 var image = new google.maps.MarkerImage(ability_icon_url,
