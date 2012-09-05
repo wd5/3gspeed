@@ -16,9 +16,9 @@ $(function(){
                 .addClass( "ui-state-default ui-combobox-input" )
                 .autocomplete({
                     delay: 0,
-                    minLength: 3,
+                    minLength: 0,
                     source: function( request, response ) {
-                        var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+                        var matcher = new RegExp( ("^" + $.ui.autocomplete.escapeRegex(request.term) + "| " + $.ui.autocomplete.escapeRegex(request.term)), "i" );
                         response( select.children( "option" ).map(function() {
                             var text = $( this ).text();
                             if ( this.value && ( !request.term || matcher.test(text) ) )
@@ -60,7 +60,7 @@ $(function(){
                         }
                     }
                 })
-                .addClass( "ui-widget ui-widget-content ui-corner-left" );
+                .addClass("ui-widget ui-widget-content ui-corner-left");
 
             input.data( "autocomplete" )._renderItem = function( ul, item ) {
                 return $( "<li></li>" )
@@ -110,7 +110,7 @@ $(function(){
         }
     });
 
-
+    console.log("!");
 
     $(".combobox").combobox({
         selected: function(event, ui) {
@@ -154,8 +154,9 @@ $(function(){
          } // selected
     });
 
-
-
+/*    $('input.ui-autocomplete-input').keyup(function() {
+        console.log($("input.ui-autocomplete-input").val());
+    });*/
 
     $("input.ui-autocomplete-input").live('click', function(){
         if ($("input.ui-autocomplete-input").val()=='Все улицы'){
@@ -185,7 +186,6 @@ $(function(){
         parent.toggleClass("select_dropped");
 
         var values = parent.find('a');
-        console.log(values);
         for (var j=0; j<=values.length-2; j++) {
             for (var i=0; i<=values.length-1-j; i++) {
                 var bufATTR;
