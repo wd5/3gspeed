@@ -16,7 +16,7 @@ $(function(){
                 .addClass( "ui-state-default ui-combobox-input" )
                 .autocomplete({
                     delay: 0,
-                    minLength: 0,
+                    minLength: 3,
                     source: function( request, response ) {
                         var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
                         response( select.children( "option" ).map(function() {
@@ -110,8 +110,10 @@ $(function(){
         }
     });
 
+
+
     $(".combobox").combobox({
-         selected: function(event, ui) {
+        selected: function(event, ui) {
             var id_city = $('div.stat_city .select_curr').attr('name');
             var id_distinct = ui.item.value;
 
@@ -150,7 +152,10 @@ $(function(){
                 }
             });
          } // selected
-      });
+    });
+
+
+
 
     $("input.ui-autocomplete-input").live('click', function(){
         if ($("input.ui-autocomplete-input").val()=='Все улицы'){

@@ -150,7 +150,7 @@ input, textarea {
 	height: 30px;
 }
 .search_input {
-	line-height: 30px;
+	line-height: 24px;
 	color: #eee;
 	border: none;
 	padding: 0px 10px 0 40px;
@@ -472,6 +472,7 @@ input.ui-autocomplete-input {
 	text-align: left;
 	background: none;
 	font-size: 13px;
+	line-height: 24px;
 	font-weight: normal;
 	outline: none;
 	border: none;
@@ -490,6 +491,18 @@ input.ui-autocomplete-input {
 	position: absolute;
 	top: 10px;
 	right: 12px;
+}
+ul.ui-menu {
+	background: #fafafa;
+	border-radius: 10px;
+	padding: 6px 0 1px 0;
+}
+ul.ui-menu li.ui-menu-item {
+	border-radius: 0;
+}
+ul.ui-menu .ui-menu-item a {
+	padding: 4px 12px 3px 12px;
+	line-height: 18px;
 }
 ul.ui-autocomplete a {
 	color: #004358;
@@ -1492,15 +1505,15 @@ background-position: 50% -50px;
 
 /*placeholder*/
 input::-webkit-input-placeholder {
-	font: italic 14px/30px Tahoma, Arial, Helvetica, sans-serif;
+	font: italic 14px/24px Tahoma, Arial, Helvetica, sans-serif;
 	color: #888;
 }
 input:-moz-placeholder {
-	font: italic 14px/30px Tahoma, Arial, Helvetica, sans-serif;
+	font: italic 14px/24px Tahoma, Arial, Helvetica, sans-serif;
 	color: #888;
 }
 input:placeholder {
-	font: italic 14px/30px Tahoma, Arial, Helvetica, sans-serif;
+	font: italic 14px/24px Tahoma, Arial, Helvetica, sans-serif;
 	color: #5a5a5a;
 }
 /*/placeholder*/
