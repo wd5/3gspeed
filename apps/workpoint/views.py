@@ -541,12 +541,17 @@ class LoadCityStatistics(View):
                     id_max = None
                     id_avg = None
                     city_mtypes = curr_distinct.get_mtypes()
+                    speed_at_pts_distinct = SpeedAtPoint.objects.filter(point__distinct__id=id_distinct)
                     if not city_mtypes:
                         return HttpResponseBadRequest()
                     city_mtypes_max_val_set = []
                     for item in city_mtypes:
                         city_mtypes_max_val_set.append({'type': '%s' % item['download_speed'], 'value': 0})
                     for operator in operators:
+
+                        speed_vals = speed_at_pts_distinct.filter(operator=operator.id).order_by('-internet_speed')[0]
+                        setattr(operator, 'point_id', speed_vals.point_id)
+
                         avg_value = curr_distinct.get_distinct_speed('avg', operator)
                         max_value = curr_distinct.get_distinct_speed('max', operator)
                         if max_avg < avg_value:
@@ -629,12 +634,18 @@ class LoadCityStatistics(View):
             id_max = None
             id_avg = None
             city_mtypes = city_curr.get_mtypes()
+            speed_at_pts_city = SpeedAtPoint.objects.filter(point__distinct__city__id=city_curr.id)
+
             if not city_mtypes:
                 return HttpResponseBadRequest()
             city_mtypes_max_val_set = []
             for item in city_mtypes:
                 city_mtypes_max_val_set.append({'type': '%s' % item['download_speed'], 'value': 0})
+
             for operator in operators:
+                speed_vals = speed_at_pts_city.filter(operator=operator.id).order_by('-internet_speed')[0]
+                setattr(operator, 'point_id', speed_vals.point_id)
+
                 avg_value = city_curr.get_city_speed('avg', operator)
                 max_value = city_curr.get_city_speed('max', operator)
                 if max_avg < avg_value:

@@ -1,4 +1,50 @@
 $(function(){
+    var HashSearch = new function () {
+       var params;
+
+       this.set = function (key, value) {
+          params[key] = value;
+          this.push();
+       };
+
+       this.remove = function (key, value) {
+          delete params[key];
+          this.push();
+       };
+
+
+       this.get = function (key, value) {
+           return params[key];
+       };
+
+       this.keyExists = function (key) {
+           return params.hasOwnProperty(key);
+       };
+
+       this.push= function () {
+           var hashBuilder = [], key, value;
+
+           for(key in params) if (params.hasOwnProperty(key)) {
+               key = escape(key), value = escape(params[key]); // escape(undefined) == "undefined"
+               hashBuilder.push(key + ( (value !== "undefined") ? '=' + value : "" ));
+           }
+
+           window.location.hash = hashBuilder.join("&");
+       };
+
+       (this.load = function () {
+           params = {}
+           var hashStr = window.location.hash, hashArray, keyVal
+           hashStr = hashStr.substring(1, hashStr.length);
+           hashArray = hashStr.split('&');
+
+           for(var i = 0; i < hashArray.length; i++) {
+               keyVal = hashArray[i].split('=');
+               params[unescape(keyVal[0])] = (typeof keyVal[1] != "undefined") ? unescape(keyVal[1]) : keyVal[1];
+           }
+       })();
+    };
+
     $.widget("ui.combobox", {
         _create: function() {
             var input,
@@ -110,12 +156,12 @@ $(function(){
         }
     });
 
-    console.log("!");
-
     $(".combobox").combobox({
         selected: function(event, ui) {
             var id_city = $('div.stat_city .select_curr').attr('name');
             var id_distinct = ui.item.value;
+            HashSearch.set('city_id', id_city);
+            HashSearch.set('street_id', id_distinct);
 
             // подгружаем среднюю скорость
             $.ajax({
@@ -151,12 +197,84 @@ $(function(){
                     $('div.stats_block').replaceWith('<div class="stats_block"><div class="h_line"><h2>Нет статистики по данному городу</h2></div></div>')
                 }
             });
-         } // selected
+         }
     });
 
-/*    $('input.ui-autocomplete-input').keyup(function() {
-        console.log($("input.ui-autocomplete-input").val());
-    });*/
+    if ((HashSearch.keyExists("city_id")) && (!(HashSearch.keyExists("street_id")))){
+        var id_city = HashSearch.get("city_id");
+        $("input.ui-autocomplete-input").val('');
+        // подгружаем среднюю скорость
+            $.ajax({
+                url: "/load_city_avg_speed/",
+                data: {
+                    id_city:id_city
+                },
+                type: "POST",
+                success: function(data) {
+                    $('div.average').replaceWith(data)
+                },
+                error:function(jqXHR,textStatus,errorThrown) {
+                    $('div.average').replaceWith('<div class="average"><div class="average_arr"></div></div>')
+                }
+            });
+
+        // подгружаем статистику по городу
+            $.ajax({
+                url: "/load_city_stat/",
+                data: {
+                    id_city:id_city
+                },
+                type: "POST",
+                beforeSend: function(){
+                    $('div.stats_block').html("<div class='measurements_qty'><img style='position:relative;left: 50%;top: 50%;margin-top: -8px;margin-left: -110px;' src='/media/img/ajax-loader.gif' alt='' /></div>");
+                },
+                success: function(data) {
+                    $('div.stats_block').replaceWith(data)
+                },
+                error:function(jqXHR,textStatus,errorThrown) {
+                    $('div.stats_block').replaceWith('<div class="stats_block"><div class="h_line"><h2>Нет статистики по данному городу</h2></div></div>')
+                }
+            });
+    }
+    if ((HashSearch.keyExists("city_id")) && ((HashSearch.keyExists("street_id")))){
+        var id_city = HashSearch.get("city_id");
+        var id_distinct = HashSearch.get("street_id");
+        $("input.ui-autocomplete-input").val($('.combobox option[value='+id_distinct+']').html());
+        // подгружаем среднюю скорость
+        $.ajax({
+            url: "/load_city_avg_speed/",
+            data: {
+                id_city:id_city,
+                id_distinct:id_distinct
+            },
+            type: "POST",
+            success: function(data) {
+                $('div.average').replaceWith(data)
+            },
+            error:function(jqXHR,textStatus,errorThrown) {
+                $('div.average').replaceWith('<div class="average"><div class="average_arr"></div></div>')
+            }
+        });
+
+        // подгружаем статистику по району
+        $.ajax({
+            url: "/load_city_stat/",
+            data: {
+                id_city:id_city,
+                id_distinct:id_distinct
+            },
+            type: "POST",
+            beforeSend: function(){
+                $('div.stats_block').html("<div class='measurements_qty'><img style='position:relative;left: 50%;top: 50%;margin-top: -8px;margin-left: -110px;' src='/media/img/ajax-loader.gif' alt='' /></div>");
+            },
+            success: function(data) {
+                $('div.stats_block').replaceWith(data)
+            },
+            error:function(jqXHR,textStatus,errorThrown) {
+                $('div.stats_block').replaceWith('<div class="stats_block"><div class="h_line"><h2>Нет статистики по данному городу</h2></div></div>')
+            }
+        });
+    }
 
     $("input.ui-autocomplete-input").live('click', function(){
         if ($("input.ui-autocomplete-input").val()=='Все улицы'){
@@ -207,6 +325,9 @@ $(function(){
         var id_distinct = $('div.stat_distinct .select_curr').attr('name');
         if (parent.is('.stat_city'))
             {
+            HashSearch.set('city_id', id_city);
+            HashSearch.remove('street_id');
+
             // подгружаем районы города
                 $.ajax({
                     url: "/load_city_distincts/",
@@ -224,6 +345,7 @@ $(function(){
                     }
                 });
 
+            $("input.ui-autocomplete-input").val('');
             // подгружаем среднюю скорость
                 $.ajax({
                     url: "/load_city_avg_speed/",
