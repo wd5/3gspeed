@@ -386,7 +386,8 @@ $(function(){
                         {infowindow.close();}
                     $.get('/load_balloon_content/', {id_point: id_point, op_title: curr_op }, function(data){
                         var boxText = document.createElement("div");
-                        var contentString = data;
+                        //var contentString = data;
+                        var contentString = '<div class="map_popup_simple" style="position: absolute; left: 200px; bottom: 200px; width: 200px; height: 200px; background: #ccc;">Простой прямоугольник бэз никто. Все стили прямо тут, в хтмле. Крестик-закрывашку можно убрать.<div class="map_popup_close"></div></div><!--/map_popup_simple-->';
                         boxText.innerHTML = contentString;
 
                         var infobox_options = {
@@ -394,7 +395,7 @@ $(function(){
                             alignBottom: true,
                             disableAutoPan: false,
                             maxWidth: 0,
-                            pixelOffset: new google.maps.Size(-184, -40),
+                            pixelOffset: new google.maps.Size(-300, 150),
                             zIndex: 200,
                             boxStyle: {
                                opacity: 1

@@ -295,7 +295,7 @@ class LoadBalloonContentCluster(View):
                 curr_op = False
 
             popup_html = render_to_string(
-                'workpoint/point_popup.html',
+                'workpoint/cluster_popup.html',
                     {
                     'operators': operators_set,
                     'speed_values_cnt': meas_cnt,
@@ -308,6 +308,39 @@ class LoadBalloonContentCluster(View):
             return HttpResponseBadRequest(u'')
 
 load_balloon_content_cluster = LoadBalloonContentCluster.as_view()
+
+class LoadBalloonClusterCnt(View):
+    def post(self, request, *args, **kwargs):
+        if request.is_ajax():
+            points_set_ids = self.request.POST.get('points_set', None)
+            points_set = []
+            for point_id in points_set_ids.split(','):
+                try:
+                    points_set.append(int(point_id))
+                except:
+                    pass
+
+            try:
+                curr_points = Point.objects.filter(id__in=points_set).batch_select('speedatpoint')
+            except:
+                return HttpResponseBadRequest()
+
+            meas_cnt = 0
+            for point in curr_points:
+                speed_values_list = point.speedatpoint_all
+                meas_cnt += len(speed_values_list) # количество замеров в класдете
+
+            popup_html = render_to_string(
+                'workpoint/cluster_cnt_popup.html',
+                    {
+                    'speed_values_cnt': meas_cnt
+                })
+            popup_html = popup_html.replace('\n', ' ')
+            return HttpResponse(popup_html)
+        else:
+            return HttpResponseBadRequest(u'')
+
+load_balloon_cluster_cnt = LoadBalloonClusterCnt.as_view()
 
 class LoadPointMarker(View):
     def post(self, request, *args, **kwargs):

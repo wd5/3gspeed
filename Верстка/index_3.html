@@ -1,0 +1,377 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="media/css/style.css" rel="stylesheet" type="text/css" />
+<!--[if lte IE 8]><link rel="stylesheet" type="text/css" media="screen" href="media/css/ie.css" /><![endif]--> 
+<script type="text/javascript" src="media/js/jquery.js"></script>
+<script type="text/javascript" src="media/js/jquery-ui-1.8.21.custom.min.js"></script>
+<script type="text/javascript" src="media/js/script.js"></script>
+<title>3GSpeed</title>
+</head>
+
+<body>
+<div class="wrapper">
+
+<!--PAGE-->
+<div class="page">
+
+    <!--HEADER-->
+	<div class="header">
+	<div class="header_in">
+		<a id="logo_box" href="/" title="3GSpeed">
+			<img id="logo" src="media/img/logo.png" alt="3GSpeed" />
+			<span id="logo_note">Измеряем мобильный интернет</span>
+		</a>
+		
+		<div class="search">
+			<input class="search_input" type="text" placeholder="Поиск по адресу" />
+		</div>
+				
+		<div class="menu">
+			<ul>
+				<li><a href="#">О проекте</a></li>
+				<li><a href="#">Статистика</a></li>
+			</ul>
+		</div><!--/menu-->
+		
+		<div class=""></div>
+		
+		<div class="measure measure_active">Идут замеры</div>
+	</div>
+	</div>
+    <!--/HEADER-->
+
+
+    <!--MAIN-->
+	<div class="main">
+		<div class="index_map_out">
+			<div class="index_map">
+				<div class="map">
+					<div class="map_popup" style="position: absolute; left: 20px; bottom: 360px;">
+						<div class="map_popup_info">
+							<table class="map_popup_info_table">
+								<thead>
+									<tr>
+										<th class="map_popup_op curr"><img src="media/img/3gspeed.png" alt="" /></th>
+										<th class="map_popup_op"><img src="media/img/op_mts_zl.png" alt="" /> МТС</th>
+										<th class="map_popup_op"><img src="media/img/op_bee_zl.png" alt="" /> Билайн</th>
+										<th class="map_popup_op"><img src="media/img/op_meg_zl.png" alt="" /> Мегафон</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="map_popup_info_label">Средняя скорость, <div>Мбит/с</div></td>
+										<td class="map_popup_info_val"><div>2.1</div></td>
+										<td class="map_popup_info_val"><div>1.6</div></td>
+										<td class="map_popup_info_val"><div>2.4</div></td>
+									</tr>
+								</tbody>
+							</table>
+						</div><!--/map_popup_info-->
+						
+						<div class="map_popup_ics">
+							<span style="background-image: url('media/img/ic1.png')"></span>
+							<span style="background-image: url('media/img/ic2.png')"></span>
+							<span style="background-image: url('media/img/ic3.png')"></span>
+							<span style="background-image: url('media/img/ic4.png')"></span>
+							<span style="background-image: url('media/img/ic5.png')"></span>
+							<span style="background-image: url('media/img/ic6.png')"></span>
+							<span style="background-image: url('media/img/ic7.png')"></span>
+						</div>
+						
+						<div class="map_popup_close"></div>
+					</div><!--/map_popup-->
+					
+					<div class="map_popup" style="position: absolute; left: 600px; bottom: 280px;">
+						<div class="map_popup_info">
+							<table class="map_popup_info_table map_popup_info_table_1p">
+								<thead>
+									<tr>
+										<th class="map_popup_op map_popup_op_3gspeed"><img src="media/img/3gspeed_zs.png" alt="" /></th>
+										<th class="map_popup_op"><img src="media/img/op_mts_zl.png" alt="" /> МТС</th>
+										<th class="map_popup_op"><img src="media/img/op_bee_zl.png" alt="" /> Билайн</th>
+										<th class="map_popup_op"><img src="media/img/op_meg_zl.png" alt="" /> Мегафон</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="map_popup_info_label">Скорость, <div>Мбит/с</div></td>
+										<td class="map_popup_info_val"><div>2.1</div></td>
+										<td class="map_popup_info_val"><div>1.6</div></td>
+										<td class="map_popup_info_val"><div>2.4</div></td>
+									</tr>
+									<tr>
+										<td class="map_popup_info_label">Тип модема</td>
+										<td class="map_popup_info_type_val"><div>2.1</div></td>
+										<td class="map_popup_info_type_val"><div>1.6</div></td>
+										<td class="map_popup_info_type_val"><div>2.4</div></td>
+									</tr>
+								</tbody>
+							</table>
+						</div><!--/map_popup_info-->
+						
+						<div class="map_popup_ics">
+							<span style="background-image: url('media/img/ic1.png')"></span>
+							<span style="background-image: url('media/img/ic2.png')"></span>
+							<span style="background-image: url('media/img/ic3.png')"></span>
+							<span style="background-image: url('media/img/ic4.png')"></span>
+							<span style="background-image: url('media/img/ic5.png')"></span>
+							<span style="background-image: url('media/img/ic6.png')"></span>
+							<span style="background-image: url('media/img/ic7.png')"></span>
+						</div>
+						
+						<div class="map_popup_qty">22 сентября 2012</div>
+						
+						<div class="map_popup_close"></div>
+					</div><!--/map_popup-->
+					
+					<div class="map_popup" style="position: absolute; left: 200px; bottom: 120px;">
+						<div class="map_popup_info">
+							<table class="map_popup_info_table">
+								<thead>
+									<tr>
+										<th class="map_popup_op"><img src="media/img/3gspeed.png" alt="" /></th>
+										<th class="map_popup_op curr"><img src="media/img/op_mts_zl.png" alt="" /> МТС</th>
+										<th class="map_popup_op"><img src="media/img/op_bee_zl.png" alt="" /> Билайн</th>
+										<th class="map_popup_op"><img src="media/img/op_meg_zl.png" alt="" /> Мегафон</th>
+									</tr>
+								</thead>
+							</table>
+							
+							<table class="map_popup_info_detail">
+								<tbody>
+									<tr>
+										<td class="map_popup_counter" rowspan="2">
+											<div class="counter">
+												<div class="counter_val">4.5</div>
+												<div class="counter_glass"></div>
+											</div>
+										</td>
+										<td class="map_popup_info_detail_type_h">тип модема</td>
+										<td class="map_popup_info_detail_type">7.2</td>
+										<td class="map_popup_info_detail_type">14.4</td>
+										<td class="map_popup_info_detail_type">21.6</td>
+										<td class="map_popup_info_detail_type">28.8</td>
+									</tr>
+									<tr>
+										<td class="map_popup_info_detail_speed_h">Мбит/с</td>
+										<td class="map_popup_info_detail_speed">0.8</td>
+										<td class="map_popup_info_detail_speed">1.2</td>
+										<td class="map_popup_info_detail_speed">1.4</td>
+										<td class="map_popup_info_detail_speed">1.6</td>
+									</tr>
+								</tbody>
+							</table>
+						</div><!--/map_popup_info-->
+						
+						<div class="map_popup_ics">
+							<span style="background-image: url('media/img/ic1.png')"></span>
+							<span style="background-image: url('media/img/ic2.png')"></span>
+							<span style="background-image: url('media/img/ic3.png')"></span>
+							<span style="background-image: url('media/img/ic4.png')"></span>
+							<span style="background-image: url('media/img/ic5.png')"></span>
+							<span style="background-image: url('media/img/ic6.png')"></span>
+							<span style="background-image: url('media/img/ic7.png')"></span>
+						</div>
+						
+						<div class="map_popup_close"></div>
+						<div class="map_popup_b"></div>
+					</div><!--/map_popup-->
+					
+					<div class="cluster_popup" style="position: absolute; top: 300px; left: 50px;"><div>2352</div> замеров</div>
+				</div><!--/map-->
+				
+				<div class="map_ctrls">
+					<div class="map_city_select select">
+						<div class="select_curr">Санкт-Петербург<div></div></div>
+						<div class="select_drop">
+							<ul>
+								<li><a href="#">Москва</a></li>
+								<li><a href="#">Нижний Новгород</a></li>
+								<li><a href="#">Чита</a></li>
+								<li><a href="#">Комсомольск-на-Амуре</a></li>
+								<li><a href="#">Нижний Новгород</a></li>
+								<li><a href="#">Чита</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="map_op_select select">
+						<div class="select_curr">Оператор<div></div></div>
+						<div class="select_drop">
+							<ul>
+								<li><a href="#">Все</a></li>
+								<li><a href="#">Билайн</a></li>
+								<li><a href="#">МТС</a></li>
+								<li><a href="#">Мегафон</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="map_modem_select select">
+						<div class="select_curr">Тип модема<div></div></div>
+						<div class="select_drop">
+							<ul>
+								<li><a href="#">7,2</a></li>
+								<li><a href="#">14,4</a></li>
+								<li><a href="#">21,6</a></li>
+								<li><a href="#">28,8</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="map_fullscreen" title="Во весь экран"></div>
+				</div><!--/map_ctrls-->
+				
+				
+				<div class="map_filter">
+					<div class="map_filter_in">
+						<div class="map_slider_ics">
+							<span class="map_slider_ic1" title="Почта" style="background-image: url('media/img/ic1.png')"></span>
+							<span class="map_slider_ic2 map_slider_active" title="Мессенджеры" style="background-image: url('media/img/ic2.png')"></span>
+							<span class="map_slider_ic3 map_slider_active" title="Социальные сети" style="background-image: url('media/img/ic3.png')"></span>
+							<span class="map_slider_ic4 map_slider_active" title="Звонки" style="background-image: url('media/img/ic4.png')"></span>
+							<span class="map_slider_ic5" title="Видеозвонки" style="background-image: url('media/img/ic5.png')"></span>
+							<span class="map_slider_ic6" title="Видео" style="background-image: url('media/img/ic6.png')"></span>
+							<span class="map_slider_ic7" title="HD-видео" style="background-image: url('media/img/ic7.png')"></span>
+						</div><!--/map_slider_ics-->
+						
+						<div id="map_slider">
+						</div>
+						
+						<div class="map_slider_scale">
+							<ul>
+								<li>0</li>
+								<li>0.2</li>
+								<li>0.4</li>
+								<li>0.6</li>
+								<li>0.8</li>
+								<li>1.0</li>
+								<li>1.2</li>
+								<li>1.4</li>
+								<li>1.6</li>
+								<li>1.8</li>
+								<li>2.0</li>
+								<li>2.2</li>
+								<li>2.4</li>
+								<li>2.6</li>
+								<li>2.8</li>
+								<li>3.0</li>
+								<li class="map_slider_scale_last">(Мбит/с)</li>
+							</ul>
+						</div><!--/map_slider_scale-->
+					</div><!--/map_filter_in-->
+				
+					<div class="filter_toggle filter_toggle_hide"></div>
+					<!--<div class="filter_toggle filter_toggle_show"></div>-->
+				</div><!--/map_filter-->
+			</div><!--/index_map-->
+		</div><!--/index_map_out-->
+		
+		
+		<div class="main_in">
+			<div class="index_calcs">
+				<div class="index_calcs_in">
+					<div class="index_calc col">
+						<h2>Средняя скорость&nbsp;3G</h2>
+						<div class="bar_line bar_line_active">
+							<div class="bar_logo"><img src="media/img/op_mts_zm.png" alt="" /></div>
+							<div class="bar1 bar1_mts" style="width: 140px;"></div>
+							<div class="bar_val">1.9 <div>Мбит/с</div></div>
+						</div>
+						<div class="bar_line bar_line_inactive">
+							<div class="bar_logo"><img src="media/img/op_meg_zl.png" alt="" /></div>
+							<div class="bar1 bar1_meg" style="width: 118px;"></div>
+							<div class="bar_val">1.9 <div>Мбит/с</div></div>
+						</div>
+						<div class="bar_line bar_line_inactive">
+							<div class="bar_logo"><img src="media/img/op_bee_zl.png" alt="" /></div>
+							<div class="bar1 bar1_bee" style="width: 90px;"></div>
+							<div class="bar_val">1.9 <div>Мбит/с</div></div>
+						</div>
+					</div>
+					<div class="index_calc col">
+						<h2>Максимальная скорость&nbsp;3G</h2>
+						<div class="bar_line bar_line_inactive">
+							<div class="bar_logo"><img src="media/img/op_mts_zm.png" alt="" /></div>
+							<div class="bar2 bar2_mts" style="width: 123px;"></div>
+							<div class="bar_val">1.9 <div>Мбит/с</div></div>
+						</div>
+						<div class="bar_line bar_line_active">
+							<div class="bar_logo"><img src="media/img/op_meg_zl.png" alt="" /></div>
+							<div class="bar2 bar2_meg" style="width: 140px;"></div>
+							<div class="bar_val">1.9 <div>Мбит/с</div></div>
+						</div>
+						<div class="bar_line bar_line_inactive">
+							<div class="bar_logo"><img src="media/img/op_bee_zl.png" alt="" /></div>
+							<div class="bar2 bar2_bee" style="width: 104px;"></div>
+							<div class="bar_val">1.9 <div>Мбит/с</div></div>
+						</div>
+					</div>
+					<div class="index_calc col">
+						<h2>Количество замеров</h2>
+						<div class="measure_qty">1 345 346</div>
+						<div class="measure_label">замеров скорости интернета в Санкт-Петербурге </div>
+						<div class="measure_all"><a href="#">Вся статистика</a></div>
+					</div>
+				</div>
+			</div><!--/index_calcs-->
+			
+			<div class="index_news col">
+				<h2>Последние новости</h2>
+				<div class="index_new">
+					<div class="index_new_date">15 июля, воскресенье</div>
+					<h3><a href="#">Виталий Юрский рассказал нам о сети 4G</a></h3>
+					<div class="index_new_short"><p>Мобильный интернет должен быть быстрым. Быстрым настолько, что фильмы не тормозят при просмотре онлайн, а страницы загружаются мгновенно.</p></div>
+				</div>
+				<div class="index_new">
+					<div class="index_new_date">15 июля, воскресенье</div>
+					<h3><a href="#">Виталий Юрский рассказал нам о сети 4G</a></h3>
+					<div class="index_new_short"><p>Мобильный интернет должен быть быстрым. Быстрым настолько, что фильмы не тормозят при просмотре онлайн, а страницы загружаются мгновенно.</p></div>
+				</div>
+				<div class="index_new">
+					<div class="index_new_date">15 июля, воскресенье</div>
+					<h3><a href="#">Виталий Юрский рассказал нам о сети 4G</a></h3>
+					<div class="index_new_short"><p>Мобильный интернет должен быть быстрым. Быстрым настолько, что фильмы не тормозят при просмотре онлайн, а страницы загружаются мгновенно.</p></div>
+				</div>
+				<div class="index_news_more"><a href="#">Больше новостей</a></div>
+			</div><!--/index_news-->
+			
+			<div class="short_about col">
+				<h2>Коротко о нашем проекте</h2>
+				<div class="text">
+					<p>Служба Яндекс.Рефераты предназначена для студентов и школьников, дизайнеров и журналистов, создателей научных заявок и отчетов — для всех, кто относится к тексту, как к количеству знаков.</p>					<p>Нажав на кнопку «Написать реферат» вы лично создаете уникальный текст, причем именно от вашего нажатия на кнопку зависит, какой именно текст получится — таким образом, авторские права на реферат принадлежат только вам.</p>					<p>Служба Яндекс.Рефераты предназначена для студентов и школьников, дизайнеров и журналистов, создателей научных заявок и отчетов — для всех, кто относится к тексту, как к количеству знаков.					</p>					<p><a href="#">Узнать больше</a></p>
+				</div>
+			</div>
+		</div><!--/main_in-->
+	</div>
+    <!--/MAIN-->
+	
+	
+    <!--FOOTER-->
+    <div class="footer">
+    <div class="footer_in">
+		<div id="copyright">© 2012 3GSpeed</div>
+
+		<div class="footer_soc">
+			Ищите нас в —
+			<a href="#"><img src="media/img/t.png" alt="t" /></a>
+			<a href="#"><img src="media/img/fb.png" alt="f" /></a>
+		</div>
+		
+		<div class="footer_menu">
+			<ul>
+				<li><img src="media/img/ic_about.png" alt="" /><a href="#">О проекте</a></li>
+				<li><img src="media/img/ic_stat.png" alt="" /><a href="#">Статистика</a></li>
+			</ul>
+		</div><!--/footer_menu-->
+		
+		<a id="madein" title="Разработка сайта — студия OctoberWeb" href="http://octoberweb.ru/"><img id="octoberweb" alt="Разработка сайта — студия OctoberWeb" src="media/img/octoberweb.png" width="32" height="32"/>разработка сайта <span>OctoberWeb</span></a>
+    </div>
+    </div>
+    <!--/FOOTER-->
+    
+</div>
+<!--/PAGE-->
+
+</div><!--/wrapper-->
+</body>
+</html>

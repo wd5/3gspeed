@@ -1,96 +1,44 @@
-{% load thumbnail pytils_numeral %}
+{% load pytils_numeral %}
 <div class="map_popup">
-<div style="display: none;">{{ point.id }}</div>
-    <div class="tab op_all{% if curr_operator_id %} tab_hidden{% endif %}">
-        <div class="map_popup_info">
-            <table class="map_popup_info_table">
-                <thead>
-                    <tr>
-                        <th class="curr map_popup_op map_popup_op_3gspeed"><div><img src="/media/img/3gspeed.png" alt="op_all" /></div></th>
-                        {% for operator in operators %}
-                            <th class="map_popup_op">
-                                <div>
-                                    <img src="{{ operator.icon.url }}" width="35px" height="35px" alt="op_{{ operator.id }}" />
-                                </div> {{ operator.title }}
-                            </th>
+    <div style="display: none;">{{ point.id }}</div>
+	<div class="map_popup_info">
+		<table class="map_popup_info_table map_popup_info_table_1p">
+			<thead>
+				<tr>
+					<th class="map_popup_op map_popup_op_3gspeed"><img src="/media/img/3gspeed_zs.png" alt="" /></th>
+                    {% for operator in operators %}
+                        <th class="map_popup_op"><img src="{{ operator.icon.url }}" width="35px" height="35px" alt="op_{{ operator.id }}" /> {{ operator.title }}</th>
+                    {% endfor %}
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="map_popup_info_label">Скорость, <div>Мбит/с</div></td>
+                    {% for operator in operators %}
+                        <td class="map_popup_info_val"><div>{{ operator.avg_speed }}</div></td>
+                    {% endfor %}
+				</tr>
+				<tr>
+					<td class="map_popup_info_label">Тип модема</td>
+                    {% for operator in operators %}
+                        {% for pt_speed in operator.point_spd_set %}
+                            {% if forloop.first %}
+                                <td class="map_popup_info_type_val"><di>{{ pt_speed.modem_type__download_speed }}</div></td>
+                            {% endif %}
                         {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="map_popup_info_label">Средняя скорость, <div>Мбит/с</div></td>
-                        {% for operator in operators %}
-                            <td class="map_popup_info_val">{{ operator.avg_speed }}</td>
-                        {% endfor %}
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                    {% endfor %}
+				</tr>
+			</tbody>
+		</table>
+	</div><!--/map_popup_info-->
 
-        <div class="map_popup_ics">
-            {% for ability in abilities %}
-                <span style="background-image: url('{{ ability.icon.url }}')"  title="{{ ability.title|title }}"></span>
-            {% endfor %}
-        </div>
+    <div class="map_popup_ics">
+        {% for ability in abilities %}
+            <span style="background-image: url('{{ ability.icon.url }}')"  title="{{ ability.title|title }}"></span>
+        {% endfor %}
     </div>
 
-    {% for operator in operators %}
-        <div class="{% if curr_operator_id != operator.id %}tab_hidden{% endif %} tab op_{{ operator.id }}" >
-            <div class="map_popup_info">
-                <table class="map_popup_info_table">
-                    <thead>
-                        <tr>
-                            <th class="map_popup_op map_popup_op_3gspeed"><div><img src="/media/img/3gspeed.png" alt="op_all" /></div></th>
-                            {% for item in operators %}
-                                <th class="{% if item.id == operator.id %}curr {% endif %}map_popup_op">
-                                    <div>
-                                        <img src="{{ item.icon.url }}" width="35px" height="35px" alt="op_{{ item.id }}" />
-                                    </div>
-                                </th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                </table>
+	<div class="map_popup_qty">{{ point.datetime_create|date:'j E Y' }}</div>
 
-                <table class="map_popup_info_detail">
-                    <thead>
-                        <tr>
-                            <th>Средняя скорость</th>
-                            <th>Тип модема</th>
-                            <th>Мбит/с</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td rowspan="4">
-                                <div class="counter">
-                                    <div class="counter_val">{{ operator.avg_speed }}</div>
-                                    <div class="counter_glass"></div>
-                                </div>
-                                <div>Мбит/с</div>
-                            </td>
-                        {% for pt_speed in operator.point_spd_set %}
-                            {% if not forloop.first %}
-                            <tr {% cycle 'class="row2"' '' %}>
-                            {% endif %}
-                                {% comment %}<td>{{ pt_speed.modem_type.get_download_speed_type }}</td>
-                                <td>{{ pt_speed.get_MBs }}</td>{% endcomment %}
-                                <td>{{ pt_speed.modem_type__download_speed }}</td>
-                                <td>{{ pt_speed.avgspeed }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="map_popup_ics">
-                {% for op_ability in operator.abilities %}
-                    <span style="background-image: url('{{ op_ability.icon.url }}')" title="{{ op_ability.title|title }}"></span>
-                {% endfor %}
-            </div>
-        </div>
-    {% endfor %}
-    {% comment %}<div class="map_popup_qty">{{ speed_values_cnt }} замер{{ speed_values_cnt|choose_plural:",а,ов" }}</div>{% endcomment %}
-    <div class="map_popup_close"></div>
-    <div class="map_popup_b"></div>
-</div>
+	<div class="map_popup_close"></div>
+</div><!--/map_popup-->

@@ -14,7 +14,7 @@
 	*display:inline;
 	*zoom:1;
 }
-..select_curr div {
+.select_curr div {
 	*position:relative;
 	*zoom:1;
 }

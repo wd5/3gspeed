@@ -13,3 +13,9 @@ $(function() {
 	});
 });
 
+$(function() {
+	$( ".map_fullscreen" ).click(function() {
+		$('body').toggleClass("fullscreen");
+	});
+});
+

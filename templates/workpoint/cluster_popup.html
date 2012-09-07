@@ -1,0 +1,82 @@
+{% load pytils_numeral %}
+<div class="map_popup">
+    <div class="tab op_all{% if curr_operator_id %} tab_hidden{% endif %}">
+        <div class="map_popup_info">
+            <table class="map_popup_info_table">
+                <thead>
+                    <tr>
+                        <th class="map_popup_op curr map_popup_op_3gspeed"><img src="/media/img/3gspeed.png" alt="op_all" /></th>
+                        {% for operator in operators %}
+                            <th class="map_popup_op"><img src="{{ operator.icon.url }}" width="35px" height="35px" alt="op_{{ operator.id }}" /> {{ operator.title }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="map_popup_info_label">Средняя скорость, <div>Мбит/с</div></td>
+                        {% for operator in operators %}
+                            <td class="map_popup_info_val"><div>{{ operator.avg_speed }}</div></td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="map_popup_ics">
+            {% for ability in abilities %}
+                <span style="background-image: url('{{ ability.icon.url }}')"  title="{{ ability.title|title }}"></span>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% for operator in operators %}
+        <div class="{% if curr_operator_id != operator.id %}tab_hidden{% endif %} tab op_{{ operator.id }}" >
+            <div class="map_popup_info">
+                <table class="map_popup_info_table">
+                    <thead>
+                        <tr>
+                            <th class="map_popup_op map_popup_op_3gspeed"><img src="/media/img/3gspeed.png" alt="op_all" /></th>
+                            {% for item in operators %}
+                                <th class="{% if item.id == operator.id %}curr {% endif %}map_popup_op">
+                                        <img src="{{ item.icon.url }}" width="35px" height="35px" alt="op_{{ item.id }}" /> {{ item.title }}
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                </table>
+
+                <table class="map_popup_info_detail">
+                    <tbody>
+                        <tr>
+                            <td class="map_popup_counter" rowspan="2">
+                                <div class="counter">
+                                    <div class="counter_val">{{ operator.avg_speed }}</div>
+                                    <div class="counter_glass"></div>
+                                </div>
+                            </td>
+                            <td class="map_popup_info_detail_type_h">тип модема</td>
+                            {% for pt_speed in operator.point_spd_set %}
+                                <td class="map_popup_info_detail_type">{{ pt_speed.modem_type__download_speed }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="map_popup_info_detail_speed_h">Мбит/с</td>
+                            {% for pt_speed in operator.point_spd_set %}
+                                <td class="map_popup_info_detail_speed">{{ pt_speed.avgspeed }}</td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="map_popup_ics">
+                {% for op_ability in operator.abilities %}
+                    <span style="background-image: url('{{ op_ability.icon.url }}')" title="{{ op_ability.title|title }}"></span>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="map_popup_close"></div>
+    <div class="map_popup_b"></div>
+</div>

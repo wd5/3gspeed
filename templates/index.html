@@ -16,7 +16,14 @@
         <script type="text/javascript" src="/media/js/jquery-ui-1.8.21.custom.min.js"></script>
         <script type="text/javascript" src="/media/js/googlemaps/markerclusterer.js"></script>
         <script type="text/javascript" src="/media/js/googlemaps/infobox.js"></script>
-        <script type="text/javascript" src="/media/js/googlemaps/my_map.js"></script>
+        {% if request.GET.test != '1' %}
+
+            <script type="text/javascript" src="/media/js/googlemaps/my_map.js"></script>
+        {% else %}
+            <script type="text/javascript" src="/media/js/googlemaps/my_map_test.js"></script>
+
+        {% endif %}
+
 
     {% else %}
         {#  YMaps  #}

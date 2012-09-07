@@ -143,13 +143,6 @@ ClusterIcon.prototype.onAdd = function () {
 		position: avgMarkerPosition
 	});
 
-/*	$("#historyBox *").hide();
-    var clusterWindow = createInfoWindow(avgMarker);
-	if(infowindow)
-		infowindow.close();
-	clusterWindow.open(map, avgMarker);
-	infowindow = clusterWindow;*/
-
     var points_set = [];
     for(var i= 0; i <= clusterMarkers.length-1; i++){
           points_set.push(clusterMarkers[i].point_id);
@@ -166,7 +159,7 @@ ClusterIcon.prototype.onAdd = function () {
           content: boxText,
           disableAutoPan: false,
           maxWidth: 0,
-          pixelOffset: new google.maps.Size(-184, -315),
+          pixelOffset: new google.maps.Size(-185, -270),
           zIndex: 200,
           boxStyle: {
              opacity: 1
@@ -182,7 +175,7 @@ ClusterIcon.prototype.onAdd = function () {
         if(infowindow)
             {infowindow.close();}
 
-        var bounds = mc.getMap().getBounds();
+/*        var bounds = mc.getMap().getBounds();
         var ne = bounds.getNorthEast();
         var sw = bounds.getSouthWest();
         delta = (ne.lat() - sw.lat()) / 5;
@@ -190,7 +183,7 @@ ClusterIcon.prototype.onAdd = function () {
         var latlng = new google.maps.LatLng(pos.lat() + delta, pos.lng());
           console.log(latlng);
           //mc.getMap().setCenter(avgMarkerPosition);
-        mc.getMap().panTo(latlng);
+        mc.getMap().panTo(latlng);*/
 
         infowindow = new InfoBox(infobox_options);
         infowindow.open(mc.getMap(), avgMarker);
@@ -260,6 +253,59 @@ ClusterIcon.prototype.onAdd = function () {
      * @event
      */
     google.maps.event.trigger(mc, "mouseover", cClusterIcon.cluster_);
+
+    // Open InfoWindow with average speed
+    var clusterMarkers = cClusterIcon.cluster_.getMarkers();
+    var avgMarkerPosition = clusterMarkers[0].getPosition();
+    var avgMarker = new google.maps.Marker({
+        position: avgMarkerPosition
+    });
+
+    var points_set = [];
+    for(var i= 0; i <= clusterMarkers.length-1; i++){
+          points_set.push(clusterMarkers[i].point_id);
+    }
+    points_set = points_set.join(',');
+      var curr_op = $('div.map_op_select div.select_curr').html().replace("<div></div>","");
+
+      $.post('/load_balloon_cluster_cnt/', {points_set: points_set, op_title: curr_op}, function(data){
+          var boxText = document.createElement("div");
+          var contentString = data;
+          boxText.innerHTML = contentString;
+
+          var infobox_options = {
+            content: boxText,
+            disableAutoPan: true,
+            maxWidth: 0,
+            pixelOffset: new google.maps.Size(-33, -78),
+            zIndex: 200,
+            boxStyle: {
+               opacity: 1
+            },
+            closeBoxMargin: "-13px -11px 0px 0px",
+            closeBoxURL: "",
+            infoBoxClearance: new google.maps.Size(1, 1),
+            isHidden: false,
+            pane: "floatPane",
+            enableEventPropagation: false
+          };
+
+          if(infowindowCnt)
+              {infowindowCnt.close();}
+
+/*          var bounds = mc.getMap().getBounds();
+          var ne = bounds.getNorthEast();
+          var sw = bounds.getSouthWest();
+          delta = (ne.lat() - sw.lat()) / 5;
+          pos = avgMarkerPosition;
+          var latlng = new google.maps.LatLng(pos.lat() + delta, pos.lng());
+            console.log(latlng);
+            //mc.getMap().setCenter(avgMarkerPosition);
+          mc.getMap().panTo(latlng);*/
+
+          infowindowCnt = new InfoBox(infobox_options);
+          infowindowCnt.open(mc.getMap(), avgMarker);
+        });
   });
 
   google.maps.event.addDomListener(this.div_, "mouseout", function () {
@@ -271,6 +317,8 @@ ClusterIcon.prototype.onAdd = function () {
      * @event
      */
     google.maps.event.trigger(mc, "mouseout", cClusterIcon.cluster_);
+      if(infowindowCnt)
+          {infowindowCnt.close();}
   });
 };
 
