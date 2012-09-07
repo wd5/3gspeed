@@ -294,18 +294,14 @@ ClusterIcon.prototype.onAdd = function () {
         });
   });
 */
+/*
   google.maps.event.addDomListener(this.div_, "mouseout", function () {
     var mc = cClusterIcon.cluster_.getMarkerClusterer();
-    /**
-     * This event is fired when the mouse moves out of a cluster marker.
-     * @name MarkerClusterer#mouseout
-     * @param {Cluster} c The cluster that the mouse moved out of.
-     * @event
-     */
     google.maps.event.trigger(mc, "mouseout", cClusterIcon.cluster_);
       if(infowindowCnt)
           {infowindowCnt.close();}
   });
+*/
 };
 
 

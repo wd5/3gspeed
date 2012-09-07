@@ -392,7 +392,7 @@ $(function(){
                         var infobox_options = {
                             content: boxText,
                             alignBottom: true,
-                            disableAutoPan: false,
+                            disableAutoPan: true,
                             maxWidth: 0,
                             pixelOffset: new google.maps.Size(-184, -40),
                             zIndex: 200,
@@ -411,13 +411,13 @@ $(function(){
                         var ib = new InfoBox(infobox_options);
                         infowindow = ib;
 
-/*        var bounds = map.getBounds();
+        var bounds = map.getBounds();
         var ne = bounds.getNorthEast();
         var sw = bounds.getSouthWest();
         delta = (ne.lat() - sw.lat()) / 5;
         pos = placemark.getPosition();
         var latlng = new google.maps.LatLng(pos.lat() + delta, pos.lng());
-        map.panTo(latlng);*/
+        map.panTo(latlng);
 
 
                         ib.open(map, placemark);
