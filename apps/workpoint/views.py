@@ -325,15 +325,15 @@ class LoadBalloonClusterCnt(View):
             except:
                 return HttpResponseBadRequest()
 
-            meas_cnt = 0
-            for point in curr_points:
-                speed_values_list = point.speedatpoint_all
-                meas_cnt += len(speed_values_list) # количество замеров в класдете
+#            meas_cnt = 0
+#            for point in curr_points:
+#                speed_values_list = point.speedatpoint_all
+#                meas_cnt += len(speed_values_list) # количество замеров в класдете
 
             popup_html = render_to_string(
                 'workpoint/cluster_cnt_popup.html',
                     {
-                    'speed_values_cnt': meas_cnt
+                    'speed_values_cnt': curr_points.count()
                 })
             popup_html = popup_html.replace('\n', ' ')
             return HttpResponse(popup_html)

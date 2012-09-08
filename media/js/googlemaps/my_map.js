@@ -572,8 +572,8 @@ $(function(){
                 zoomOnClick: false,
                 styles: [{
                     url: '/media/img/cluster.png',
-                    height: 58,
-                    width: 58,
+                    height: 48,
+                    width: 48,
                     //anchor: [4, 0],
                     text: 'Times New Roman',
                     textColor: '#000',
@@ -627,6 +627,34 @@ $(function(){
     } else {
         getJSONPoints();
     }
+
+/*    rectangle = new google.maps.Rectangle();
+
+    google.maps.event.addListener(rectangle, "mouseover", function () {
+        console.log('1');
+    });*/
+
+    if(infowindowCnt){
+        google.maps.event.addListener(infowindowCnt, "mouseover", function () {
+            if(infowindowCnt)
+            {infowindowCnt.close();}
+        });
+    }
+
+
+/*    google.maps.event.addListener(map, 'bounds_changed', function() {
+        var rectOptions = {
+             strokeColor: "#FF0000",
+             strokeOpacity: 0,
+             strokeWeight: 2,
+             fillColor: "#FF0000",
+             fillOpacity: 0.3,
+             zIndex:1,
+             map: map,
+             bounds: map.getBounds()
+           };
+        rectangle.setOptions(rectOptions);
+    });*/
 
     google.maps.event.addListener(map, 'zoom_changed', function() {
         if(infowindow)

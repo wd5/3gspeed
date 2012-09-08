@@ -159,7 +159,7 @@ ClusterIcon.prototype.onAdd = function () {
           content: boxText,
           disableAutoPan: true,
           maxWidth: 0,
-          pixelOffset: new google.maps.Size(-185, -270),
+          pixelOffset: new google.maps.Size(-185, -265),
           zIndex: 200,
           boxStyle: {
              opacity: 1
@@ -244,7 +244,7 @@ ClusterIcon.prototype.onAdd = function () {
     }
   });
 
-/*
+
   google.maps.event.addDomListener(this.div_, "mouseover", function () {
     var mc = cClusterIcon.cluster_.getMarkerClusterer();
 
@@ -273,7 +273,7 @@ ClusterIcon.prototype.onAdd = function () {
             content: boxText,
             disableAutoPan: true,
             maxWidth: 0,
-            pixelOffset: new google.maps.Size(-33, -78),
+            pixelOffset: new google.maps.Size(-33, -74),
             zIndex: 200,
             boxStyle: {
                opacity: 1
@@ -293,7 +293,7 @@ ClusterIcon.prototype.onAdd = function () {
           infowindowCnt.open(mc.getMap(), avgMarker);
         });
   });
-*/
+
   google.maps.event.addDomListener(this.div_, "mouseout", function () {
     var mc = cClusterIcon.cluster_.getMarkerClusterer();
     /**
