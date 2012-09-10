@@ -156,26 +156,31 @@ ClusterIcon.prototype.onAdd = function () {
         boxText.innerHTML = contentString;
 
         var infobox_options = {
-          content: boxText,
-          disableAutoPan: true,
-          maxWidth: 0,
-          pixelOffset: new google.maps.Size(-185, -265),
-          zIndex: 200,
-          boxStyle: {
-             opacity: 1
-          },
-          closeBoxMargin: "-13px -11px 0px 0px",
-          closeBoxURL: "",
-          infoBoxClearance: new google.maps.Size(1, 1),
-          isHidden: false,
-          pane: "floatPane",
-          enableEventPropagation: false
+            content: boxText,
+            alignBottom: true,
+            disableAutoPan: false,
+            maxWidth: 366,
+            pixelOffset: new google.maps.Size(-183, -25),
+            zIndex: 200,
+            boxStyle: {
+               opacity: 1,
+               height: 239,
+               width: 366
+            },
+            closeBoxMargin: "-13px -11px 0px 0px",
+            closeBoxURL: "",
+            isHidden: false,
+            pane: "floatPane",
+            enableEventPropagation: false,
+            infoBoxClearance: new google.maps.Size(10, 70)
         };
 
         if(infowindow)
             {infowindow.close();}
+        if(infowindowCnt)
+            {infowindowCnt.close();}
 
-        var bounds = mc.getMap().getBounds();
+/*        var bounds = mc.getMap().getBounds();
         var ne = bounds.getNorthEast();
         var sw = bounds.getSouthWest();
         delta = (ne.lat() - sw.lat()) / 5;
@@ -183,7 +188,7 @@ ClusterIcon.prototype.onAdd = function () {
         var latlng = new google.maps.LatLng(pos.lat() + delta, pos.lng());
           console.log(latlng);
           //mc.getMap().setCenter(avgMarkerPosition);
-        mc.getMap().panTo(latlng);
+        mc.getMap().panTo(latlng);*/
 
         infowindow = new InfoBox(infobox_options);
         infowindow.open(mc.getMap(), avgMarker);

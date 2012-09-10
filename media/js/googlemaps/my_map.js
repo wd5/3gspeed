@@ -384,6 +384,8 @@ $(function(){
                     var id_point = placemark.point_id;
                     if(infowindow)
                         {infowindow.close();}
+                    if(infowindowCnt)
+                        {infowindowCnt.close();}
                     $.get('/load_balloon_content/', {id_point: id_point, op_title: curr_op }, function(data){
                         var boxText = document.createElement("div");
                         var contentString = data;
@@ -392,32 +394,33 @@ $(function(){
                         var infobox_options = {
                             content: boxText,
                             alignBottom: true,
-                            disableAutoPan: true,
-                            maxWidth: 0,
-                            pixelOffset: new google.maps.Size(-184, -40),
+                            disableAutoPan: false,
+                            maxWidth: 366,
+                            pixelOffset: new google.maps.Size(-183, -40),
                             zIndex: 200,
                             boxStyle: {
-                               opacity: 1
+                               opacity: 1,
+                               height: 239,
+                               width: 366
                             },
                             closeBoxMargin: "-13px -11px 0px 0px",
-                            //closeBoxURL: "/media/img/close.png",
                             closeBoxURL: "",
-                            infoBoxClearance: new google.maps.Size(1, 50),
                             isHidden: false,
                             pane: "floatPane",
-                            enableEventPropagation: false
+                            enableEventPropagation: false,
+                            infoBoxClearance: new google.maps.Size(10, 70)
                         };
 
                         var ib = new InfoBox(infobox_options);
                         infowindow = ib;
 
-        var bounds = map.getBounds();
+/*        var bounds = map.getBounds();
         var ne = bounds.getNorthEast();
         var sw = bounds.getSouthWest();
         delta = (ne.lat() - sw.lat()) / 5;
         pos = placemark.getPosition();
         var latlng = new google.maps.LatLng(pos.lat() + delta, pos.lng());
-        map.panTo(latlng);
+        map.panTo(latlng);*/
 
 
                         ib.open(map, placemark);
