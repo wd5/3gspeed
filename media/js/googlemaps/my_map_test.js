@@ -387,26 +387,27 @@ $(function(){
                     $.get('/load_balloon_content/', {id_point: id_point, op_title: curr_op }, function(data){
                         var boxText = document.createElement("div");
                         //var contentString = data;
-                        var contentString = '<div class="map_popup_simple" style="position: absolute; left: 200px; bottom: 200px; width: 200px; height: 200px; background: #ccc;">Простой прямоугольник бэз никто. Все стили прямо тут, в хтмле. Крестик-закрывашку можно убрать.<div class="map_popup_close"></div></div><!--/map_popup_simple-->';
+                        var contentString = '<div class="map_popup_simple" style="width: 366px; height: 239px; background: #ccc;">Простой прямоугольник бэз никто. Все стили прямо тут, в хтмле. Крестик-закрывашку можно убрать.<div class="map_popup_close"></div></div><!--/map_popup_simple-->';
                         boxText.innerHTML = contentString;
 
                         var infobox_options = {
                             content: boxText,
                             alignBottom: true,
                             disableAutoPan: false,
-                            maxWidth: 0,
-                            pixelOffset: new google.maps.Size(-300, 150),
+                            maxWidth: 366,
+                            pixelOffset: new google.maps.Size(-183, -50),
                             zIndex: 200,
                             boxStyle: {
-                               opacity: 1
+                               opacity: 1,
+                               height: 239,
+                               width: 366
                             },
                             closeBoxMargin: "-13px -11px 0px 0px",
-                            //closeBoxURL: "/media/img/close.png",
                             closeBoxURL: "",
-                            infoBoxClearance: new google.maps.Size(1, 50),
                             isHidden: false,
                             pane: "floatPane",
-                            enableEventPropagation: false
+                            enableEventPropagation: false,
+                            infoBoxClearance: new google.maps.Size(10, 70)
                         };
 
                         var ib = new InfoBox(infobox_options);

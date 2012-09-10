@@ -359,8 +359,9 @@ InfoBox.prototype.panBox_ = function (disablePan) {
 	  }
 	  if(mapWidth - pixPosition.x < 178)
 		xOffset = 178 - (mapWidth - pixPosition.x);
-	  if(pixPosition.y < 272)
-		yOffset = -(272 - pixPosition.y);
+	//вот тут я закоментировал две строки и пяня заработала как надо
+	//if(pixPosition.y < 272)
+	//	yOffset = -(272 - pixPosition.y);
 		
 	  if (!(xOffset === 0 && yOffset === 0)) {
 
