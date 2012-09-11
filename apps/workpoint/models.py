@@ -357,6 +357,7 @@ class Point(models.Model):
     objects = BatchManager()
 
     class Meta:
+        get_latest_by = 'datetime_create'
         ordering = ['-datetime_create']
         verbose_name = _(u'point')
         verbose_name_plural = _(u'points')

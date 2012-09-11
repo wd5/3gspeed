@@ -6,11 +6,13 @@ from apps.newsboard.views import news_detail, load_items_news_about
 from views import index, test, db_copy, points_list_json, points_list_json_test
 from django.views.decorators.cache import cache_page
 from apps.utils.items_loader.views import items_loader
+from apps.workpoint.management.commands.checkpoints import TestView
 #from apps.app.urls import urlpatterns as app_url
 
 
 urlpatterns = patterns('',
     url(r'^$',index, name='index'),
+    (r'^test_load/$',TestView.as_view()),
     (r'^load_items/$',csrf_exempt(items_loader)),
     (r'^load_items_news_about/$',csrf_exempt(load_items_news_about)),
     url(r'^get_points_json/$', points_list_json),
